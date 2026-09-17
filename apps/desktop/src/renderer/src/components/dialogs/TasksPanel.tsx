@@ -66,7 +66,7 @@ export function TasksPanel() {
     }
   };
   return (
-    <aside className="fixed inset-y-0 end-0 z-40 flex w-96 flex-col border-s border-border bg-surface shadow-[var(--shadow)] animate-fade-in" data-testid="tasks-panel">
+    <aside className="fixed bottom-8 end-0 top-14 z-30 flex w-96 flex-col border-s border-border bg-surface shadow-[var(--shadow)] animate-fade-in" data-testid="tasks-panel">
       <div className="flex h-14 items-center justify-between border-b border-border px-4">
         <h2 className="text-sm font-semibold">{t('tasks.title')}</h2>
         <div className="flex items-center gap-1">

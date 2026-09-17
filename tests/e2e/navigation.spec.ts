@@ -33,6 +33,14 @@ test.describe('application shell', () => {
     await expect(page).toHaveURL(/#\/editor\//);
     await expect(page.getByTestId('topbar-project-name')).toHaveText('إعلان غسيل السيارات');
     await expect(page.getByTestId('editor-resolution')).toContainText('1080×1920');
+    await expect(page.locator('[data-action="nav.editor"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('[data-action="nav.home"]')).not.toHaveAttribute('aria-current', 'page');
+    await page.locator('[data-action="tasks.open"]').click();
+    await expect(page.getByTestId('tasks-panel')).toBeVisible();
+    await page.locator('[data-action="app.assistant"]').click();
+    await expect(page.getByTestId('assistant-panel')).toBeVisible();
+    await page.locator('[data-action="tasks.close"]').click();
+    await page.locator('[data-action="assistant.close"]').click();
     await page.locator('[data-action="editor.addTrack.video"]').click();
     await expect(page.getByTestId('editor-track-row')).toHaveCount(4);
     await page.locator('[data-action="edit.undo"]').click();
