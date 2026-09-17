@@ -15,6 +15,8 @@ export interface EngineHost {
     openExternal(url: string): Promise<void>;
   };
   quit(): void;
+  /** Builds a URL the renderer can load for a local file (custom protocol in Electron, HTTP in browser mode). */
+  mediaUrl(path: string): string | null;
 }
 
 export const EXTERNAL_URL_ALLOWLIST = [

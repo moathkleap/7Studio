@@ -13,7 +13,7 @@ async function main(): Promise<void> {
   const userData = process.env.SEVENVID_USER_DATA ?? path.join(root, '.sevenvid-dev', 'userData');
   const resources = process.env.SEVENVID_RESOURCES ?? path.join(root, 'resources');
   const version = readVersion(root);
-  const engine = createEngine({ host: createBrowserHost({ appVersion: version, onQuit: () => shutdown() }), paths: { userData, resources }, logToConsole: process.env.SEVENVID_LOG_CONSOLE === '1' });
+  const engine = createEngine({ host: createBrowserHost({ appVersion: version, onQuit: () => shutdown(), mediaUrl: (p) => `http://127.0.0.1:${port}/media/${token}/${encodeURIComponent(p)}` }), paths: { userData, resources }, logToConsole: process.env.SEVENVID_LOG_CONSOLE === '1' });
   const bridge = await startDevBridge(engine, { port, token });
   await engine.start();
   const info = { port: bridge.port, token, url: bridge.url, userData };

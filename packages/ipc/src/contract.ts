@@ -20,6 +20,11 @@ import {
   TemplateInfoSchema,
   ExportInfoSchema,
   NetworkLogEntrySchema,
+  AssetInfoSchema,
+  AssetKindSchema,
+  PlaybackCapabilitiesSchema,
+  WaveformDataSchema,
+  ExportSettingsInputSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -100,6 +105,22 @@ export const channels = {
   'templates.saveFromProject': { input: z.object({ projectId: z.string(), name: z.string().min(1), category: z.string().optional() }), output: TemplateInfoSchema },
   'exports.list': { input: z.object({ projectId: z.string().optional(), limit: z.number().optional() }).optional(), output: z.array(ExportInfoSchema) },
   'network.recent': { input: z.object({ limit: z.number().optional() }).optional(), output: z.array(NetworkLogEntrySchema) },
+  'media.import': { input: z.object({ paths: z.array(z.string()).min(1), projectId: z.string().nullable() }), output: z.object({ assets: z.array(AssetInfoSchema), skipped: z.array(z.object({ path: z.string(), reason: z.enum(['not-found', 'unsupported', 'duplicate']) })) }) },
+  'media.list': { input: z.object({ projectId: z.string().nullable().optional(), includeLibrary: z.boolean().optional(), kind: z.union([AssetKindSchema, z.array(AssetKindSchema)]).optional(), favorite: z.boolean().optional(), query: z.string().optional() }).optional(), output: z.array(AssetInfoSchema) },
+  'media.get': { input: z.object({ assetId: z.string() }), output: AssetInfoSchema.nullable() },
+  'media.update': { input: z.object({ assetId: z.string(), patch: z.object({ name: z.string().optional(), tags: z.array(z.string()).optional(), favorite: z.boolean().optional() }) }), output: AssetInfoSchema },
+  'media.remove': { input: z.object({ assetId: z.string(), deleteCache: z.boolean().optional() }), output: z.object({ removed: z.boolean() }) },
+  'media.relink': { input: z.object({ assetId: z.string(), path: z.string() }), output: TaskInfoSchema },
+  'media.reanalyze': { input: z.object({ assetId: z.string() }), output: TaskInfoSchema },
+  'media.waveform': { input: z.object({ assetId: z.string() }), output: WaveformDataSchema.nullable() },
+  'media.url': { input: z.object({ path: z.string() }), output: z.object({ url: z.string().nullable() }) },
+  'media.setPlaybackCapabilities': { input: PlaybackCapabilitiesSchema, output: z.object({ ok: z.boolean() }) },
+  'media.addToTimeline': { input: z.object({ projectId: z.string(), assetId: z.string(), trackId: z.string().nullable().optional(), atMs: z.number().nullable().optional(), mode: z.enum(['overwrite', 'insert']).optional(), durationMs: z.number().nullable().optional() }), output: SessionStateSchema },
+  'export.start': { input: z.object({ projectId: z.string(), settings: ExportSettingsInputSchema, outputPath: z.string().nullable().optional(), fileName: z.string().nullable().optional() }), output: ExportInfoSchema },
+  'export.get': { input: z.object({ exportId: z.string() }), output: ExportInfoSchema.nullable() },
+  'export.encoders': { input: z.object({ verify: z.boolean().optional() }).optional(), output: z.object({ available: z.array(z.string()), hardware: z.array(z.string()), verified: z.record(z.string(), z.object({ ok: z.boolean(), error: z.string().nullable(), ms: z.number() })) }) },
+  'render.previewRange': { input: z.object({ projectId: z.string(), startMs: z.number(), endMs: z.number() }), output: TaskInfoSchema },
+  'render.extractFrame': { input: z.object({ projectId: z.string(), tMs: z.number() }), output: TaskInfoSchema },
 } as const;
 
 /** Push events from the engine to the UI. */
@@ -116,6 +137,8 @@ export const events = {
   'log': LogEntrySchema,
   'projects.changed': z.object({ projectId: z.string().nullable(), reason: z.string() }),
   'recovery.available': z.array(RecoveryInfoSchema),
+  'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
+  'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
 } as const;
 
 export type ChannelMap = typeof channels;

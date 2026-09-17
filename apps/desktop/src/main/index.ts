@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { app, BrowserWindow, ipcMain, Menu, session, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell } from 'electron';
+import { pathToFileURL } from 'node:url';
 import { AppError, createEngine, type Engine } from '@sevenvid/engine';
 import { createElectronHost } from './host';
 import { buildMenu } from './menu';
@@ -13,6 +14,8 @@ process.on('warning', (w) => {
 const isDev = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
 let engine: Engine | null = null;
+
+protocol.registerSchemesAsPrivileged([{ scheme: 'sevenvid-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -73,6 +76,17 @@ function installCsp(): void {
   });
 }
 
+/** Serves local media the engine allows (assets and derived cache files) with Range support via net.fetch. */
+function installMediaProtocol(e: Engine): void {
+  protocol.handle('sevenvid-media', (request) => {
+    const url = new URL(request.url);
+    const file = decodeURIComponent(url.pathname.replace(/^\//, ''));
+    const abs = process.platform === 'win32' ? file : `/${file.replace(/^\/+/, '')}`;
+    if (!e.media.isPathAllowed(abs)) return new Response('forbidden', { status: 403 });
+    return net.fetch(pathToFileURL(abs).toString(), { headers: request.headers });
+  });
+}
+
 function wireIpc(e: Engine): void {
   ipcMain.handle('sevenvid:api', async (_event, channel: string, input: unknown) => {
     try {
@@ -97,6 +111,7 @@ app.whenReady().then(async () => {
     logToConsole: isDev,
   });
   wireIpc(engine);
+  installMediaProtocol(engine);
   installCsp();
   Menu.setApplicationMenu(buildMenu({ isDev, openExternal: (url) => void engine?.invoke('shell.openExternal', { url }) }));
   await engine.start();

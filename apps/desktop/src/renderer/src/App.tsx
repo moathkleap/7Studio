@@ -11,7 +11,9 @@ import { TemplatesScreen } from './screens/TemplatesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { SystemScreen } from './screens/SystemScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
-import { CreatorScreen, ExportScreen, MediaScreen, ModelsScreen } from './screens/GatedScreens';
+import { CreatorScreen, ModelsScreen } from './screens/GatedScreens';
+import { MediaScreen } from './screens/MediaScreen';
+import { ExportScreen } from './screens/ExportScreen';
 import { useAppStore } from './store/appStore';
 
 const router = createHashRouter([

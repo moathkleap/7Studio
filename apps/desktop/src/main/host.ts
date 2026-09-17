@@ -43,5 +43,6 @@ export function createElectronHost(getWindow: () => BrowserWindow | null, isDev:
       openExternal: (url) => shell.openExternal(url),
     },
     quit: () => app.quit(),
+    mediaUrl: (p) => `sevenvid-media://local/${encodeURIComponent(p)}`,
   };
 }

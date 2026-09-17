@@ -15,6 +15,9 @@ import { ensureAppDirs, resolveAppPaths, type AppPaths, type ResolvePathsOptions
 import { ProjectService } from '../project/ProjectService';
 import { SessionManager } from '../project/SessionManager';
 import { TemplateService } from '../project/TemplateService';
+import { MediaService } from '../media/MediaService';
+import { ExportService } from '../export/ExportService';
+import { PreviewRenderService } from '../render/PreviewRenderService';
 import { SearchService } from '../search/SearchService';
 import { SettingsService } from '../settings/SettingsService';
 import { TaskManager } from '../tasks/TaskManager';
@@ -47,6 +50,9 @@ export interface EngineServices {
   notifications: NotificationService;
   ffmpeg: FfmpegLocation;
   templates: TemplateService;
+  media: MediaService;
+  exports: ExportService;
+  previews: PreviewRenderService;
 }
 
 export interface Engine extends EngineServices {
@@ -86,8 +92,11 @@ export function createEngine(opts: EngineOptions): Engine {
   const errors = new ErrorLog(bus);
   const notifications = new NotificationService(bus, settings);
   const templates = new TemplateService(db, projects, search);
+  const media = new MediaService(db, paths, ffmpeg, tasks, sessions, settings, search, bus, logs.child({ module: 'media' }));
+  const exportsService = new ExportService(db, paths, ffmpeg, tasks, projects, sessions, settings, bus, logs.child({ module: 'export' }));
+  const previews = new PreviewRenderService(paths, ffmpeg, tasks, projects, sessions, exportsService, logs.child({ module: 'render' }));
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews };
   registerCoreCapabilities(services);
 
   const handlers = createCoreHandlers(services) as ApiHandlers;

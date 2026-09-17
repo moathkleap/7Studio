@@ -242,3 +242,60 @@ export const NetworkLogEntrySchema = z.object({
   status: z.string(),
 });
 export type NetworkLogEntry = z.infer<typeof NetworkLogEntrySchema>;
+
+export const AssetKindSchema = z.enum(['video', 'image', 'audio', 'music', 'voice', 'character', 'generated', 'template', 'font']);
+export const AssetInfoSchema = z.object({
+  id: z.string(),
+  projectId: z.string().nullable(),
+  kind: AssetKindSchema,
+  name: z.string(),
+  sourcePath: z.string(),
+  mime: z.string().nullable(),
+  container: z.string().nullable(),
+  durationMs: z.number().nullable(),
+  width: z.number().nullable(),
+  height: z.number().nullable(),
+  fps: z.object({ num: z.number(), den: z.number() }).nullable(),
+  videoCodec: z.string().nullable(),
+  audioCodec: z.string().nullable(),
+  channels: z.number().nullable(),
+  sampleRate: z.number().nullable(),
+  bitrate: z.number().nullable(),
+  sizeBytes: z.number().nullable(),
+  thumbnailPath: z.string().nullable(),
+  spritePath: z.string().nullable(),
+  spriteMeta: z.object({ count: z.number(), cols: z.number(), rows: z.number(), tileWidth: z.number(), tileHeight: z.number(), intervalMs: z.number() }).nullable(),
+  waveformPath: z.string().nullable(),
+  proxyPath: z.string().nullable(),
+  proxyStatus: z.enum(['none', 'pending', 'running', 'ready', 'failed', 'not-needed']),
+  analysisStatus: z.enum(['pending', 'running', 'ready', 'failed']),
+  analysisError: AppErrorInfoSchema.nullable(),
+  tags: z.array(z.string()),
+  favorite: z.boolean(),
+  missing: z.boolean(),
+  origin: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type AssetInfo = z.infer<typeof AssetInfoSchema>;
+
+export const PlaybackCapabilitiesSchema = z.object({ h264: z.boolean(), hevc: z.boolean(), vp9: z.boolean(), av1: z.boolean(), aac: z.boolean(), opus: z.boolean(), mp3: z.boolean() });
+
+export const WaveformDataSchema = z.object({ version: z.literal(1), samplesPerSecond: z.number(), durationMs: z.number(), peaks: z.array(z.number()) });
+
+export const ExportSettingsInputSchema = z.object({
+  presetId: z.string().optional(),
+  container: z.enum(['mp4', 'mov', 'webm']).optional(),
+  videoCodec: z.enum(['h264', 'h265', 'av1', 'vp9']).optional(),
+  audioCodec: z.enum(['aac', 'opus', 'mp3']).optional(),
+  width: z.number().nullable().optional(),
+  height: z.number().nullable().optional(),
+  fps: z.object({ num: z.number(), den: z.number() }).nullable().optional(),
+  qualityMode: z.enum(['crf', 'bitrate']).optional(),
+  crf: z.number().optional(),
+  videoBitrateKbps: z.number().optional(),
+  audioBitrateKbps: z.number().optional(),
+  speedPreset: z.enum(['ultrafast', 'veryfast', 'fast', 'medium', 'slow', 'slower']).optional(),
+  hardwareAcceleration: z.enum(['auto', 'off']).optional(),
+  burnSubtitles: z.boolean().optional(),
+});

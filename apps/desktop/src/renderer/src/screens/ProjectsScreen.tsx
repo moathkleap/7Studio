@@ -83,7 +83,10 @@ function VersionsDialog({ project, onClose }: { project: ProjectSummary; onClose
   const [versions, setVersions] = useState<ProjectVersion[]>([]);
   const [label, setLabel] = useState('');
   const load = () => getApi().invoke('projects.versions.list', { projectId: project.id }).then(setVersions).catch(reportError);
-  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [project.id]);
+  useEffect(() => {
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.id]);
   const restore = async (versionId: string) => {
     try {
       await useSessionStore.getState().open(project.id);

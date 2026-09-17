@@ -125,6 +125,25 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
     'templates.saveFromProject': ({ projectId, name, category }) => s.templates.saveFromProject(projectId, name, category),
     'exports.list': (input) => s.db.exports.list({ projectId: input?.projectId, limit: input?.limit }),
     'network.recent': (input) => s.db.networkLog.recent(input?.limit ?? 200),
+    'media.import': ({ paths, projectId }) => s.media.import(paths, projectId),
+    'media.list': (input) => s.media.list({ projectId: input?.projectId, includeLibrary: input?.includeLibrary, kind: input?.kind, favorite: input?.favorite, query: input?.query }),
+    'media.get': ({ assetId }) => s.media.get(assetId),
+    'media.update': ({ assetId, patch }) => s.media.update(assetId, patch),
+    'media.remove': ({ assetId, deleteCache }) => ({ removed: s.media.remove(assetId, deleteCache ?? true) }),
+    'media.relink': ({ assetId, path: p }) => s.media.relink(assetId, p),
+    'media.reanalyze': ({ assetId }) => s.media.reanalyze(assetId),
+    'media.waveform': ({ assetId }) => s.media.waveform(assetId),
+    'media.url': ({ path: p }) => ({ url: s.media.isPathAllowed(p) ? s.host.mediaUrl(p) : null }),
+    'media.setPlaybackCapabilities': (caps) => {
+      s.media.setPlaybackCapabilities(caps);
+      return { ok: true };
+    },
+    'media.addToTimeline': ({ projectId, assetId, trackId, atMs, mode, durationMs }) => s.media.addToTimeline(projectId, assetId, { trackId, atMs, mode, durationMs }),
+    'export.start': ({ projectId, settings, outputPath, fileName }) => s.exports.start({ projectId, settings: settings as never, outputPath, fileName }),
+    'export.get': ({ exportId }) => s.exports.get(exportId) ?? null,
+    'export.encoders': (input) => ({ available: s.ffmpeg.encoders.filter((e) => /^(lib(x264|x265|vpx-vp9|svtav1|aom-av1))$|_(nvenc|qsv|amf|videotoolbox|vaapi)$/.test(e)), hardware: s.ffmpeg.hwEncoders, verified: input?.verify ? s.exports.encoderProbe.verifyAllHardware() : s.exports.encoderProbe.results() }),
+    'render.previewRange': ({ projectId, startMs, endMs }) => s.previews.renderRange(projectId, startMs, endMs),
+    'render.extractFrame': ({ projectId, tMs }) => s.previews.extractFrameTask(projectId, tMs),
   };
 }
 
@@ -137,4 +156,6 @@ export type CoreChannel =
   | 'search.query' | 'logs.tail' | 'diagnostics.exportBundle' | 'errors.recent' | 'notifications.recent'
   | 'fs.listDir' | 'fs.roots' | 'fs.exists' | 'dialog.pickFiles' | 'dialog.pickDirectory' | 'dialog.saveFile'
   | 'shell.openPath' | 'shell.showInFolder' | 'shell.openExternal' | 'app.quit'
-  | 'templates.list' | 'templates.delete' | 'templates.saveFromProject' | 'exports.list' | 'network.recent';
+  | 'templates.list' | 'templates.delete' | 'templates.saveFromProject' | 'exports.list' | 'network.recent'
+  | 'media.import' | 'media.list' | 'media.get' | 'media.update' | 'media.remove' | 'media.relink' | 'media.reanalyze' | 'media.waveform' | 'media.url' | 'media.setPlaybackCapabilities' | 'media.addToTimeline'
+  | 'export.start' | 'export.get' | 'export.encoders' | 'render.previewRange' | 'render.extractFrame';

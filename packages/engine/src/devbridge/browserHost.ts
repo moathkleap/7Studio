@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { EngineHost } from '../api/host';
 
 /** Host services for browser mode: no native dialogs (the UI uses the in-app file browser instead). */
-export function createBrowserHost(opts: { appVersion: string; isDev?: boolean; onQuit?: () => void } ): EngineHost {
+export function createBrowserHost(opts: { appVersion: string; isDev?: boolean; onQuit?: () => void; mediaUrl?: (path: string) => string | null }): EngineHost {
   const opener = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer' : 'xdg-open';
   return {
     mode: 'browser',
@@ -23,5 +23,6 @@ export function createBrowserHost(opts: { appVersion: string; isDev?: boolean; o
       openExternal: (url) => new Promise((resolve) => execFile(opener, [url], () => resolve())),
     },
     quit: () => opts.onQuit?.(),
+    mediaUrl: (p) => opts.mediaUrl?.(p) ?? null,
   };
 }

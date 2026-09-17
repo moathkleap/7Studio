@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
 const out = path.resolve(__dirname, '..', 'results', 'screenshots');
@@ -11,8 +11,30 @@ test('capture screenshots of the main screens', async ({ page }) => {
   await page.locator('[data-action="home.newProject"]').click();
   await page.getByTestId('project-name-input').fill('Car wash promo');
   await page.locator('[data-action="projects.create.submit"]').click();
-  await page.getByTestId('editor-resolution').waitFor();
+  await page.getByTestId('editor').waitFor();
+  await page.locator('[data-action="editor.import"]').click();
+  await page.locator('[data-action="fileBrowser.root"]', { hasText: 'sample-media' }).click();
+  await page.locator('[data-action="fileBrowser.toggleFile"]', { hasText: 'clip-10s-720p.mp4' }).click();
+  await page.locator('[data-action="fileBrowser.toggleFile"]', { hasText: 'music-8s.mp3' }).click();
+  await page.locator('[data-action="fileBrowser.select"]').click();
+  const video = page.getByTestId('media-panel-item').filter({ hasText: 'clip-10s-720p.mp4' });
+  await expect(video.locator('[data-action="editor.addAsset"]')).toBeEnabled({ timeout: 60_000 });
+  await video.locator('[data-action="editor.addAsset"]').click();
+  const music = page.getByTestId('media-panel-item').filter({ hasText: 'music-8s.mp3' });
+  await expect(music.locator('[data-action="editor.addAsset"]')).toBeEnabled({ timeout: 60_000 });
+  await music.locator('[data-action="editor.addAsset"]').click();
+  await page.waitForTimeout(1500);
+  await page.getByTestId('timeline').click({ position: { x: 300, y: 60 } });
+  await page.keyboard.press('Home');
+  for (let i = 0; i < 6; i++) await page.keyboard.press('Shift+ArrowRight');
+  await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(out, 'editor-dark.png') });
+  await page.locator('[data-action="nav.media"]').click();
+  await page.getByTestId('media-card').first().waitFor();
+  await page.screenshot({ path: path.join(out, 'media-dark.png') });
+  await page.locator('[data-action="nav.export"]').click();
+  await page.getByTestId('export-preset').waitFor();
+  await page.screenshot({ path: path.join(out, 'export-dark.png') });
   await page.locator('[data-action="nav.home"]').click();
   await page.getByTestId('recent-projects').waitFor();
   await page.screenshot({ path: path.join(out, 'home-dark.png') });

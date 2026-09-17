@@ -62,6 +62,8 @@ export function isAppError(err: unknown): err is { info: AppErrorInfo } {
   return typeof err === 'object' && err !== null && 'info' in err && typeof (err as { info: unknown }).info === 'object';
 }
 
+let bootstrapStarted = false;
+
 export const useAppStore = create<AppState>((set, get) => ({
   ready: false,
   bootError: null,
@@ -81,6 +83,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   bridge: 'connecting',
 
   async bootstrap() {
+    if (bootstrapStarted) return;
+    bootstrapStarted = true;
     const api = getApi();
     const bridge = getBridge();
     if (bridge) {

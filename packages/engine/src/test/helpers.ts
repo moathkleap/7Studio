@@ -21,6 +21,7 @@ export function testHost(): EngineHost {
     },
     shell: { openPath: async () => '', showInFolder: () => undefined, openExternal: async () => undefined },
     quit: () => undefined,
+    mediaUrl: (p) => `file://${p}`,
   };
 }
 

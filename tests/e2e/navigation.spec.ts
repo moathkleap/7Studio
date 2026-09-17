@@ -42,11 +42,11 @@ test.describe('application shell', () => {
     await page.locator('[data-action="tasks.close"]').click();
     await page.locator('[data-action="assistant.close"]').click();
     await page.locator('[data-action="editor.addTrack.video"]').click();
-    await expect(page.getByTestId('editor-track-row')).toHaveCount(4);
+    await expect(page.getByTestId('timeline-track-header')).toHaveCount(4);
     await page.locator('[data-action="edit.undo"]').click();
-    await expect(page.getByTestId('editor-track-row')).toHaveCount(3);
+    await expect(page.getByTestId('timeline-track-header')).toHaveCount(3);
     await page.locator('[data-action="edit.redo"]').click();
-    await expect(page.getByTestId('editor-track-row')).toHaveCount(4);
+    await expect(page.getByTestId('timeline-track-header')).toHaveCount(4);
     await page.locator('[data-action="project.save"]').click();
     await expect(page.locator('header')).toContainText(/Saved|محفوظ/);
     await page.locator('[data-action="editor.validate"]').click();
