@@ -1,0 +1,40 @@
+import { test } from '@playwright/test';
+import path from 'node:path';
+
+const out = path.resolve(__dirname, '..', 'results', 'screenshots');
+
+test('capture screenshots of the main screens', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('main-content').waitFor();
+  await page.locator('[data-action="home.newProject"]').click();
+  await page.getByTestId('project-name-input').fill('Car wash promo');
+  await page.locator('[data-action="projects.create.submit"]').click();
+  await page.getByTestId('editor-resolution').waitFor();
+  await page.screenshot({ path: path.join(out, 'editor-dark.png') });
+  await page.locator('[data-action="nav.home"]').click();
+  await page.getByTestId('recent-projects').waitFor();
+  await page.screenshot({ path: path.join(out, 'home-dark.png') });
+  await page.locator('[data-action="nav.settings"]').click();
+  await page.locator('[data-action="tab.language"]').click();
+  await page.getByTestId('settings-language-select').selectOption('ar');
+  await page.locator('[data-action="nav.home"]').click();
+  await page.getByTestId('recent-projects').waitFor();
+  await page.screenshot({ path: path.join(out, 'home-arabic-rtl.png') });
+  await page.locator('[data-action="nav.system"]').click();
+  await page.screenshot({ path: path.join(out, 'system-arabic.png') });
+  await page.locator('[data-action="nav.settings"]').click();
+  await page.locator('[data-action="tab.appearance"]').click();
+  await page.getByTestId('settings-theme-select').selectOption('light');
+  await page.locator('[data-action="nav.projects"]').click();
+  await page.screenshot({ path: path.join(out, 'projects-light-arabic.png') });
+  await page.locator('[data-action="nav.settings"]').click();
+  await page.locator('[data-action="tab.language"]').click();
+  await page.getByTestId('settings-language-select').selectOption('en');
+  await page.locator('[data-action="tab.appearance"]').click();
+  await page.getByTestId('settings-theme-select').selectOption('dark');
+  await page.locator('[data-action="nav.diagnostics"]').click();
+  await page.screenshot({ path: path.join(out, 'diagnostics-dark.png') });
+  await page.locator('[data-action="tasks.open"]').click();
+  await page.locator('[data-action="app.assistant"]').click();
+  await page.screenshot({ path: path.join(out, 'panels-dark.png') });
+});
