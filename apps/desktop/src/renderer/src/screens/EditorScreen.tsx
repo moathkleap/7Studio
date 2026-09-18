@@ -13,7 +13,7 @@ import { useSessionStore } from '@/store/sessionStore';
 import { Button } from '@/components/ui/Button';
 import { EmptyState, Spinner } from '@/components/ui/Misc';
 import { EditorToolbar } from '@/editor/EditorToolbar';
-import { Inspector } from '@/editor/Inspector';
+import { ToolsPanel } from '@/editor/ToolsPanel';
 import { MediaPanel } from '@/editor/MediaPanel';
 import { PreviewPlayer } from '@/editor/PreviewPlayer';
 import { Timeline } from '@/editor/Timeline';
@@ -55,10 +55,11 @@ export function EditorScreen() {
     if (editor.selection.some((id) => !ids.has(id))) editor.select(editor.selection.filter((id) => ids.has(id)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc]);
+  const docId = doc?.id;
   useEffect(() => {
-    if (!doc) return;
+    if (!docId) return;
     getApi().invoke('media.setPlaybackCapabilities', probePlayback()).catch(() => undefined);
-  }, [doc?.id]);
+  }, [docId]);
   useEvent('task.updated', (task) => {
     if (task.id !== editor.previewTaskId) return;
     if (task.status === 'done') {
@@ -145,7 +146,7 @@ export function EditorScreen() {
           <div className="min-h-0 flex-1 p-3"><PreviewPlayer doc={doc} /></div>
           <EditorToolbar doc={doc} onCommand={onCommand} onSplit={actions.split} onDelete={actions.remove} onRenderPreview={() => void renderPreview()} timelineWidth={timelineWidth} />
         </div>
-        <Inspector doc={doc} onCommand={onCommand} />
+        <ToolsPanel doc={doc} onCommand={onCommand} />
       </div>
       <div className="flex h-8 shrink-0 items-center gap-2 border-t border-border bg-surface px-3 text-[12px] text-muted">
         <span data-testid="editor-resolution">{doc.settings.width}×{doc.settings.height}</span>

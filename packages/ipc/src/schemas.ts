@@ -299,3 +299,207 @@ export const ExportSettingsInputSchema = z.object({
   hardwareAcceleration: z.enum(['auto', 'off']).optional(),
   burnSubtitles: z.boolean().optional(),
 });
+
+// ---- Phase 3: models, runtime, vision, audio, subtitles, OCR ----
+
+export const NormBoxSchema = z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() });
+export type NormBoxInput = z.infer<typeof NormBoxSchema>;
+
+export const ModelFileSchema = z.object({ path: z.string(), url: z.string(), sha256: z.string().nullable(), sizeBytes: z.number().nullable() });
+export const ModelSpecSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  capability: z.string(),
+  providerId: z.string(),
+  version: z.string(),
+  kind: z.string(),
+  files: z.array(ModelFileSchema),
+  sizeBytes: z.number(),
+  vramMb: z.number().nullable(),
+  ramMb: z.number().nullable(),
+  requiresGpu: z.boolean(),
+  languages: z.array(z.string()),
+  license: z.string(),
+  description: z.string(),
+  descriptionAr: z.string(),
+  host: z.string(),
+  recommended: z.enum(['always', 'optional', 'gpu']),
+});
+export const ModelStatusSchema = z.object({
+  spec: ModelSpecSchema,
+  status: z.enum(['installed', 'available', 'downloading', 'broken', 'partial']),
+  installPath: z.string(),
+  files: z.array(z.object({ path: z.string(), present: z.boolean(), sizeBytes: z.number().nullable(), expectedBytes: z.number().nullable() })),
+  checksumOk: z.boolean().nullable(),
+  lastTest: z.object({ ok: z.boolean(), ms: z.number(), message: z.string(), at: z.string() }).nullable(),
+  installedBytes: z.number(),
+  downloadTaskId: z.string().nullable(),
+  /** Hardware fit computed from the live hardware snapshot. */
+  fit: z.object({ ok: z.boolean(), reasonKey: z.string().nullable(), params: z.record(z.string(), z.union([z.string(), z.number()])) }),
+  /** Whether the download can be started from inside the app (single files over HTTPS). */
+  downloadable: z.boolean(),
+});
+export type ModelStatusInfo = z.infer<typeof ModelStatusSchema>;
+
+export const RuntimeStatusSchema = z.object({
+  python: z.object({ path: z.string(), version: z.string(), source: z.string(), venvReady: z.boolean(), workerInstalled: z.boolean() }).nullable(),
+  worker: z.object({ running: z.boolean(), version: z.string().nullable(), device: z.string().nullable(), capabilities: z.record(z.string(), z.object({ available: z.boolean(), reason: z.string().nullable() })) }).nullable(),
+  workerSourceDir: z.string(),
+  venvDir: z.string(),
+  lastError: z.string().nullable(),
+  setupTaskId: z.string().nullable(),
+  extras: z.array(z.object({ id: z.string(), installed: z.boolean(), approxMb: z.number() })),
+});
+export type RuntimeStatus = z.infer<typeof RuntimeStatusSchema>;
+
+export const MaskKindSchema = z.enum(['blur', 'pixelate', 'box', 'custom']);
+export const MaskShapeSchema = z.enum(['rect', 'ellipse']);
+export const FaceSelectorSchema = z.union([z.enum(['all', 'largest', 'leftmost', 'rightmost', 'center']), z.number().int().min(0)]);
+
+export const TimeRangeSchema = z.object({ startMs: z.number(), endMs: z.number() });
+
+export const SubtitleFormatSchema = z.enum(['srt', 'vtt', 'ass']);
+
+/** Typed shapes of task results produced by the phase-3 services (delivered through TaskInfo.result). */
+export interface FaceTrackInfo {
+  index: number;
+  detections: number;
+  startMs: number;
+  endMs: number;
+  meanArea: number;
+  meanCenterX: number;
+  meanScore: number;
+  box: NormBoxInput;
+}
+export interface DetectFacesResult {
+  clipId: string;
+  sampleFps: number;
+  framesAnalyzed: number;
+  totalDetections: number;
+  tracks: FaceTrackInfo[];
+  /** Per sampled frame, boxes in sequence coordinates with timeline times. */
+  frames: Array<{ tMs: number; boxes: Array<NormBoxInput & { score: number; track: number }> }>;
+  analyzedFile: 'proxy' | 'source';
+  durationMs: number;
+}
+export interface DetectObjectsResult {
+  clipId: string;
+  sampleFps: number;
+  framesAnalyzed: number;
+  labels: Array<{ label: string; count: number; maxScore: number }>;
+  frames: Array<{ tMs: number; boxes: Array<NormBoxInput & { score: number; label: string }> }>;
+  tracks: Array<{ index: number; label: string; startMs: number; endMs: number; detections: number; box: NormBoxInput }>;
+}
+export interface BlurFacesResult {
+  clipId: string;
+  masks: Array<{ maskId: string; trackIndex: number; startMs: number; endMs: number; keyframes: number; coverage: number; status: 'ok' | 'partial' }>;
+  facesDetected: number;
+  framesAnalyzed: number;
+  sampleFps: number;
+  skipped: Array<{ trackIndex: number; reason: 'too-short' | 'not-selected' }>;
+}
+export interface TrackTargetResult {
+  clipId: string;
+  maskId: string;
+  status: 'ok' | 'partial' | 'lost';
+  keyframes: number;
+  coveredStartMs: number;
+  coveredEndMs: number;
+  requestedEndMs: number;
+  lostRanges: Array<{ startMs: number; endMs: number }>;
+}
+export interface MaskVerificationResult {
+  maskId: string;
+  ok: boolean;
+  samples: Array<{ tMs: number; before: number; after: number; ratio: number; ok: boolean }>;
+  threshold: number;
+  method: 'laplacian-variance' | 'block-mean-error';
+}
+export interface SilenceDetectionResult {
+  method: 'vad' | 'silencedetect';
+  ranges: Array<{ startMs: number; endMs: number }>;
+  totalSilenceMs: number;
+  durationMs: number;
+  thresholdDb: number | null;
+  minSilenceMs: number;
+  speechMs: number;
+}
+export interface RemoveSilenceResult extends SilenceDetectionResult {
+  cutRanges: Array<{ startMs: number; endMs: number }>;
+  removedMs: number;
+  beforeDurationMs: number;
+  afterDurationMs: number;
+  verified: boolean | null;
+  remainingSilences: Array<{ startMs: number; endMs: number }>;
+}
+export interface LoudnessResult {
+  integratedLufs: number | null;
+  loudnessRangeLu: number | null;
+  truePeakDb: number | null;
+  meanVolumeDb: number | null;
+  maxVolumeDb: number | null;
+  durationMs: number;
+}
+export interface EnhancePreviewResult {
+  clipId: string;
+  startMs: number;
+  endMs: number;
+  beforePath: string;
+  afterPath: string;
+  before: LoudnessResult;
+  after: LoudnessResult;
+  effects: string[];
+}
+export interface TranscribeResult {
+  trackId: string;
+  language: string;
+  languageProbability: number;
+  cues: number;
+  durationMs: number;
+  device: string;
+  modelId: string;
+  words: number;
+  verification: { sorted: boolean; withinDuration: boolean; speechOverlap: number | null };
+}
+export interface OcrLine {
+  text: string;
+  confidence: number;
+  box: NormBoxInput;
+  language: 'ar' | 'en' | 'mixed' | 'unknown';
+}
+export interface OcrTrack {
+  index: number;
+  text: string;
+  language: OcrLine['language'];
+  startMs: number;
+  endMs: number;
+  box: NormBoxInput;
+  confidence: number;
+  frames: number;
+}
+export interface OcrResult {
+  clipId: string;
+  languages: string[];
+  sampleFps: number;
+  framesAnalyzed: number;
+  frames: Array<{ tMs: number; lines: OcrLine[] }>;
+  tracks: OcrTrack[];
+  text: string;
+}
+export interface UpscaleResult {
+  clipId: string;
+  assetId: string;
+  path: string;
+  width: number;
+  height: number;
+  factor: number;
+  method: 'lanczos' | 'ai';
+  replaced: boolean;
+}
+export interface CompareRenderResult {
+  startMs: number;
+  endMs: number;
+  beforePath: string;
+  afterPath: string;
+  bypassed: { effects: number; masks: number; audioEffects: number };
+}

@@ -28,7 +28,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: `rm -rf "${userData}" && SEVENVID_USER_DATA="${userData}" SEVENVID_REPO_ROOT="${root}" SEVENVID_DEVBRIDGE_PORT=${bridgePort} SEVENVID_DEVBRIDGE_TOKEN=${token} SEVENVID_DEV_MEDIA_DIR="${path.join(root, 'tests', 'fixtures', 'generated')}" pnpm exec tsx packages/engine/src/devbridge/main.ts`,
+      command: `rm -rf "${userData}" && SEVENVID_USER_DATA="${userData}" SEVENVID_REPO_ROOT="${root}" SEVENVID_DEVBRIDGE_PORT=${bridgePort} SEVENVID_DEVBRIDGE_TOKEN=${token} SEVENVID_DEV_MEDIA_DIR="${path.join(root, 'tests', 'fixtures', 'generated')}" SEVENVID_MODELS_DIR="${path.join(root, '.sevenvid-dev', 'userData', 'models')}" pnpm exec tsx packages/engine/src/devbridge/main.ts`,
       cwd: root,
       url: `http://127.0.0.1:${bridgePort}/health`,
       reuseExistingServer: false,

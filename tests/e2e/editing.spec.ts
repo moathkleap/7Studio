@@ -1,7 +1,4 @@
 import { expect, test } from '@playwright/test';
-import path from 'node:path';
-
-const fixtures = path.resolve(__dirname, '..', 'fixtures', 'generated');
 
 test.describe('media, timeline and export', () => {
   test('imports media through the in-app file browser, edits on the timeline and exports a validated file', async ({ page }) => {

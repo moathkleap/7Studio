@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { DEFAULT_SHORTCUTS, EXPORT_PRESETS, eventToCombo, resolveShortcuts, type AppSettings, type DeepPartial } from '@sevenvid/core';

@@ -56,8 +56,10 @@ test.describe('application shell', () => {
     await expect(page.getByTestId('search-results')).toContainText('إعلان غسيل السيارات');
     await page.keyboard.press('Escape');
     await page.locator('[data-action="nav.projects"]').click();
-    await expect(page.getByTestId('project-row')).toHaveCount(1);
-    await page.locator('[data-action="projects.menu"]').first().click();
+    // other specs create projects in the same user-data directory: assert on this test's project only
+    const row = page.getByTestId('project-row').filter({ hasText: 'إعلان غسيل السيارات' });
+    await expect(row).toHaveCount(1);
+    await row.locator('[data-action="projects.menu"]').click();
     await page.locator('[data-action="projects.menu.versions"]').click();
     await expect(page.getByTestId('versions-list').locator('li')).toHaveCount(2);
   });

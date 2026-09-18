@@ -11,3 +11,5 @@ export * from './settings';
 export * from './shortcuts';
 export * from './capabilities';
 export * from './errors';
+export * from './document/geometry';
+export * from './audio';

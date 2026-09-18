@@ -89,7 +89,7 @@ export class ExportService {
   }
 
   /** Renders a document range to a file (shared by export and preview renders). */
-  async render(doc: ProjectDocument, outputPath: string, settings: ExportSettings, opts: { range?: CompileOptions['range']; usePreviewQuality?: boolean; pathOverrides?: Record<string, string>; signal?: AbortSignal; onProgress?: (ratio: number, message: string | null) => void; onProcess?: Parameters<typeof runFfmpeg>[0]['onProcess']; scratchDir: string; clipVideoFilters?: CompileOptions['clipVideoFilters']; finalVideoFilters?: string[]; finalAudioFilters?: string[] }): Promise<{ durationMs: number; warnings: string[]; encoder: string }> {
+  async render(doc: ProjectDocument, outputPath: string, settings: ExportSettings, opts: { range?: CompileOptions['range']; usePreviewQuality?: boolean; pathOverrides?: Record<string, string>; signal?: AbortSignal; onProgress?: (ratio: number, message: string | null) => void; onProcess?: Parameters<typeof runFfmpeg>[0]['onProcess']; scratchDir: string; clipVideoFilters?: CompileOptions['clipVideoFilters']; finalVideoFilters?: string[]; finalAudioFilters?: string[]; bypass?: CompileOptions['bypass'] }): Promise<{ durationMs: number; warnings: string[]; encoder: string; masksApplied: number }> {
     const ffmpeg = this.ffmpeg.ffmpeg!;
     fs.mkdirSync(opts.scratchDir, { recursive: true });
     const seq = doc.settings;
@@ -104,7 +104,7 @@ export class ExportService {
     }
     const outputSize = settings.width && settings.height && (settings.width !== seq.width || settings.height !== seq.height) ? { width: settings.width, height: settings.height } : null;
     const finalVideoFilters = [...(opts.finalVideoFilters ?? []), ...(outputSize ? outputSizeFilters(outputSize.width, outputSize.height) : [])];
-    const graph = compileRenderGraph({ doc, target, range: opts.range ?? null, pathOverrides: opts.pathOverrides, subtitlesAssPath, fontsDir: fs.existsSync(path.join(this.paths.resources, 'fonts')) ? path.join(this.paths.resources, 'fonts') : null, clipVideoFilters: opts.clipVideoFilters, finalVideoFilters, finalAudioFilters: opts.finalAudioFilters });
+    const graph = compileRenderGraph({ doc, target, range: opts.range ?? null, pathOverrides: opts.pathOverrides, subtitlesAssPath, fontsDir: fs.existsSync(path.join(this.paths.resources, 'fonts')) ? path.join(this.paths.resources, 'fonts') : null, clipVideoFilters: opts.clipVideoFilters, finalVideoFilters, finalAudioFilters: opts.finalAudioFilters, masks: { scratchDir: opts.scratchDir }, bypass: opts.bypass });
     const scriptPath = path.join(opts.scratchDir, `filter-${newId()}.txt`);
     fs.writeFileSync(scriptPath, graph.filterScript, 'utf8');
     const preferHw = this.settings.get().gpu.preferHardwareEncoding && !opts.usePreviewQuality;
@@ -120,13 +120,14 @@ export class ExportService {
         const sw = chooseEncoders(this.ffmpeg, this.encoderProbe, { ...settings, hardwareAcceleration: 'off' }, false);
         const swArgs = buildFfmpegArgs(graph, scriptPath, { ...sw, container: settings.container, fps: target.fps, threads: this.settings.get().performance.ffmpegThreads }, outputPath);
         await runFfmpeg({ ffmpeg, args: swArgs, logger: this.logger, signal: opts.signal, expectDurationMs: graph.durationMs, onProgress: (p) => opts.onProgress?.(p.ratio ?? 0, null), onProcess: opts.onProcess, operation: 'render' });
-        return { durationMs: graph.durationMs, warnings: [...graph.warnings, `hardware encoder ${enc.videoEncoder} failed; used ${sw.videoEncoder}`], encoder: sw.videoEncoder };
+        return { durationMs: graph.durationMs, warnings: [...graph.warnings, `hardware encoder ${enc.videoEncoder} failed; used ${sw.videoEncoder}`], encoder: sw.videoEncoder, masksApplied: graph.masksApplied };
       }
       throw err;
     } finally {
       fs.rmSync(scriptPath, { force: true });
+      for (const f of graph.tempFiles) fs.rmSync(f, { force: true });
     }
-    return { durationMs: graph.durationMs, warnings: graph.warnings, encoder: enc.videoEncoder };
+    return { durationMs: graph.durationMs, warnings: graph.warnings, encoder: enc.videoEncoder, masksApplied: graph.masksApplied };
   }
 
   private async runExport(exportId: string, ctx: { progress: (v: number, m?: string | null) => void; signal: AbortSignal; setPauseHandlers: (h: { pause: () => void; resume: () => void } | null) => void }): Promise<ExportValidation> {

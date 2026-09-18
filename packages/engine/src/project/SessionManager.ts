@@ -100,6 +100,16 @@ export class SessionManager {
   checkRecovery(uncleanShutdown: boolean): RecoveryInfo[] {
     const infos: RecoveryInfo[] = [];
     for (const p of this.db.projects.list()) {
+      // a project that is open right now is not stranded: its session owns the journal and can simply flush pending changes
+      const open = this.sessions.get(p.id);
+      if (open) {
+        try {
+          open.flushIfDirty();
+        } catch (err) {
+          this.logger.warn({ module: 'project', operation: 'recovery.check', projectId: p.id, err }, 'could not flush open session during recovery check');
+        }
+        continue;
+      }
       const journal = path.join(p.dataDir, JOURNAL_FILE);
       const entries = readJournal(journal);
       if (entries.length === 0) continue;

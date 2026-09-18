@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ProjectDocument } from '@sevenvid/core';
+import { maskBoxAt, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenvid/core';
 import { useEditorStore } from '@/store/editorStore';
 import { useMediaStore } from '@/store/mediaStore';
 import { Badge } from '@/components/ui/Badge';
+import { CompareView } from './CompareView';
 import { activeCues, audibleClips, cssFilterFor, fitRect, visibleLayers } from './compositor';
 
 interface PoolEntry {
@@ -34,7 +35,11 @@ export function PreviewPlayer({ doc }: { doc: ProjectDocument }) {
   const [unplayable, setUnplayable] = useState<string[]>([]);
   const previewMode = useEditorStore((s) => s.previewMode);
   const renderedPreview = useEditorStore((s) => s.renderedPreview);
-  const hasEffects = doc.tracks.some((t) => t.clips.some((c) => c.effects.length > 0 || c.reverse));
+  const compare = useEditorStore((s) => s.compare);
+  const drawActive = useEditorStore((s) => s.maskDraw.active);
+  const offRef = useRef<HTMLCanvasElement | null>(null);
+  const dragRef = useRef<{ x: number; y: number } | null>(null);
+  const hasEffects = doc.tracks.some((t) => t.clips.some((c) => c.effects.length > 0 || c.reverse)) || doc.masks.some((m) => m.enabled);
   useEffect(() => {
     docRef.current = doc;
   }, [doc]);
@@ -282,6 +287,27 @@ export function PreviewPlayer({ doc }: { doc: ProjectDocument }) {
         }
         ctx.restore();
       }
+
+      if (state.showMasks) drawMasks(ctx, canvas, offRef, d.masks, tMs, W, H, state.selectedMaskId);
+      if (state.maskDraw.active || state.maskDraw.box) {
+        const box = state.maskDraw.box;
+        ctx.save();
+        if (state.maskDraw.active) {
+          ctx.strokeStyle = 'rgba(124,92,255,0.9)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.strokeRect(1, 1, W - 2, H - 2);
+        }
+        if (box) {
+          ctx.setLineDash([]);
+          ctx.fillStyle = 'rgba(124,92,255,0.18)';
+          ctx.fillRect(box.x * W, box.y * H, box.w * W, box.h * H);
+          ctx.strokeStyle = '#7C5CFF';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(box.x * W, box.y * H, box.w * W, box.h * H);
+        }
+        ctx.restore();
+      }
     };
     raf = requestAnimationFrame(draw);
     return () => {
@@ -299,9 +325,39 @@ export function PreviewPlayer({ doc }: { doc: ProjectDocument }) {
 
   const badge = previewMode === 'rendered' && renderedPreview ? t('editor.previewRendered') : hasEffects ? t('editor.previewApprox') : t('editor.previewLive');
   const unplayableNames = unplayable.map((id) => doc.assets[id]?.name).filter(Boolean);
+  const normPoint = (e: ReactPointerEvent<HTMLCanvasElement>): { x: number; y: number } => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height)) };
+  };
+  const onPointerDown = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (!useEditorStore.getState().maskDraw.active) return;
+    dragRef.current = normPoint(e);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    useEditorStore.getState().setMaskDraw({ active: true, box: null });
+  };
+  const onPointerMove = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const start = dragRef.current;
+    if (!start) return;
+    const p = normPoint(e);
+    useEditorStore.getState().setMaskDraw({ active: true, box: rectFrom(start, p) });
+  };
+  const onPointerUp = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const start = dragRef.current;
+    if (!start) return;
+    dragRef.current = null;
+    const box = rectFrom(start, normPoint(e));
+    useEditorStore.getState().setMaskDraw({ active: false, box: box.w > 0.01 && box.h > 0.01 ? box : null });
+  };
+  if (compare) {
+    return (
+      <div ref={containerRef} className="relative h-full w-full overflow-hidden bg-black" data-testid="preview">
+        <CompareView compare={compare} />
+      </div>
+    );
+  }
   return (
     <div ref={containerRef} className="relative grid h-full w-full place-items-center overflow-hidden bg-black" data-testid="preview">
-      <canvas ref={canvasRef} width={size.w * (window.devicePixelRatio || 1)} height={size.h * (window.devicePixelRatio || 1)} style={{ width: size.w, height: size.h }} />
+      <canvas ref={canvasRef} width={size.w * (window.devicePixelRatio || 1)} height={size.h * (window.devicePixelRatio || 1)} style={{ width: size.w, height: size.h, cursor: drawActive ? 'crosshair' : 'default', touchAction: 'none' }} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} data-testid="preview-canvas" />
       <div className="pointer-events-none absolute start-3 top-3 flex flex-col gap-1">
         <Badge tone={previewMode === 'rendered' ? 'success' : hasEffects ? 'warning' : 'neutral'} dot>{badge}</Badge>
         {unplayableNames.length ? <Badge tone="warning">{t('editor.previewUnplayable')} ({unplayableNames.join(', ')})</Badge> : null}
@@ -325,4 +381,77 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): st
     out.push(line);
   }
   return out;
+}
+
+function rectFrom(a: { x: number; y: number }, b: { x: number; y: number }): NormBox {
+  const x = Math.min(a.x, b.x);
+  const y = Math.min(a.y, b.y);
+  return { x, y, w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
+}
+
+function maskPath(ctx: CanvasRenderingContext2D, mask: MaskTrack, x: number, y: number, w: number, h: number): void {
+  ctx.beginPath();
+  if (mask.shape === 'ellipse') ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+  else ctx.rect(x, y, w, h);
+}
+
+/** Approximates the document's masks on the live preview (blur, pixelate, solid box); exact output comes from FFmpeg. */
+function drawMasks(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, offRef: { current: HTMLCanvasElement | null }, masks: MaskTrack[], tMs: number, W: number, H: number, selectedId: string | null): void {
+  const dpr = window.devicePixelRatio || 1;
+  for (const mask of masks) {
+    const box = maskBoxAt(mask, tMs);
+    const selected = mask.id === selectedId;
+    if (!box && !selected) continue;
+    const b = box ?? maskBoxAt({ ...mask, enabled: true, startMs: -Infinity, endMs: Infinity }, tMs);
+    if (!b) continue;
+    const x = b.x * W;
+    const y = b.y * H;
+    const w = Math.max(1, b.w * W);
+    const h = Math.max(1, b.h * H);
+    if (box) {
+      const off = offRef.current ?? (offRef.current = document.createElement('canvas'));
+      const octx = off.getContext('2d');
+      if (!octx) continue;
+      ctx.save();
+      maskPath(ctx, mask, x, y, w, h);
+      ctx.clip();
+      const sx = Math.round(x * dpr);
+      const sy = Math.round(y * dpr);
+      const sw = Math.max(1, Math.round(w * dpr));
+      const sh = Math.max(1, Math.round(h * dpr));
+      if (mask.kind === 'box') {
+        ctx.fillStyle = mask.color || '#000';
+        ctx.fillRect(x, y, w, h);
+      } else if (mask.kind === 'pixelate') {
+        const block = Math.max(2, Math.round((mask.strength * H) / 1080));
+        off.width = Math.max(1, Math.round(w / block));
+        off.height = Math.max(1, Math.round(h / block));
+        octx.imageSmoothingEnabled = true;
+        octx.drawImage(canvas, sx, sy, sw, sh, 0, 0, off.width, off.height);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(off, 0, 0, off.width, off.height, x, y, w, h);
+        ctx.imageSmoothingEnabled = true;
+      } else {
+        off.width = sw;
+        off.height = sh;
+        octx.drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh);
+        ctx.filter = `blur(${Math.max(2, Math.round((mask.strength * H) / 1080 / 1.5))}px)`;
+        ctx.drawImage(off, 0, 0, sw, sh, x, y, w, h);
+        ctx.filter = 'none';
+      }
+      ctx.restore();
+    }
+    ctx.save();
+    maskPath(ctx, mask, x, y, w, h);
+    ctx.setLineDash(box ? [] : [4, 4]);
+    ctx.lineWidth = selected ? 2 : 1;
+    ctx.strokeStyle = selected ? '#7C5CFF' : 'rgba(255,255,255,0.45)';
+    ctx.stroke();
+    if (selected) {
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillStyle = '#7C5CFF';
+      ctx.fillText(mask.label, x + 4, Math.max(12, y - 4));
+    }
+    ctx.restore();
+  }
 }

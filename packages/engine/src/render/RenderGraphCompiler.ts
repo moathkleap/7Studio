@@ -1,5 +1,9 @@
-import { clipEndMs, fpsToNumber, getDocumentDurationMs, type Clip, type Effect, type Fraction, type ProjectDocument, type Track } from '@sevenvid/core';
+import { clipEndMs, fpsToNumber, getDocumentDurationMs, isAudioEffect, type Clip, type Effect, type Fraction, type ProjectDocument, type Track } from '@sevenvid/core';
 import { AppError } from '../errors';
+import { escapeFilterPath } from './filterUtils';
+import { compileMaskStage } from './masks';
+
+export { escapeFilterPath };
 
 export interface RenderTarget {
   width: number;
@@ -30,6 +34,14 @@ export interface CompileOptions {
   finalVideoFilters?: string[];
   /** Extra filters applied to the mixed audio. */
   finalAudioFilters?: string[];
+  /** Render the document's mask tracks (blur/pixelate/box) on the composite; needs a scratch dir for command files. */
+  masks?: { scratchDir: string } | null;
+  /** Bypass switches used by before/after comparisons. */
+  bypass?: { videoEffects?: boolean; audioEffects?: boolean; masks?: boolean };
+  /** Only build the audio graph (silence detection, loudness, transcription). */
+  audioOnly?: boolean;
+  /** Only build the video graph (single-frame renders); no audio output label is produced. */
+  videoOnly?: boolean;
 }
 
 export interface InputSpec {
@@ -40,19 +52,20 @@ export interface InputSpec {
 export interface CompiledGraph {
   inputs: InputSpec[];
   filterScript: string;
-  videoLabel: string;
-  audioLabel: string;
+  /** Null for audio-only graphs. */
+  videoLabel: string | null;
+  /** Null for video-only graphs. */
+  audioLabel: string | null;
   durationMs: number;
   warnings: string[];
   clipCount: number;
+  /** Number of mask tracks rendered by this graph. */
+  masksApplied: number;
+  /** Temporary files referenced by the graph (delete after the render). */
+  tempFiles: string[];
 }
 
 const sec = (ms: number) => (ms / 1000).toFixed(3);
-
-/** Escapes a path for use inside a filtergraph option value. */
-export function escapeFilterPath(p: string): string {
-  return p.replace(/\\/g, '/').replace(/:/g, '\\:').replace(/'/g, "\\'").replace(/,/g, '\\,').replace(/\[/g, '\\[').replace(/\]/g, '\\]');
-}
 
 function db(gain: number): string {
   return `${gain.toFixed(2)}dB`;
@@ -204,14 +217,17 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
   const lines: string[] = [];
   const soloed = doc.tracks.some((t) => t.solo);
   const audible = (t: Track) => !t.muted && (!soloed || t.solo);
+  const bypass = opts.bypass ?? {};
+  const videoEffectsOf = (clip: Clip): Effect[] => (bypass.videoEffects ? [] : clip.effects);
+  const audioEffectsOf = (clip: Clip): Effect[] => (bypass.audioEffects ? clip.effects.filter((e) => !isAudioEffect(e)) : clip.effects);
 
-  lines.push(`color=c=black:s=${target.width}x${target.height}:r=${target.fps.num}/${target.fps.den}:d=${sec(durationMs)},format=yuv420p[base0]`);
+  if (!opts.audioOnly) lines.push(`color=c=black:s=${target.width}x${target.height}:r=${target.fps.num}/${target.fps.den}:d=${sec(durationMs)},format=yuv420p[base0]`);
   let baseLabel = 'base0';
   let layer = 0;
   let clipCount = 0;
   const audioLabels: string[] = [];
 
-  const visualTracks = [...doc.tracks.filter((t) => t.kind === 'video'), ...doc.tracks.filter((t) => t.kind === 'overlay')];
+  const visualTracks = opts.audioOnly ? [] : [...doc.tracks.filter((t) => t.kind === 'video'), ...doc.tracks.filter((t) => t.kind === 'overlay')];
   for (const track of visualTracks) {
     if (track.muted && track.kind !== 'audio' && !audible(track)) continue;
     for (const clip of [...track.clips].sort((a, b) => a.startMs - b.startMs)) {
@@ -255,7 +271,7 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
         lines.push(`[fg${idx}]scale=${W}:${H}:force_original_aspect_ratio=decrease,format=yuva420p[fgs${idx}]`);
         lines.push(`[bgb${idx}][fgs${idx}]overlay=(W-w)/2:(H-h)/2:format=auto,format=yuva420p[clip${idx}]`);
       } else {
-        const extra = [...colorFilters(clip.effects), ...(opts.clipVideoFilters?.[clip.id] ?? [])];
+        const extra = [...colorFilters(videoEffectsOf(clip)), ...(opts.clipVideoFilters?.[clip.id] ?? [])];
         const opacity = clip.transform.opacity;
         if (opacity < 0.999) extra.push('format=yuva420p', `colorchannelmixer=aa=${opacity.toFixed(3)}`);
         lines.push(`[${idx}:v]${[...vf, ...tf, ...extra].join(',')}[clip${idx}]`);
@@ -272,7 +288,7 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
     }
   }
 
-  const audioTracks = doc.tracks.filter((t) => t.kind === 'video' || t.kind === 'audio');
+  const audioTracks = opts.videoOnly ? [] : doc.tracks.filter((t) => t.kind === 'video' || t.kind === 'audio');
   for (const track of audioTracks) {
     if (!audible(track)) continue;
     for (const clip of track.clips) {
@@ -288,7 +304,7 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
       const af: string[] = [`atrim=duration=${sec(sourceSpan)}`, 'asetpts=PTS-STARTPTS'];
       if (clip.reverse) af.push('areverse');
       if (Math.abs(clip.speed - 1) > 1e-6) af.push(...atempoChain(clip.speed));
-      af.push(...audioEffectFilters(clip.effects));
+      af.push(...audioEffectFilters(audioEffectsOf(clip)));
       const gain = clip.audio.gainDb + track.gainDb;
       if (Math.abs(gain) > 0.01) af.push(`volume=${db(gain)}`);
       if (clip.audio.fadeInMs > 0) af.push(`afade=t=in:st=0:d=${sec(clip.audio.fadeInMs)}`);
@@ -301,18 +317,35 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
     }
   }
 
-  if (audioLabels.length === 0) {
-    lines.push(`anullsrc=r=${target.sampleRate}:cl=${target.channels === 1 ? 'mono' : 'stereo'},atrim=duration=${sec(durationMs)}[amix]`);
-  } else if (audioLabels.length === 1) {
-    lines.push(`${audioLabels[0]}anull[amix]`);
-  } else {
-    lines.push(`${audioLabels.join('')}amix=inputs=${audioLabels.length}:duration=longest:normalize=0[amix]`);
+  if (!opts.videoOnly) {
+    if (audioLabels.length === 0) {
+      lines.push(`anullsrc=r=${target.sampleRate}:cl=${target.channels === 1 ? 'mono' : 'stereo'},atrim=duration=${sec(durationMs)}[amix]`);
+    } else if (audioLabels.length === 1) {
+      lines.push(`${audioLabels[0]}anull[amix]`);
+    } else {
+      lines.push(`${audioLabels.join('')}amix=inputs=${audioLabels.length}:duration=longest:normalize=0[amix]`);
+    }
+    const masterAf: string[] = [`atrim=duration=${sec(durationMs)}`, 'asetpts=PTS-STARTPTS'];
+    if (Math.abs(doc.master.gainDb) > 0.01) masterAf.push(`volume=${db(doc.master.gainDb)}`);
+    if (doc.master.normalize) masterAf.push(`loudnorm=I=${doc.master.targetLufs}:TP=-1.5:LRA=11`);
+    masterAf.push(...(opts.finalAudioFilters ?? []));
+    lines.push(`[amix]${masterAf.join(',')}[aout]`);
   }
-  const masterAf: string[] = [`atrim=duration=${sec(durationMs)}`, 'asetpts=PTS-STARTPTS'];
-  if (Math.abs(doc.master.gainDb) > 0.01) masterAf.push(`volume=${db(doc.master.gainDb)}`);
-  if (doc.master.normalize) masterAf.push(`loudnorm=I=${doc.master.targetLufs}:TP=-1.5:LRA=11`);
-  masterAf.push(...(opts.finalAudioFilters ?? []));
-  lines.push(`[amix]${masterAf.join(',')}[aout]`);
+  const audioLabel = opts.videoOnly ? null : '[aout]';
+
+  if (opts.audioOnly) {
+    return { inputs, filterScript: lines.join(';\n') + '\n', videoLabel: null, audioLabel, durationMs, warnings, clipCount, masksApplied: 0, tempFiles: [] };
+  }
+
+  let masksApplied = 0;
+  const tempFiles: string[] = [];
+  if (opts.masks && !bypass.masks && doc.masks.length > 0) {
+    const stage = compileMaskStage({ masks: doc.masks, width: target.width, height: target.height, range, scratchDir: opts.masks.scratchDir, inputLabel: baseLabel });
+    lines.push(...stage.lines);
+    baseLabel = stage.outputLabel;
+    masksApplied = stage.applied;
+    tempFiles.push(...stage.files);
+  }
 
   const finalVf: string[] = [`trim=duration=${sec(durationMs)}`, ...(opts.finalVideoFilters ?? [])];
   if (opts.subtitlesAssPath) {
@@ -322,7 +355,7 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
   finalVf.push('format=yuv420p');
   lines.push(`[${baseLabel}]${finalVf.join(',')}[vout]`);
 
-  return { inputs, filterScript: lines.join(';\n') + '\n', videoLabel: '[vout]', audioLabel: '[aout]', durationMs, warnings, clipCount };
+  return { inputs, filterScript: lines.join(';\n') + '\n', videoLabel: '[vout]', audioLabel, durationMs, warnings, clipCount, masksApplied, tempFiles };
 }
 
 export interface EncodingOptions {
@@ -341,9 +374,22 @@ export function buildFfmpegArgs(graph: CompiledGraph, filterScriptPath: string, 
   const args: string[] = [];
   if (enc.threads && enc.threads > 0) args.push('-threads', String(enc.threads));
   for (const input of graph.inputs) args.push(...input.args, '-i', input.path);
+  if (!graph.videoLabel || !graph.audioLabel) throw new AppError({ code: 'RENDER_FAILED', operation: 'render.args', message: 'buildFfmpegArgs needs a graph with both video and audio outputs' });
   args.push('-filter_complex_script', filterScriptPath, '-map', graph.videoLabel, '-map', graph.audioLabel);
   args.push('-r', `${enc.fps.num}/${enc.fps.den}`, '-c:v', enc.videoEncoder, ...enc.videoArgs, '-c:a', enc.audioEncoder, ...enc.audioArgs);
   if (enc.container === 'mp4' || enc.container === 'mov') args.push('-movflags', '+faststart');
   args.push('-t', sec(graph.durationMs), '-f', enc.container === 'mov' ? 'mov' : enc.container, outputPath);
+  return args;
+}
+
+/** Argument list for an audio-only render to a PCM WAV file (analysis and previews). */
+export function buildFfmpegAudioArgs(graph: CompiledGraph, filterScriptPath: string, outputPath: string, opts: { sampleRate?: number; channels?: number } = {}): string[] {
+  const args: string[] = [];
+  for (const input of graph.inputs) args.push(...input.args, '-i', input.path);
+  if (!graph.audioLabel) throw new AppError({ code: 'RENDER_FAILED', operation: 'render.args', message: 'graph has no audio output' });
+  args.push('-filter_complex_script', filterScriptPath, '-map', graph.audioLabel, '-vn', '-c:a', 'pcm_s16le');
+  if (opts.sampleRate) args.push('-ar', String(opts.sampleRate));
+  if (opts.channels) args.push('-ac', String(opts.channels));
+  args.push('-t', sec(graph.durationMs), '-f', 'wav', outputPath);
   return args;
 }

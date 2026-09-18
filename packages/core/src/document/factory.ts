@@ -184,6 +184,8 @@ export function createMaskTrack(input: {
     status: 'ok',
     startMs: input.startMs,
     endMs: input.endMs,
+    lostRanges: [],
+    verification: null,
   };
 }
 

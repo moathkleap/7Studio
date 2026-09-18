@@ -1,7 +1,16 @@
 import { create } from 'zustand';
-import { frameDurationMs, snapToFrame, type Fraction } from '@sevenvid/core';
+import { frameDurationMs, snapToFrame, type Fraction, type NormBox } from '@sevenvid/core';
 
 export type EditorTool = 'select' | 'razor';
+export type ToolTab = 'inspector' | 'audio' | 'privacy' | 'subtitles' | 'text' | 'enhance';
+
+export interface CompareState {
+  startMs: number;
+  endMs: number;
+  beforeUrl: string;
+  afterUrl: string;
+  bypassed: { effects: number; masks: number; audioEffects: number };
+}
 
 export interface RenderedPreview {
   path: string;
@@ -28,6 +37,17 @@ interface EditorState {
   renderedPreview: RenderedPreview | null;
   previewTaskId: string | null;
   unplayableAssets: Record<string, boolean>;
+  toolTab: ToolTab;
+  selectedMaskId: string | null;
+  showMasks: boolean;
+  /** Region drawing on the preview (privacy tool): active flag and the last drawn box in sequence coordinates. */
+  maskDraw: { active: boolean; box: NormBox | null };
+  compare: CompareState | null;
+  setToolTab(tab: ToolTab): void;
+  selectMask(id: string | null): void;
+  setShowMasks(v: boolean): void;
+  setMaskDraw(v: { active: boolean; box: NormBox | null }): void;
+  setCompare(c: CompareState | null): void;
   setContext(durationMs: number, fps: Fraction): void;
   setPlayhead(ms: number, opts?: { snap?: boolean }): void;
   play(): void;
@@ -70,6 +90,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   renderedPreview: null,
   previewTaskId: null,
   unplayableAssets: {},
+  toolTab: 'inspector',
+  selectedMaskId: null,
+  showMasks: true,
+  maskDraw: { active: false, box: null },
+  compare: null,
+  setToolTab: (toolTab) => set({ toolTab }),
+  selectMask: (selectedMaskId) => set({ selectedMaskId }),
+  setShowMasks: (showMasks) => set({ showMasks }),
+  setMaskDraw: (maskDraw) => set({ maskDraw }),
+  setCompare: (compare) => set({ compare, playing: false }),
   setContext: (durationMs, fps) => set((s) => ({ durationMs, fps, playheadMs: Math.min(s.playheadMs, Math.max(0, durationMs)) })),
   setPlayhead: (ms, opts) => set((s) => ({ playheadMs: Math.max(0, Math.min(s.durationMs, opts?.snap === false ? ms : snapToFrame(ms, s.fps))) })),
   play: () => {

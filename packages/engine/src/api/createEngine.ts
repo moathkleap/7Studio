@@ -18,10 +18,21 @@ import { TemplateService } from '../project/TemplateService';
 import { MediaService } from '../media/MediaService';
 import { ExportService } from '../export/ExportService';
 import { PreviewRenderService } from '../render/PreviewRenderService';
+import { PythonRuntime } from '../worker/PythonRuntime';
+import { WorkerService } from '../worker/WorkerService';
+import { ModelManager } from '../models/ModelManager';
+import type { ModelSpec } from '../models/registry';
+import { NetworkGateway } from '../network/NetworkGateway';
+import { AudioService } from '../audio/AudioService';
+import { VisionService } from '../vision/VisionService';
+import { SubtitleService } from '../subtitles/SubtitleService';
+import { OcrService } from '../ocr/OcrService';
+import { EnhanceService } from '../enhance/EnhanceService';
 import { SearchService } from '../search/SearchService';
 import { SettingsService } from '../settings/SettingsService';
 import { TaskManager } from '../tasks/TaskManager';
 import { createCoreHandlers } from './handlers';
+import { createPhase3Handlers } from './handlers3';
 import type { EngineHost } from './host';
 
 export interface EngineOptions {
@@ -53,6 +64,15 @@ export interface EngineServices {
   media: MediaService;
   exports: ExportService;
   previews: PreviewRenderService;
+  runtime: PythonRuntime;
+  worker: WorkerService;
+  models: ModelManager;
+  gateway: NetworkGateway;
+  audio: AudioService;
+  vision: VisionService;
+  subtitles: SubtitleService;
+  ocr: OcrService;
+  enhance: EnhanceService;
 }
 
 export interface Engine extends EngineServices {
@@ -95,11 +115,23 @@ export function createEngine(opts: EngineOptions): Engine {
   const media = new MediaService(db, paths, ffmpeg, tasks, sessions, settings, search, bus, logs.child({ module: 'media' }));
   const exportsService = new ExportService(db, paths, ffmpeg, tasks, projects, sessions, settings, bus, logs.child({ module: 'export' }));
   const previews = new PreviewRenderService(paths, ffmpeg, tasks, projects, sessions, exportsService, logs.child({ module: 'render' }));
+  const runtime = new PythonRuntime(paths, tasks, logs.child({ module: 'worker' }));
+  const models = new ModelManager(db, paths, tasks, bus, logs.child({ module: 'models' }));
+  const gateway = new NetworkGateway(db, settings, logs.child({ module: 'network' }));
+  models.setFetcher(gateway.fetchToFile);
+  const worker = new WorkerService(paths, runtime, models, ffmpeg, capabilities, hardware, logs.child({ module: 'worker' }));
+  const audio = new AudioService(ffmpeg, tasks, projects, sessions, worker, capabilities, logs.child({ module: 'audio' }));
+  const vision = new VisionService(ffmpeg, tasks, projects, sessions, worker, previews, logs.child({ module: 'vision' }));
+  const subtitles = new SubtitleService(db, paths, tasks, projects, sessions, worker, models, audio, capabilities, search, logs.child({ module: 'subtitles' }));
+  const ocr = new OcrService(paths, ffmpeg, tasks, projects, sessions, models, vision, capabilities, search, logs.child({ module: 'ocr' }));
+  const enhance = new EnhanceService(ffmpeg, tasks, projects, sessions, media, hardware, capabilities, worker, logs.child({ module: 'render' }));
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance };
   registerCoreCapabilities(services);
+  models.setTester((spec, dir) => testModel(services, spec, dir));
+  bus.on('models.changed', () => void capabilities.refresh());
 
-  const handlers = createCoreHandlers(services) as ApiHandlers;
+  const handlers = { ...createCoreHandlers(services), ...createPhase3Handlers(services) } as ApiHandlers;
   let started = false;
 
   const engine: Engine = {
@@ -151,6 +183,8 @@ export function createEngine(opts: EngineOptions): Engine {
         logger.error({ err }, 'closing sessions failed');
       }
       await tasks.shutdown();
+      await worker.stop();
+      await ocr.dispose();
       sessions.markCleanShutdown();
       db.close();
       logs.flush();
@@ -176,6 +210,84 @@ function registerCoreCapabilities(s: EngineServices): void {
         : { status: 'needs-hardware', reasonKey: 'capabilities.noHardwareEncoder', action: { type: 'none', target: null } },
   );
   s.capabilities.register('planner.deterministic', () => ({ status: 'available', providerId: 'deterministic-planner', external: false }));
+  // Language-model based capabilities arrive with the assistant phase; until then their status is derived honestly from installed models.
+  s.capabilities.register('llm.text', () => {
+    const installed = ['llm/qwen2.5-3b-instruct-q4', 'llm/qwen2.5-7b-instruct-q4'].filter((m) => s.models.isInstalled(m));
+    if (installed.length === 0) return { status: 'needs-model', reasonKey: 'capabilities.modelMissing', reasonParams: { models: 'llm/qwen2.5-3b-instruct-q4' }, action: { type: 'open-models', target: 'llm/qwen2.5-3b-instruct-q4' } };
+    return { status: 'unavailable', reasonKey: 'capabilities.notImplemented', reasonParams: { models: installed.join(', ') }, action: { type: 'none', target: null } };
+  });
+  s.capabilities.register('translate', () => ({ status: 'needs-provider', reasonKey: 'capabilities.needsTextProvider', action: { type: 'open-models', target: 'llm/qwen2.5-3b-instruct-q4' } }));
+  s.capabilities.register('gen.music', () => ({ status: 'needs-provider', reasonKey: 'capabilities.needsMusicProvider', action: { type: 'open-providers', target: null } }));
+}
+
+/** Real smoke test per model family, run on bundled sample media. Never reports success without an actual inference. */
+async function testModel(s: EngineServices, spec: ModelSpec, dir: string): Promise<{ ok: boolean; message: string }> {
+  const sample = (name: string): string => {
+    const p = path.join(s.paths.resources, 'test', name);
+    if (!fs.existsSync(p)) throw new AppError({ code: 'FILE_NOT_FOUND', operation: 'models.test', message: `Test sample ${name} is missing from the application resources` });
+    return p;
+  };
+  switch (spec.id) {
+    case 'opencv/yunet-2023mar': {
+      const r = await s.worker.detectFacesInImage(sample('face-sample.jpg'));
+      return { ok: r.faces.length >= 1, message: `${r.faces.length} face(s) detected in the sample photo` };
+    }
+    case 'opencv/sface-2021dec': {
+      const r = await s.worker.embedFaces(sample('face-sample.jpg'));
+      const dims = r.faces[0]?.embedding.length ?? 0;
+      return { ok: r.faces.length >= 1 && dims >= 64, message: `${r.faces.length} face(s), ${dims}-dimensional embedding` };
+    }
+    case 'opencv/vittrack-2023sep': {
+      const r = await s.worker.track(sample('face-sample.jpg'), { startMs: 0, endMs: 100, box: { x: 0.3, y: 0.2, w: 0.3, h: 0.4 }, detector: null });
+      return { ok: r.keyframes.length >= 1, message: `tracker initialized (${r.status})` };
+    }
+    case 'mediapipe/efficientdet-lite0':
+    case 'mediapipe/efficientdet-lite2': {
+      const r = await s.worker.detectObjects(sample('face-sample.jpg'), { sampleFps: 1 });
+      const labels = r.frames.flatMap((f) => f.objects.map((o) => o.label));
+      return { ok: labels.length >= 1, message: labels.length ? `detected: ${[...new Set(labels)].join(', ')}` : 'no objects detected in the sample image' };
+    }
+    case 'silero/vad-v5': {
+      const r = await s.worker.vad(sample('speech-sample.wav'));
+      return { ok: r.speech.length >= 1 && r.speech_ratio > 0.2, message: `${r.speech.length} speech segment(s), ${Math.round(r.speech_ratio * 100)}% speech` };
+    }
+    case 'tesseract/eng-fast': {
+      const r = await s.ocr.recognizeFile(sample('text-sample.png'), ['en']);
+      return { ok: /OPEN/i.test(r.text), message: r.text ? `recognized: ${r.text.replace(/\n/g, ' | ').slice(0, 80)}` : 'no text recognized' };
+    }
+    case 'tesseract/ara-fast': {
+      const r = await s.ocr.recognizeFile(sample('text-sample.png'), ['ar']);
+      return { ok: /[؀-ۿ]/.test(r.text), message: r.text ? `recognized: ${r.text.replace(/\n/g, ' | ').slice(0, 80)}` : 'no Arabic text recognized' };
+    }
+    case 'whisper/small-ct2':
+    case 'whisper/medium-ct2':
+    case 'whisper/large-v3-turbo-ct2': {
+      const r = await s.worker.transcribe(sample('speech-sample.wav'), { modelId: spec.id, language: 'en' });
+      const text = r.segments.map((x) => x.text).join(' ').trim();
+      return { ok: /speech|sample|seven/i.test(text), message: text ? `heard: "${text.slice(0, 80)}" (${r.device})` : 'nothing transcribed' };
+    }
+    case 'piper/ar-kareem-medium':
+    case 'piper/en-lessac-medium': {
+      const out = path.join(s.paths.tmp, `tts-test-${Date.now()}.wav`);
+      try {
+        const r = await s.worker.synthesize(spec.id.startsWith('piper/ar') ? 'مرحبا بكم في سفن فيد' : 'Welcome to seven vid', out, { engine: 'piper', modelId: spec.id });
+        return { ok: r.duration_ms > 300, message: `synthesized ${Math.round(r.duration_ms)} ms of speech` };
+      } finally {
+        fs.rmSync(out, { force: true });
+      }
+    }
+    case 'realesrgan/x4plus': {
+      const out = path.join(s.paths.tmp, `upscale-test-${Date.now()}.png`);
+      try {
+        const r = await s.worker.upscaleImage(sample('text-sample.png'), out, { factor: 4 });
+        return { ok: r.width > 0, message: `upscaled sample to ${r.width}×${r.height}` };
+      } finally {
+        fs.rmSync(out, { force: true });
+      }
+    }
+    default:
+      return { ok: false, message: `Files present in ${dir}; a runtime test for this model family is not available in this build yet` };
+  }
 }
 
 function seedBuiltinTemplates(s: EngineServices): void {

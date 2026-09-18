@@ -25,6 +25,13 @@ import {
   PlaybackCapabilitiesSchema,
   WaveformDataSchema,
   ExportSettingsInputSchema,
+  ModelStatusSchema,
+  RuntimeStatusSchema,
+  NormBoxSchema,
+  MaskKindSchema,
+  MaskShapeSchema,
+  FaceSelectorSchema,
+  SubtitleFormatSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -121,6 +128,38 @@ export const channels = {
   'export.encoders': { input: z.object({ verify: z.boolean().optional() }).optional(), output: z.object({ available: z.array(z.string()), hardware: z.array(z.string()), verified: z.record(z.string(), z.object({ ok: z.boolean(), error: z.string().nullable(), ms: z.number() })) }) },
   'render.previewRange': { input: z.object({ projectId: z.string(), startMs: z.number(), endMs: z.number() }), output: TaskInfoSchema },
   'render.extractFrame': { input: z.object({ projectId: z.string(), tMs: z.number() }), output: TaskInfoSchema },
+  'render.compare': { input: z.object({ projectId: z.string(), startMs: z.number(), endMs: z.number() }), output: TaskInfoSchema },
+  // ---- models & runtime ----
+  'models.list': { input: Void, output: z.array(ModelStatusSchema) },
+  'models.get': { input: z.object({ modelId: z.string() }), output: ModelStatusSchema },
+  'models.download': { input: z.object({ modelId: z.string() }), output: TaskInfoSchema },
+  'models.remove': { input: z.object({ modelId: z.string() }), output: z.object({ removed: z.boolean() }) },
+  'models.test': { input: z.object({ modelId: z.string() }), output: z.object({ ok: z.boolean(), ms: z.number(), message: z.string() }) },
+  'runtime.status': { input: z.object({ probe: z.boolean().optional() }).optional(), output: RuntimeStatusSchema },
+  'runtime.setup': { input: z.object({ extras: z.array(z.string()) }), output: TaskInfoSchema },
+  'runtime.restart': { input: Void, output: RuntimeStatusSchema },
+  // ---- vision / privacy ----
+  'vision.detectFaces': { input: z.object({ projectId: z.string(), clipId: z.string(), sampleFps: z.number().optional() }), output: TaskInfoSchema },
+  'vision.detectObjects': { input: z.object({ projectId: z.string(), clipId: z.string(), sampleFps: z.number().optional(), categories: z.array(z.string()).optional() }), output: TaskInfoSchema },
+  'vision.blurFaces': { input: z.object({ projectId: z.string(), clipId: z.string(), kind: MaskKindSchema.optional(), shape: MaskShapeSchema.optional(), strength: z.number().optional(), selector: FaceSelectorSchema.optional(), sampleFps: z.number().optional() }), output: TaskInfoSchema },
+  'vision.trackTarget': { input: z.object({ projectId: z.string(), clipId: z.string(), box: NormBoxSchema, startMs: z.number().optional(), endMs: z.number().optional(), kind: MaskKindSchema.optional(), shape: MaskShapeSchema.optional(), strength: z.number().optional(), detector: z.enum(['face']).nullable().optional(), label: z.string().optional() }), output: TaskInfoSchema },
+  'vision.verifyMask': { input: z.object({ projectId: z.string(), maskId: z.string() }), output: TaskInfoSchema },
+  'analysis.get': { input: z.object({ projectId: z.string(), clipId: z.string(), kind: z.enum(['faces', 'objects', 'ocr']) }), output: z.unknown().nullable() },
+  // ---- audio ----
+  'audio.detectSilence': { input: z.object({ projectId: z.string(), startMs: z.number().optional(), endMs: z.number().optional(), thresholdDb: z.number().optional(), minSilenceMs: z.number().optional(), method: z.enum(['auto', 'vad', 'silencedetect']).optional() }), output: TaskInfoSchema },
+  'audio.removeSilence': { input: z.object({ projectId: z.string(), startMs: z.number().optional(), endMs: z.number().optional(), thresholdDb: z.number().optional(), minSilenceMs: z.number().optional(), paddingMs: z.number().optional(), method: z.enum(['auto', 'vad', 'silencedetect']).optional(), verify: z.boolean().optional() }), output: TaskInfoSchema },
+  'audio.measure': { input: z.object({ projectId: z.string(), startMs: z.number().optional(), endMs: z.number().optional() }), output: TaskInfoSchema },
+  'audio.applyPreset': { input: z.object({ projectId: z.string(), clipIds: z.array(z.string()).min(1), presetId: z.string() }), output: SessionStateSchema },
+  'audio.previewEnhance': { input: z.object({ projectId: z.string(), clipId: z.string(), startMs: z.number().optional(), endMs: z.number().optional() }), output: TaskInfoSchema },
+  // ---- subtitles ----
+  'subtitles.transcribe': { input: z.object({ projectId: z.string(), clipId: z.string().nullable().optional(), language: z.enum(['auto', 'ar', 'en']).optional(), modelId: z.string().optional() }), output: TaskInfoSchema },
+  'subtitles.import': { input: z.object({ projectId: z.string(), path: z.string(), language: z.string().optional() }), output: SessionStateSchema },
+  'subtitles.export': { input: z.object({ projectId: z.string(), trackId: z.string(), format: SubtitleFormatSchema, outputPath: z.string().nullable().optional() }), output: z.object({ path: z.string(), cues: z.number() }) },
+  // ---- OCR / text ----
+  'ocr.detect': { input: z.object({ projectId: z.string(), clipId: z.string(), languages: z.array(z.enum(['ar', 'en'])).optional(), sampleFps: z.number().optional() }), output: TaskInfoSchema },
+  'ocr.createMasks': { input: z.object({ projectId: z.string(), clipId: z.string(), kind: MaskKindSchema.optional(), trackIndexes: z.array(z.number()).optional() }), output: SessionStateSchema },
+  // ---- enhancement ----
+  'enhance.upscale': { input: z.object({ projectId: z.string(), clipId: z.string(), factor: z.union([z.literal(2), z.literal(4)]).optional(), method: z.enum(['lanczos', 'ai']).optional(), replaceClip: z.boolean().optional() }), output: TaskInfoSchema },
 } as const;
 
 /** Push events from the engine to the UI. */
@@ -137,6 +176,7 @@ export const events = {
   'log': LogEntrySchema,
   'projects.changed': z.object({ projectId: z.string().nullable(), reason: z.string() }),
   'recovery.available': z.array(RecoveryInfoSchema),
+  'models.changed': z.object({ modelId: z.string() }),
   'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
 } as const;

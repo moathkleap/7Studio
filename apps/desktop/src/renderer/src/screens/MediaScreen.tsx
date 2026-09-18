@@ -35,7 +35,7 @@ export function AssetThumb({ asset, className }: { asset: AssetInfo; className?:
 }
 
 export function MediaScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const projectId = useSessionStore((s) => s.projectId);
   const media = useMediaStore();

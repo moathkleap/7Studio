@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSyncedState } from '@/hooks/useSyncedState';
 import { useTranslation } from 'react-i18next';
 import { Copy, Image as ImageIcon, Trash2 } from 'lucide-react';
@@ -30,16 +29,16 @@ function RangeField({ label, value, min, max, step, onCommit, action, format }: 
   );
 }
 
-export function Inspector({ doc, onCommand }: { doc: ProjectDocument; onCommand: (cmd: Command) => Promise<unknown> }) {
+export function Inspector({ doc, onCommand, embedded }: { doc: ProjectDocument; onCommand: (cmd: Command) => Promise<unknown>; embedded?: boolean }) {
   const { t } = useTranslation();
   const selection = useEditorStore((s) => s.selection);
   const found = selection[0] ? findClip(doc, selection[0]) : undefined;
+  const body = found ? <ClipInspector doc={doc} clip={found.clip} onCommand={onCommand} /> : <SequenceInspector doc={doc} onCommand={onCommand} />;
+  if (embedded) return <div className="px-4 pb-6" data-testid="inspector">{body}</div>;
   return (
     <aside className="flex h-full w-[300px] shrink-0 flex-col overflow-y-auto border-s border-border bg-surface" data-testid="inspector">
       <div className="border-b border-border px-4 py-2.5 text-sm font-semibold">{t('editor.inspector')}</div>
-      <div className="px-4 pb-6">
-        {found ? <ClipInspector doc={doc} clip={found.clip} onCommand={onCommand} /> : <SequenceInspector doc={doc} onCommand={onCommand} />}
-      </div>
+      <div className="px-4 pb-6">{body}</div>
     </aside>
   );
 }

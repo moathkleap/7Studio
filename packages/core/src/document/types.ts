@@ -140,12 +140,22 @@ export type MaskStatus = 'ok' | 'partial' | 'lost';
 export interface MaskKeyframe {
   /** Time on the timeline in ms. */
   tMs: number;
-  /** Normalized box (0..1) relative to the sequence frame. */
+  /** Normalized box (0..1) relative to the sequence (composite) frame; linearly interpolated between keyframes. */
   x: number;
   y: number;
   w: number;
   h: number;
   confidence: number | null;
+}
+
+/** Result of measuring a rendered mask (Laplacian variance inside the box, before vs after). */
+export interface MaskVerification {
+  ok: boolean;
+  at: string;
+  /** Mean sharpness inside the box without / with the mask. */
+  before: number;
+  after: number;
+  samples: number;
 }
 
 export interface MaskTrack {
@@ -169,6 +179,9 @@ export interface MaskTrack {
   /** Timeline range covered by the mask. */
   startMs: number;
   endMs: number;
+  /** Ranges inside [startMs, endMs) where tracking lost the target (mask holds the last known box there). */
+  lostRanges?: Array<{ startMs: number; endMs: number }>;
+  verification?: MaskVerification | null;
 }
 
 export interface SubtitleStyle {

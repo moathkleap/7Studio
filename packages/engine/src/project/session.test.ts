@@ -87,6 +87,22 @@ describe('project sessions', () => {
     expect(versions[0]!.reason).toBe('recovery');
   });
 
+  it('does not report a project that is open right now as needing recovery (it flushes it instead)', async () => {
+    dir = tempDir();
+    engine = makeEngine(dir);
+    await engine.start();
+    const summary = await engine.invoke('projects.create', { name: 'open while checking' });
+    await engine.invoke('projects.open', { projectId: summary.id });
+    await engine.invoke('session.command', { projectId: summary.id, command: { type: 'marker.add', marker: { id: 'mrk_1', tMs: 500, label: 'pending', color: '#fff' } } });
+    expect(fs.readFileSync(path.join(summary.dataDir, JOURNAL_FILE), 'utf8').trim()).not.toBe('');
+    // the renderer re-checks recovery on every boot; an open session with unsaved changes must not trigger the recovery dialog
+    const recovery = await engine.invoke('projects.recovery.check');
+    expect(recovery).toHaveLength(0);
+    const s = await engine.invoke('session.state', { projectId: summary.id });
+    expect(s.save.dirty).toBe(false);
+    expect(fs.readFileSync(path.join(summary.dataDir, JOURNAL_FILE), 'utf8')).toBe('');
+  });
+
   it('autosaves after the configured interval and duplicates/deletes projects', async () => {
     dir = tempDir();
     engine = makeEngine(dir);
