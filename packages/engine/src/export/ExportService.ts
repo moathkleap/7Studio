@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getExportPreset, newId, validateDocument, type ExportSettings, type ProjectDocument } from '@sevenvid/core';
+import { estimateExportBytes, fpsToNumber, getDocumentDurationMs, getExportPreset, newId, validateDocument, type ExportSettings, type ProjectDocument } from '@sevenvid/core';
 import type { ExportInfo } from '@sevenvid/ipc';
 import type { AppDatabase } from '../db/database';
 import { AppError } from '../errors';
@@ -23,6 +23,21 @@ export interface ExportRequest {
   settings: Partial<ExportSettings> & { presetId?: ExportSettings['presetId'] };
   outputPath?: string | null;
   fileName?: string | null;
+}
+
+export interface ExportSpaceCheck {
+  /** Estimated final file size in bytes. */
+  estimatedBytes: number;
+  /** Estimate plus working headroom for intermediate render files. */
+  requiredBytes: number;
+  /** Free bytes at the target directory, or null when it could not be measured. */
+  freeBytes: number | null;
+  /** True when there is (probably) enough room, or when free space is unknown. */
+  enoughSpace: boolean;
+  durationMs: number;
+  videoBitrateKbps: number;
+  /** Absolute directory the export would be written to. */
+  targetDir: string;
 }
 
 function safeName(name: string): string {
@@ -58,6 +73,29 @@ export class ExportService {
     return { ...base, ...input, presetId: input.presetId ?? base.presetId };
   }
 
+  /** Estimates the output size and checks free disk space for a would-be export, without starting it. */
+  estimate(req: Pick<ExportRequest, 'projectId' | 'settings' | 'outputPath'>): ExportSpaceCheck {
+    const doc = this.loadDocument(req.projectId);
+    const settings = this.resolveSettings(req.settings);
+    const dir = req.outputPath ? path.dirname(req.outputPath) : (this.settings.get().storage.exportsDir ?? this.paths.exports);
+    return this.spaceCheck(dir, doc, settings);
+  }
+
+  private spaceCheck(dir: string, doc: ProjectDocument, settings: ExportSettings): ExportSpaceCheck {
+    const durationMs = getDocumentDurationMs(doc);
+    const dims = {
+      width: settings.width ?? doc.settings.width,
+      height: settings.height ?? doc.settings.height,
+      fps: fpsToNumber(settings.fps ?? doc.settings.fps),
+    };
+    const est = estimateExportBytes(durationMs, settings, dims);
+    // Leave headroom for staged/intermediate render files on top of the final size.
+    const headroom = Math.max(128 * 1024 * 1024, Math.round(est.estimatedBytes * 0.3));
+    const requiredBytes = est.estimatedBytes + headroom;
+    const freeBytes = safeFreeSpace(dir);
+    return { estimatedBytes: est.estimatedBytes, requiredBytes, freeBytes, enoughSpace: freeBytes == null || freeBytes >= requiredBytes, durationMs, videoBitrateKbps: est.videoBitrateKbps, targetDir: dir };
+  }
+
   /** Creates the export record and queues the render task. */
   start(req: ExportRequest): ExportInfo {
     if (!this.ffmpeg.ffmpeg || !this.ffmpeg.ffprobe) throw new AppError({ code: 'FFMPEG_NOT_FOUND', operation: 'export.start', message: 'FFmpeg is required to export' });
@@ -71,8 +109,11 @@ export class ExportService {
     const ext = settings.container === 'webm' ? 'webm' : settings.container === 'mov' ? 'mov' : 'mp4';
     const file = req.outputPath ?? path.join(dir, `${safeName(req.fileName ?? project.name)}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.${ext}`);
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    const free = safeFreeSpace(path.dirname(file));
-    if (free != null && free < 200 * 1024 * 1024) throw new AppError({ code: 'DISK_FULL', operation: 'export.start', message: `Only ${Math.round(free / 1048576)} MB free at ${path.dirname(file)}`, details: { free } });
+    const space = this.spaceCheck(path.dirname(file), doc, settings);
+    if (!space.enoughSpace) {
+      const mb = (n: number) => Math.round(n / 1048576);
+      throw new AppError({ code: 'DISK_FULL', operation: 'export.start', message: `Not enough disk space at ${path.dirname(file)}: needs about ${mb(space.requiredBytes)} MB, only ${mb(space.freeBytes ?? 0)} MB free`, details: { requiredBytes: space.requiredBytes, estimatedBytes: space.estimatedBytes, freeBytes: space.freeBytes } });
+    }
     const row = this.db.exports.insert({ id: newId('exp'), projectId: req.projectId, taskId: null, presetId: settings.presetId, settings: settings as unknown as Record<string, unknown>, outputPath: file, status: 'queued' });
     const task = this.tasks.enqueue({ kind: 'render.export', params: { exportId: row.id }, projectId: req.projectId, priority: 1 });
     const updated = this.db.exports.update(row.id, { taskId: task.id })!;
@@ -170,10 +211,13 @@ export class ExportService {
       const cancelled = ctx.signal.aborted || appErr.info.code === 'TASK_CANCELLED';
       this.db.exports.update(exportId, { status: cancelled ? 'cancelled' : 'failed', error: cancelled ? null : appErr.info, finishedAt: new Date().toISOString(), durationMs: Date.now() - t0 });
       this.bus.emit('exports.changed', { exportId, status: cancelled ? 'cancelled' : 'failed' });
-      if (cancelled || appErr.info.code === 'RENDER_FAILED' || appErr.info.code === 'FFMPEG_FAILED') {
+      const diskFull = appErr.info.code === 'DISK_FULL';
+      if (cancelled || diskFull || appErr.info.code === 'RENDER_FAILED' || appErr.info.code === 'FFMPEG_FAILED') {
         try {
-          if (fs.existsSync(row.outputPath) && !cancelled) fs.renameSync(row.outputPath, `${row.outputPath}.failed`);
-          else if (cancelled) fs.rmSync(row.outputPath, { force: true });
+          // Delete the partial file when cancelled or out of space (keeping it would waste the space that ran out);
+          // otherwise keep it as .failed for inspection.
+          if (cancelled || diskFull) fs.rmSync(row.outputPath, { force: true });
+          else if (fs.existsSync(row.outputPath)) fs.renameSync(row.outputPath, `${row.outputPath}.failed`);
         } catch {
           /* ignore */
         }
@@ -183,11 +227,18 @@ export class ExportService {
   }
 }
 
+/** Free bytes at `dir`, or at its nearest existing ancestor when `dir` has not been created yet. */
 function safeFreeSpace(dir: string): number | null {
-  try {
-    const st = fs.statfsSync(dir);
-    return Number(st.bavail) * Number(st.bsize);
-  } catch {
-    return null;
+  let p = path.resolve(dir);
+  for (let i = 0; i < 64; i++) {
+    try {
+      const st = fs.statfsSync(p);
+      return Number(st.bavail) * Number(st.bsize);
+    } catch {
+      const parent = path.dirname(p);
+      if (parent === p) return null;
+      p = parent;
+    }
   }
+  return null;
 }

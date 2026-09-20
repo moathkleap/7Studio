@@ -149,6 +149,11 @@ export function runFfmpeg(opts: RunFfmpegOptions): Promise<FfmpegResult> {
         return;
       }
       const tail = stderr.split('\n').filter(Boolean).slice(-6).join('\n');
+      // Report an out-of-space failure honestly as DISK_FULL rather than a generic encode failure.
+      if (/no space left on device|enospc/i.test(stderr)) {
+        reject(new AppError({ code: 'DISK_FULL', operation: opts.operation ?? 'ffmpeg', message: `ffmpeg ran out of disk space: ${tail}`, details: { code, stderrTail: tail } }));
+        return;
+      }
       reject(new AppError({ code: 'FFMPEG_FAILED', operation: opts.operation ?? 'ffmpeg', message: `ffmpeg exited with code ${code}: ${tail || 'no error output'}`, details: { code, stderrTail: tail, args: args.slice(0, 60) } }));
     });
   });

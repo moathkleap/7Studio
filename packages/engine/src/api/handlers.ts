@@ -141,6 +141,7 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
     'media.addToTimeline': ({ projectId, assetId, trackId, atMs, mode, durationMs }) => s.media.addToTimeline(projectId, assetId, { trackId, atMs, mode, durationMs }),
     'export.start': ({ projectId, settings, outputPath, fileName }) => s.exports.start({ projectId, settings: settings as never, outputPath, fileName }),
     'export.get': ({ exportId }) => s.exports.get(exportId) ?? null,
+    'export.estimate': ({ projectId, settings, outputPath }) => s.exports.estimate({ projectId, settings: settings as never, outputPath }),
     'export.encoders': (input) => ({ available: s.ffmpeg.encoders.filter((e) => /^(lib(x264|x265|vpx-vp9|svtav1|aom-av1))$|_(nvenc|qsv|amf|videotoolbox|vaapi)$/.test(e)), hardware: s.ffmpeg.hwEncoders, verified: input?.verify ? s.exports.encoderProbe.verifyAllHardware() : s.exports.encoderProbe.results() }),
     'render.previewRange': ({ projectId, startMs, endMs }) => s.previews.renderRange(projectId, startMs, endMs),
     'render.extractFrame': ({ projectId, tMs }) => s.previews.extractFrameTask(projectId, tMs),
@@ -158,4 +159,4 @@ export type CoreChannel =
   | 'shell.openPath' | 'shell.showInFolder' | 'shell.openExternal' | 'app.quit'
   | 'templates.list' | 'templates.delete' | 'templates.saveFromProject' | 'exports.list' | 'network.recent'
   | 'media.import' | 'media.list' | 'media.get' | 'media.update' | 'media.remove' | 'media.relink' | 'media.reanalyze' | 'media.waveform' | 'media.url' | 'media.setPlaybackCapabilities' | 'media.addToTimeline'
-  | 'export.start' | 'export.get' | 'export.encoders' | 'render.previewRange' | 'render.extractFrame';
+  | 'export.start' | 'export.get' | 'export.estimate' | 'export.encoders' | 'render.previewRange' | 'render.extractFrame';

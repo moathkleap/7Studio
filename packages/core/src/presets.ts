@@ -121,6 +121,42 @@ export function getExportPreset(id: ExportPresetId): ExportPreset {
   return EXPORT_PRESETS.find((p) => p.id === id) ?? EXPORT_PRESETS[EXPORT_PRESETS.length - 1]!;
 }
 
+export interface ExportEstimate {
+  /** Estimated final file size in bytes (biased slightly high so a disk-space precheck is conservative). */
+  estimatedBytes: number;
+  /** Effective video bitrate used for the estimate, in kbps. */
+  videoBitrateKbps: number;
+  audioBitrateKbps: number;
+  durationMs: number;
+}
+
+/** Rough bitrate a codec needs, relative to H.264, for comparable visual quality. */
+const CODEC_EFFICIENCY: Record<VideoCodecId, number> = { h264: 1, h265: 0.65, av1: 0.55, vp9: 0.75 };
+
+/**
+ * Estimates the encoded size of an export. In bitrate mode this is exact from the configured bitrate; in CRF mode
+ * it derives an effective bitrate from resolution, fps, codec and CRF (each 6 CRF steps ≈ 2× size). The result is
+ * biased upward so it can back a conservative disk-space precheck — it is an estimate, never a guarantee.
+ */
+export function estimateExportBytes(durationMs: number, settings: ExportSettings, dims: { width: number; height: number; fps: number }): ExportEstimate {
+  const seconds = Math.max(0.1, durationMs / 1000);
+  let videoBitrateKbps: number;
+  if (settings.qualityMode === 'bitrate') {
+    videoBitrateKbps = Math.max(200, settings.videoBitrateKbps);
+  } else {
+    // bits per pixel per frame for H.264 at CRF 23, medium motion, scaled by CRF distance and codec efficiency.
+    const baseBpp = 0.07;
+    const crfFactor = Math.pow(2, (23 - Math.max(0, Math.min(51, settings.crf))) / 6);
+    const bpp = baseBpp * crfFactor * (CODEC_EFFICIENCY[settings.videoCodec] ?? 1);
+    const bitsPerSecond = dims.width * dims.height * dims.fps * bpp;
+    videoBitrateKbps = Math.max(200, Math.round(bitsPerSecond / 1000));
+  }
+  const audioBitrateKbps = Math.max(0, settings.audioBitrateKbps);
+  const overhead = settings.qualityMode === 'crf' ? 1.2 : 1.1; // CRF sizes are less predictable, so pad more.
+  const estimatedBytes = Math.round(((videoBitrateKbps + audioBitrateKbps) * 1000 / 8) * seconds * overhead);
+  return { estimatedBytes, videoBitrateKbps, audioBitrateKbps, durationMs };
+}
+
 export const CONTAINER_CODECS: Record<ContainerId, { video: VideoCodecId[]; audio: AudioCodecId[] }> = {
   mp4: { video: ['h264', 'h265', 'av1'], audio: ['aac', 'mp3', 'opus'] },
   mov: { video: ['h264', 'h265'], audio: ['aac', 'mp3'] },

@@ -20,7 +20,7 @@ phase are shown in the interface as explicitly **not available** — nothing is 
 | 4 | AI assistant, command planner, execution and validation engine | ✅ |
 | 5 | AI Video Creator (brief → script → characters → storyboard → voice → animatic → assembly → review) | ✅ |
 | 6 | AI model manager, external provider registry, network gateway, hardware recommendations | ✅ |
-| 7 | Export center, quality validation, diagnostics | 🔜 |
+| 7 | Export center, quality validation, disk-space checks, diagnostics | ✅ |
 | 8 | QA audit, performance, security review, packaging, documentation | 🔜 |
 
 ## Architecture (short)
@@ -49,6 +49,8 @@ tests               Playwright end-to-end tests (browser mode + Electron)
 - **AI Video Creator:** an idea becomes a structured brief, then a deterministic first-draft **script** (hook, beats, call to action) with no language model required — fully editable, and a text model can rewrite it when configured. Characters carry a bible and voice, and are linked into the scenes that mention them. It renders a real **storyboard card** per scene (Arabic shaped by libass), synthesizes **voiceover** with eSpeak NG, and **assembles** cards, voice and subtitles onto the same editor timeline so every editing tool applies to the result. With no image/video generation model installed it produces an honest **animatic**, clearly labelled — never a fake “generated” video. A final **review** reports empty scenes, duration drift and character inconsistency (SFace) honestly.
 
 - **External providers:** an opt-in registry of text providers (Anthropic, any OpenAI-compatible endpoint, and local Ollama). Every request goes through the privacy-aware `NetworkGateway` — nothing leaves the machine unless external processing is enabled — and is logged. Keys are stored with the OS keychain when available (Electron safeStorage) and never returned to the interface. Configuring a provider makes the assistant's `llm.text` and subtitle **translation** capabilities available; the model manager, sha256 registry, resumable downloads and per-model tests from earlier phases round out the models & runtime surface.
+
+- **Export center & diagnostics:** the full export matrix — MP4/MOV/WebM containers × H.264/H.265/AV1/VP9 codecs × any resolution/fps — is rendered and then **validated by measurement** (real file, streams, duration within tolerance, exact dimensions and fps, and a full error-free decode pass), covered by a matrix test that renders and checks every supported combination. Hardware encoders (NVENC/QSV/AMF/VideoToolbox/VAAPI) are only offered after a real one-second test encode, with automatic software fallback at render time. Before an export starts, an **estimate** of the output size is shown next to the free disk space and the export is refused up front when it would not fit; an out-of-space failure mid-render is reported honestly as a disk-full error (and the partial file is removed) rather than a generic failure. A **Diagnostics** panel streams live logs, errors, the task history and the network log, and exports a single **diagnostics bundle** (system info, settings, capabilities, tasks, errors, network log and rotated log files) as a zip. Crash recovery restores the last valid project snapshot and journal on the next launch.
 
 Capabilities that need a model, a runtime or hardware this machine lacks are shown as such in the interface, with the reason and the next step.
 

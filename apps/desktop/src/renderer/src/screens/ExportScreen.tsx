@@ -32,6 +32,7 @@ export function ExportScreen() {
   const [exports, setExports] = useState<ExportInfo[]>([]);
   const [encoders, setEncoders] = useState<{ available: string[]; hardware: string[]; verified: Record<string, { ok: boolean; error: string | null; ms: number }> } | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [estimate, setEstimate] = useState<{ estimatedBytes: number; requiredBytes: number; freeBytes: number | null; enoughSpace: boolean; durationMs: number } | null>(null);
   const resolved = useMemo(() => ({ ...getExportPreset(presetId).settings, ...custom, presetId }), [presetId, custom]);
   const load = () => getApi().invoke('exports.list', { limit: 50 }).then(setExports).catch(reportError);
   useEffect(() => {
@@ -40,6 +41,22 @@ export function ExportScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEvent('exports.changed', () => void load());
+  // Fetch a size + free-space estimate whenever the project or settings change, debounced so typing stays smooth.
+  useEffect(() => {
+    if (!session) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEstimate(null);
+      return;
+    }
+    const id = setTimeout(() => {
+      getApi()
+        .invoke('export.estimate', { projectId: session.projectId, settings: resolved, outputPath: outputDir ? `${outputDir}/estimate.${resolved.container}` : null })
+        .then(setEstimate)
+        .catch(() => setEstimate(null));
+    }, 250);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.projectId, JSON.stringify(resolved), outputDir]);
   const set = <K extends keyof ExportSettings>(k: K, v: ExportSettings[K]) => setCustom((c) => ({ ...c, [k]: v }));
   const start = async () => {
     if (!session) return;
@@ -139,8 +156,19 @@ export function ExportScreen() {
                   </div>
                 </Field>
               </div>
+              {estimate ? (
+                <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px]" data-testid="export-estimate">
+                  <span className="text-muted">{t('export.estimateLabel')}: <span className="font-medium text-text">{formatBytes(estimate.estimatedBytes, i18n.language)}</span></span>
+                  {estimate.freeBytes != null ? <span className="text-muted">{t('export.freeSpace')}: <span className="font-medium text-text">{formatBytes(estimate.freeBytes, i18n.language)}</span></span> : null}
+                </div>
+              ) : null}
+              {estimate && !estimate.enoughSpace ? (
+                <div className="mt-2 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-[12.5px] text-danger" data-testid="export-space-warning">
+                  {t('export.notEnoughSpace', { required: formatBytes(estimate.requiredBytes, i18n.language), free: formatBytes(estimate.freeBytes ?? 0, i18n.language) })}
+                </div>
+              ) : null}
               <div className="mt-2 flex items-center gap-3">
-                <Button action="export.start" variant="primary" size="lg" icon={<Download />} disabled={!session} onClick={() => void start()} data-testid="export-start">{t('export.start')}</Button>
+                <Button action="export.start" variant="primary" size="lg" icon={<Download />} disabled={!session || (estimate ? !estimate.enoughSpace : false)} onClick={() => void start()} data-testid="export-start">{t('export.start')}</Button>
                 {!session ? <span className="text-[13px] text-muted">{t('export.noProject')}</span> : null}
               </div>
             </CapabilityGate>

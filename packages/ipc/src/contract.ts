@@ -134,6 +134,7 @@ export const channels = {
   'media.addToTimeline': { input: z.object({ projectId: z.string(), assetId: z.string(), trackId: z.string().nullable().optional(), atMs: z.number().nullable().optional(), mode: z.enum(['overwrite', 'insert']).optional(), durationMs: z.number().nullable().optional() }), output: SessionStateSchema },
   'export.start': { input: z.object({ projectId: z.string(), settings: ExportSettingsInputSchema, outputPath: z.string().nullable().optional(), fileName: z.string().nullable().optional() }), output: ExportInfoSchema },
   'export.get': { input: z.object({ exportId: z.string() }), output: ExportInfoSchema.nullable() },
+  'export.estimate': { input: z.object({ projectId: z.string(), settings: ExportSettingsInputSchema, outputPath: z.string().nullable().optional() }), output: z.object({ estimatedBytes: z.number(), requiredBytes: z.number(), freeBytes: z.number().nullable(), enoughSpace: z.boolean(), durationMs: z.number(), videoBitrateKbps: z.number(), targetDir: z.string() }) },
   'export.encoders': { input: z.object({ verify: z.boolean().optional() }).optional(), output: z.object({ available: z.array(z.string()), hardware: z.array(z.string()), verified: z.record(z.string(), z.object({ ok: z.boolean(), error: z.string().nullable(), ms: z.number() })) }) },
   'render.previewRange': { input: z.object({ projectId: z.string(), startMs: z.number(), endMs: z.number() }), output: TaskInfoSchema },
   'render.extractFrame': { input: z.object({ projectId: z.string(), tMs: z.number() }), output: TaskInfoSchema },

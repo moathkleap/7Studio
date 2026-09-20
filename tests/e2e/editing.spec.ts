@@ -61,6 +61,9 @@ test.describe('media, timeline and export', () => {
     // Export with validation
     await page.locator('[data-action="project.export"]').click();
     await page.getByTestId('export-preset').selectOption('web-small');
+    // The export center shows a size + free-space estimate first, and the start button is enabled because it fits.
+    await expect(page.getByTestId('export-estimate')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('export-start')).toBeEnabled();
     await page.getByTestId('export-start').click();
     await expect(page.getByTestId('export-row').first()).toHaveAttribute('data-status', 'done', { timeout: 120_000 });
     await expect(page.getByTestId('export-validation').first()).toContainText('decode');

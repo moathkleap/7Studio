@@ -462,6 +462,9 @@
     "verified": "verified",
     "notVerified": "not verified",
     "estimatedSize": "Output size",
+    "estimateLabel": "Estimated size",
+    "freeSpace": "Free space",
+    "notEnoughSpace": "Not enough disk space: needs about {{required}}, only {{free}} free",
     "warnings": "Warnings",
     "encoder": "Encoder used"
   },

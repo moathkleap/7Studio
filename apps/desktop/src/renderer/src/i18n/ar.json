@@ -462,6 +462,9 @@
     "verified": "مُتحقق",
     "notVerified": "غير مُتحقق",
     "estimatedSize": "حجم الناتج",
+    "estimateLabel": "الحجم المتوقّع",
+    "freeSpace": "المساحة المتاحة",
+    "notEnoughSpace": "لا توجد مساحة كافية على القرص: يلزم نحو {{required}}، المتاح {{free}} فقط",
     "warnings": "تحذيرات",
     "encoder": "المرمّز المستخدم"
   },
