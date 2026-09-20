@@ -1,4 +1,4 @@
-import { dialog, shell, app, type BrowserWindow } from 'electron';
+import { dialog, shell, app, safeStorage, type BrowserWindow } from 'electron';
 import type { EngineHost } from '@sevenvid/engine';
 
 const FILTERS = {
@@ -44,5 +44,18 @@ export function createElectronHost(getWindow: () => BrowserWindow | null, isDev:
     },
     quit: () => app.quit(),
     mediaUrl: (p) => `sevenvid-media://local/${encodeURIComponent(p)}`,
+    // OS-backed secret storage so provider API keys are encrypted at rest (macOS Keychain, Windows DPAPI,
+    // libsecret on Linux). Evaluated lazily — `isEncryptionAvailable` is only valid once the app is ready.
+    secrets: {
+      get available(): boolean {
+        try {
+          return safeStorage.isEncryptionAvailable();
+        } catch {
+          return false;
+        }
+      },
+      encrypt: (plain: string): string => safeStorage.encryptString(plain).toString('base64'),
+      decrypt: (enc: string): string => safeStorage.decryptString(Buffer.from(enc, 'base64')),
+    },
   };
 }

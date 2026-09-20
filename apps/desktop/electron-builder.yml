@@ -1,0 +1,105 @@
+# electron-builder configuration for 7vid.
+# Run `pnpm --filter @sevenvid/desktop package` (electron-vite build && electron-builder).
+# Icons: drop icon.icns (mac), icon.ico (win) and a 512×512 icon.png (linux) into
+# apps/desktop/build-resources/ before a release build; electron-builder picks them up from buildResources.
+appId: com.sevenvid.app
+productName: 7vid
+copyright: Copyright © 2026 7vid
+
+directories:
+  output: release
+  buildResources: build-resources
+
+# electron-vite emits the compiled main/preload/renderer into out/.
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  - '!**/*.ts'
+
+# Bundled runtime assets read by the engine from `process.resourcesPath/<path>`.
+# To bundle FFmpeg, place static ffmpeg/ffprobe binaries under resources/bin/<platform>-<arch>/
+# (e.g. linux-x64, win32-x64, darwin-arm64) before packaging. The locator also falls back to
+# SEVENVID_FFMPEG_PATH and then the system PATH, so bundling is optional.
+extraResources:
+  - from: ../../resources/fonts
+    to: resources/fonts
+  - from: ../../resources/models
+    to: resources/models
+  - from: ../../resources/presets
+    to: resources/presets
+  - from: ../../resources/templates
+    to: resources/templates
+  - from: ../../resources/test
+    to: resources/test
+  - from: ../../resources/icons
+    to: resources/icons
+  - from: ../../resources/bin
+    to: resources/bin
+    filter: ['**/*']
+  # Python AI worker source; the app creates its own venv on first run (AI Models → Set up runtime).
+  - from: ../../ai-worker
+    to: resources/ai-worker
+    filter:
+      - '**/*'
+      - '!.venv/**'
+      - '!**/__pycache__/**'
+      - '!**/*.pyc'
+      - '!tests/**'
+      - '!**/*.egg-info/**'
+
+# Keep binary/native assets outside the asar so child processes (FFmpeg, Python) can exec them.
+asar: true
+asarUnpack:
+  - resources/bin/**
+  - resources/ai-worker/**
+
+npmRebuild: false
+electronLanguages: ['en', 'ar']
+
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+
+mac:
+  category: public.app-category.video
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build-resources/entitlements.mac.plist
+  entitlementsInherit: build-resources/entitlements.mac.plist
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+
+linux:
+  category: AudioVideo
+  target:
+    - AppImage
+    - deb
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  desktop:
+    entry:
+      Name: 7vid
+      Comment: Local-first AI video editor and creator
+      Categories: AudioVideo;Video;AudioVideoEditing;
+
+# Auto-update is disabled by default (local-first, no telemetry). Configure a `publish` provider to enable it.
+publish: null
