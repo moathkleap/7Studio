@@ -719,7 +719,31 @@
     "title": "AI Assistant",
     "placeholder": "Tell 7vid what to do, in Arabic or English…",
     "send": "Send",
-    "hint": "Example: احذف أول 20 ثانية وطمس الوجه"
+    "hint": "Example: احذف أول 20 ثانية وطمس الوجه",
+    "clear": "Clear conversation",
+    "openProject": "Open a project to use the assistant.",
+    "intro": "Describe the edit you want in plain Arabic or English. I will show a plan and apply it only after you confirm.",
+    "applying": "Applying…",
+    "apply": "Review & apply",
+    "applyNow": "Apply",
+    "verified": "verified",
+    "unverified": "unverified",
+    "report": "Report",
+    "counts": "{{done}} done · {{failed}} failed · {{skipped}} skipped",
+    "notUnderstood": "I could not turn that into an editing action.",
+    "someUnknown": "I did not understand: {{text}}",
+    "someFeasible": "{{done}} of {{total}} can run now",
+    "noneFeasible": "None of these can run right now — see the reasons above.",
+    "help": {
+      "title": "What I can do",
+      "body": "Trim and cut, remove silence, blur faces or on-screen text, clean up audio, adjust colour, change speed, stabilize, add subtitles, set the aspect ratio for a platform, upscale and export. Just describe it."
+    },
+    "meta": {
+      "undo": "Undo the last change.",
+      "redo": "Redo the last change.",
+      "undoDo": "Undo",
+      "redoDo": "Redo"
+    }
   },
   "fileBrowser": {
     "title": "Choose files",
@@ -1038,5 +1062,26 @@
     "output": "Output",
     "slider": "Drag to compare",
     "bypassed": "{{effects}} effect(s), {{masks}} mask(s) and {{audio}} audio effect(s) bypassed in “before”."
+  },
+  "ai": {
+    "reason": {
+      "capability": "Needs a capability that is not available ({{status}})",
+      "noVideoClip": "There is no video clip on the timeline",
+      "noClip": "There is no suitable clip",
+      "emptyTimeline": "The timeline is empty",
+      "trimTooLong": "That is longer than the whole video"
+    },
+    "clarify": {
+      "edge": "Remove from the start or the end?",
+      "edgeStart": "From the start",
+      "edgeEnd": "From the end",
+      "durationStrategy": "How should I shorten it to {{targetMs}} ms?",
+      "durationLonger": "The target is longer than the video — slow it down to fill the time?",
+      "strategyTrimEnd": "Trim the end",
+      "strategyTrimStart": "Trim the start",
+      "strategySilenceFirst": "Remove silence first",
+      "strategySpeed": "Speed up",
+      "strategySlow": "Slow down"
+    }
   }
 }

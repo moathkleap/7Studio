@@ -503,3 +503,88 @@ export interface CompareRenderResult {
   afterPath: string;
   bypassed: { effects: number; masks: number; audioEffects: number };
 }
+
+// ---- assistant (phase 4) ----
+export const OperationDraftIoSchema = z.object({
+  type: z.string(),
+  params: z.record(z.string(), z.unknown()),
+  confidence: z.number(),
+  text: z.string(),
+});
+export const ClarificationSchema = z.object({
+  operationIndex: z.number(),
+  field: z.string(),
+  questionKey: z.string(),
+  params: z.record(z.string(), z.unknown()),
+  options: z.array(z.object({ value: z.union([z.string(), z.number(), z.null()]), labelKey: z.string() })),
+});
+export const PlanStepSchema = z.object({
+  index: z.number(),
+  type: z.string(),
+  params: z.record(z.string(), z.unknown()),
+  summaryAr: z.string(),
+  summaryEn: z.string(),
+  feasible: z.boolean(),
+  reasonKey: z.string().nullable(),
+  reasonParams: z.record(z.string(), z.unknown()),
+  capability: z.string().nullable(),
+  capabilityStatus: z.string().nullable(),
+  destructive: z.boolean(),
+  long: z.boolean(),
+  targetClipIds: z.array(z.string()),
+});
+export const AssistantPlanSchema = z.object({
+  id: z.string(),
+  conversationId: z.string(),
+  messageId: z.string(),
+  projectId: z.string(),
+  text: z.string(),
+  language: z.enum(['ar', 'en', 'mixed', 'unknown']),
+  meta: z.enum(['undo', 'redo', 'help']).nullable(),
+  steps: z.array(PlanStepSchema),
+  clarifications: z.array(ClarificationSchema),
+  unknownClauses: z.array(z.string()),
+  summaryAr: z.string(),
+  summaryEn: z.string(),
+  requiresConfirmation: z.boolean(),
+  feasibleCount: z.number(),
+  confidence: z.number(),
+  status: z.enum(['draft', 'confirmed', 'executing', 'done', 'failed', 'cancelled', 'partial']),
+});
+export type AssistantPlan = z.infer<typeof AssistantPlanSchema>;
+export type PlanStep = z.infer<typeof PlanStepSchema>;
+
+export const StepResultSchema = z.object({
+  index: z.number(),
+  type: z.string(),
+  status: z.enum(['done', 'failed', 'skipped']),
+  summaryAr: z.string(),
+  summaryEn: z.string(),
+  verified: z.boolean().nullable(),
+  detailAr: z.string().nullable(),
+  detailEn: z.string().nullable(),
+  errorCode: z.string().nullable(),
+});
+export const PlanRunResultSchema = z.object({
+  planId: z.string(),
+  projectId: z.string(),
+  steps: z.array(StepResultSchema),
+  doneCount: z.number(),
+  failedCount: z.number(),
+  skippedCount: z.number(),
+  reportAr: z.string(),
+  reportEn: z.string(),
+});
+export type PlanRunResult = z.infer<typeof PlanRunResultSchema>;
+export type StepResult = z.infer<typeof StepResultSchema>;
+
+export const AssistantMessageSchema = z.object({
+  id: z.string(),
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+  createdAt: z.string(),
+  planId: z.string().nullable(),
+  plan: AssistantPlanSchema.nullable(),
+  result: PlanRunResultSchema.nullable(),
+});
+export type AssistantMessage = z.infer<typeof AssistantMessageSchema>;

@@ -17,7 +17,7 @@ phase are shown in the interface as explicitly **not available** — nothing is 
 | 1 | Application shell, navigation, i18n (ar/en, RTL), projects, versions, crash recovery, tasks, errors, logs, hardware detection, capability registry, dev bridge | ✅ |
 | 2 | Media import/analysis, library, timeline, preview, basic editing, render compiler, export | ✅ |
 | 3 | Audio, subtitles, OCR, face/object detection, masking, tracking (Python AI worker) | ✅ |
-| 4 | AI assistant, command planner, execution and validation engine | 🔜 |
+| 4 | AI assistant, command planner, execution and validation engine | ✅ |
 | 5 | AI Video Creator | 🔜 |
 | 6 | AI model manager, providers, network gateway | 🔜 |
 | 7 | Export center, quality validation, diagnostics | 🔜 |
@@ -42,6 +42,7 @@ tests               Playwright end-to-end tests (browser mode + Electron)
 - **Audio:** silence detection (Silero VAD when installed, FFmpeg `silencedetect` otherwise), silence removal with re-detection as verification, loudness measurement (`ebur128`), enhancement presets and a rendered before/after comparison with real numbers.
 - **Subtitles:** SRT/WebVTT import, SRT/WebVTT/ASS export verified by re-parsing, burn-in with Arabic shaping (libass), cue and style editing. Speech recognition runs through faster-whisper once a Whisper model is installed.
 - **On-screen text:** OCR (Tesseract, Arabic + English) per sampled frame, linked into text regions, text extraction and text masks.
+- **AI assistant:** a deterministic bilingual (Arabic/English) command parser turns a request into a validated plan of operations, shows it step by step with feasibility, asks a clarifying question when a request is ambiguous (“make it a minute” → trim which end, or slow down), applies it through the same undoable timeline commands and engine tasks, and **verifies every step** against the document (duration changed, mask added, effect present, cues generated). Operations that need a missing model or runtime are shown as not runnable with the reason, never faked. A local or cloud text model can widen understanding but never bypasses the schema or the verification.
 - **Enhancement:** looks (color presets), Lanczos upscaling with output validation, AI upscaling gated on a Vulkan GPU runtime, before/after split comparison.
 - **Models & runtime:** model registry with checksums, downloads through the privacy-aware network gateway (resumable, logged), real per-model tests on bundled samples, Python runtime detection and setup.
 

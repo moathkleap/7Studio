@@ -4,6 +4,7 @@ import { AppError } from '../errors';
 import type { Logger } from '../logging/logger';
 import { openSqlite, type SqlDriver } from './driver';
 import { migrate } from './migrations';
+import { AiRepo } from './repos/ai';
 import { AppStateRepo } from './repos/appState';
 import { AssetsRepo } from './repos/assets';
 import { ExportsRepo } from './repos/exports';
@@ -31,6 +32,7 @@ export interface AppDatabase {
   networkLog: NetworkLogRepo;
   search: SearchRepo;
   transcripts: TranscriptsRepo;
+  ai: AiRepo;
   transaction<T>(fn: () => T): T;
   close(): void;
 }
@@ -53,6 +55,7 @@ export function openDatabase(file: string, logger?: Logger): AppDatabase {
       models: new ModelsRepo(driver),
       templates: new TemplatesRepo(driver),
       networkLog: new NetworkLogRepo(driver),
+      ai: new AiRepo(driver),
       search: new SearchRepo(driver),
       transcripts: new TranscriptsRepo(driver),
       transaction: (fn) => driver.transaction(fn),

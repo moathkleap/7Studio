@@ -13,3 +13,4 @@ export * from './capabilities';
 export * from './errors';
 export * from './document/geometry';
 export * from './audio';
+export * from './ai';

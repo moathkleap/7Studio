@@ -32,6 +32,9 @@ import {
   MaskShapeSchema,
   FaceSelectorSchema,
   SubtitleFormatSchema,
+  AssistantPlanSchema,
+  AssistantMessageSchema,
+  PlanRunResultSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -160,6 +163,12 @@ export const channels = {
   'ocr.createMasks': { input: z.object({ projectId: z.string(), clipId: z.string(), kind: MaskKindSchema.optional(), trackIndexes: z.array(z.number()).optional() }), output: SessionStateSchema },
   // ---- enhancement ----
   'enhance.upscale': { input: z.object({ projectId: z.string(), clipId: z.string(), factor: z.union([z.literal(2), z.literal(4)]).optional(), method: z.enum(['lanczos', 'ai']).optional(), replaceClip: z.boolean().optional() }), output: TaskInfoSchema },
+  // ---- assistant (phase 4) ----
+  'assistant.plan': { input: z.object({ projectId: z.string(), text: z.string().min(1), selectedClipIds: z.array(z.string()).optional(), choices: z.record(z.string(), z.union([z.string(), z.number(), z.null()])).optional() }), output: AssistantPlanSchema },
+  'assistant.apply': { input: z.object({ projectId: z.string(), planId: z.string(), selectedClipIds: z.array(z.string()).optional() }), output: TaskInfoSchema },
+  'assistant.history': { input: z.object({ projectId: z.string() }), output: z.array(AssistantMessageSchema) },
+  'assistant.clear': { input: z.object({ projectId: z.string() }), output: z.object({ cleared: z.boolean() }) },
+  'assistant.meta': { input: z.object({ projectId: z.string(), action: z.enum(['undo', 'redo']) }), output: SessionStateSchema },
 } as const;
 
 /** Push events from the engine to the UI. */
@@ -179,6 +188,7 @@ export const events = {
   'models.changed': z.object({ modelId: z.string() }),
   'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
+  'assistant.updated': z.object({ projectId: z.string(), planId: z.string(), result: PlanRunResultSchema.nullable() }),
 } as const;
 
 export type ChannelMap = typeof channels;
