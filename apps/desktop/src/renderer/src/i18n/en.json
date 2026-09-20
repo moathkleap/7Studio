@@ -231,7 +231,77 @@
   },
   "creator": {
     "title": "AI Video Creator",
-    "subtitle": "Idea → script → characters → scenes → voice → video → export."
+    "subtitle": "Idea → script → characters → scenes → voice → video → export.",
+    "noProject": "Open or create a project to use the Creator.",
+    "openInEditor": "Open in editor",
+    "animaticMode": "No video-generation model is installed — the Creator will produce an animatic (storyboard cards, real voiceover and subtitles) that you can edit and export.",
+    "idea": "Your idea",
+    "ideaHint": "Describe the video in a sentence or two, in Arabic or English.",
+    "ideaPlaceholder": "e.g. A 20-second ad for our morning coffee, energetic, ending with a call to visit the store.",
+    "language": "Language",
+    "duration": "Duration (s)",
+    "platform": "Platform",
+    "aspect": "Aspect",
+    "tone": "Tone",
+    "style": "Style",
+    "cta": "Call to action",
+    "ctaPlaceholder": "e.g. Visit our store today",
+    "narration": "Narration",
+    "music": "Music",
+    "buildScript": "Build the script",
+    "saveScript": "Save script",
+    "narrationPlaceholder": "Narration or dialogue for this scene",
+    "addCharacter": "Add character",
+    "noCharacters": "No characters yet. Add one to keep them consistent across scenes.",
+    "charName": "Name",
+    "charAge": "Age",
+    "charAppearance": "Appearance",
+    "charHair": "Hair",
+    "charClothing": "Clothing",
+    "charVoiceRate": "Voice rate",
+    "hasReference": "reference set",
+    "renderStoryboard": "Render storyboard",
+    "synthVoice": "Voiceover",
+    "assemble": "Assemble animatic",
+    "recheck": "Re-check",
+    "reviewClean": "No issues found. The project is ready to assemble and export.",
+    "stage": {
+      "brief": "Brief",
+      "script": "Script",
+      "characters": "Characters",
+      "produce": "Produce",
+      "review": "Review"
+    },
+    "tones": {
+      "neutral": "Neutral",
+      "energetic": "Energetic",
+      "calm": "Calm",
+      "serious": "Serious",
+      "playful": "Playful",
+      "inspirational": "Inspirational",
+      "dramatic": "Dramatic"
+    },
+    "styles": {
+      "cinematic": "Cinematic",
+      "realistic": "Realistic",
+      "documentary": "Documentary",
+      "animation": "Animation",
+      "minimal": "Minimal",
+      "vlog": "Vlog",
+      "corporate": "Corporate"
+    },
+    "status": {
+      "draft": "Draft",
+      "storyboard": "Storyboard",
+      "voiced": "Voiced",
+      "generated": "Generated",
+      "assembled": "Assembled",
+      "failed": "Failed"
+    },
+    "severity": {
+      "error": "Error",
+      "warning": "Warning"
+    }
   },
   "media": {
     "title": "Media Library",

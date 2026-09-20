@@ -14,7 +14,7 @@ export interface JournalEntry {
   patches: Patch[];
 }
 
-type Origin = 'command' | 'undo' | 'redo' | 'ai' | 'restore' | 'save' | 'external';
+type Origin = 'command' | 'undo' | 'redo' | 'ai' | 'restore' | 'save' | 'external' | 'creator';
 
 /**
  * In-memory editing session for one open project: owns the document, undo history, autosave and the
@@ -105,7 +105,7 @@ export class ProjectSession {
   }
 
   /** Replaces the whole document (version restore / recovery). History is cleared. */
-  replaceDocument(doc: ProjectDocument, origin: Origin, save: { reason: 'restore' | 'recovery' | 'manual'; label: string | null } | null): SessionState {
+  replaceDocument(doc: ProjectDocument, origin: Origin, save: { reason: 'restore' | 'recovery' | 'manual' | 'creator'; label: string | null } | null): SessionState {
     this.assertOpen();
     this.doc = { ...doc, id: this.projectId };
     this.history.clear();

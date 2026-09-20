@@ -35,6 +35,11 @@ import {
   AssistantPlanSchema,
   AssistantMessageSchema,
   PlanRunResultSchema,
+  CreatorStateSchema,
+  CreatorReviewSchema,
+  BriefIoSchema,
+  ScriptIoSchema,
+  CharacterIoSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -169,13 +174,25 @@ export const channels = {
   'assistant.history': { input: z.object({ projectId: z.string() }), output: z.array(AssistantMessageSchema) },
   'assistant.clear': { input: z.object({ projectId: z.string() }), output: z.object({ cleared: z.boolean() }) },
   'assistant.meta': { input: z.object({ projectId: z.string(), action: z.enum(['undo', 'redo']) }), output: SessionStateSchema },
+  // ---- creator (phase 5) ----
+  'creator.state': { input: z.object({ projectId: z.string() }), output: CreatorStateSchema },
+  'creator.setBrief': { input: z.object({ projectId: z.string(), brief: BriefIoSchema }), output: CreatorStateSchema },
+  'creator.updateScript': { input: z.object({ projectId: z.string(), script: ScriptIoSchema }), output: CreatorStateSchema },
+  'creator.saveCharacter': { input: z.object({ projectId: z.string(), character: CharacterIoSchema }), output: CreatorStateSchema },
+  'creator.removeCharacter': { input: z.object({ projectId: z.string(), characterId: z.string() }), output: CreatorStateSchema },
+  'creator.embedCharacter': { input: z.object({ projectId: z.string(), characterId: z.string(), imagePath: z.string() }), output: CreatorStateSchema },
+  'creator.storyboard': { input: z.object({ projectId: z.string(), sceneIds: z.array(z.string()).optional() }), output: TaskInfoSchema },
+  'creator.voice': { input: z.object({ projectId: z.string(), sceneIds: z.array(z.string()).optional() }), output: TaskInfoSchema },
+  'creator.assemble': { input: z.object({ projectId: z.string() }), output: TaskInfoSchema },
+  'creator.review': { input: z.object({ projectId: z.string() }), output: CreatorReviewSchema },
+  'creator.clear': { input: z.object({ projectId: z.string() }), output: CreatorStateSchema },
 } as const;
 
 /** Push events from the engine to the UI. */
 export const events = {
   'task.updated': TaskInfoSchema,
   'task.progress': z.object({ taskId: z.string(), progress: z.number(), message: z.string().nullable(), etaMs: z.number().nullable() }),
-  'session.updated': z.object({ projectId: z.string(), state: SessionStateSchema, origin: z.enum(['command', 'undo', 'redo', 'ai', 'restore', 'save', 'external']) }),
+  'session.updated': z.object({ projectId: z.string(), state: SessionStateSchema, origin: z.enum(['command', 'undo', 'redo', 'ai', 'restore', 'save', 'external', 'creator']) }),
   'session.closed': z.object({ projectId: z.string() }),
   'capabilities.updated': z.record(z.string(), CapabilityInfoSchema),
   'hardware.updated': HardwareSnapshotSchema,
@@ -189,6 +206,7 @@ export const events = {
   'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
   'assistant.updated': z.object({ projectId: z.string(), planId: z.string(), result: PlanRunResultSchema.nullable() }),
+  'creator.updated': z.object({ projectId: z.string() }),
 } as const;
 
 export type ChannelMap = typeof channels;

@@ -54,10 +54,9 @@ test.describe('media, timeline and export', () => {
     await tone.locator('[data-action="editor.addAsset"]').click();
     await expect(page.getByTestId('editor-clip-count')).toContainText('2');
     await page.getByTestId('playback-toggle').click();
-    await page.waitForTimeout(700);
+    // wait deterministically for the playback clock to advance rather than a brittle fixed delay
+    await expect.poll(async () => (await page.getByTestId('timecode').innerText()).trim().startsWith('00:00:00:00'), { timeout: 8000 }).toBe(false);
     await page.getByTestId('playback-toggle').click();
-    const tc = await page.getByTestId('timecode').innerText();
-    expect(tc.startsWith('00:00:00:00')).toBe(false);
 
     // Export with validation
     await page.locator('[data-action="project.export"]').click();

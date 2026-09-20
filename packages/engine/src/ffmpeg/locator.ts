@@ -37,7 +37,7 @@ function findOnPath(name: string): string | null {
 
 function readVersion(ffmpeg: string): string | null {
   try {
-    const out = execFileSync(ffmpeg, ['-version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 });
+    const out = execFileSync(ffmpeg, ['-version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
     const m = /ffmpeg version (\S+)/.exec(out);
     return m ? m[1]! : null;
   } catch {
@@ -47,7 +47,7 @@ function readVersion(ffmpeg: string): string | null {
 
 function listEncoders(ffmpeg: string): string[] {
   try {
-    const out = execFileSync(ffmpeg, ['-hide_banner', '-encoders'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 });
+    const out = execFileSync(ffmpeg, ['-hide_banner', '-encoders'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
     return out
       .split('\n')
       .map((l) => /^\s*[VAS][.A-Z]{5}\s+(\S+)/.exec(l)?.[1])
@@ -59,7 +59,7 @@ function listEncoders(ffmpeg: string): string[] {
 
 function listFilters(ffmpeg: string): string[] {
   try {
-    const out = execFileSync(ffmpeg, ['-hide_banner', '-filters'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 });
+    const out = execFileSync(ffmpeg, ['-hide_banner', '-filters'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
     return out
       .split('\n')
       .map((l) => /^\s*[T.][S.][C.]\s+(\S+)/.exec(l)?.[1])

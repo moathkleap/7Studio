@@ -29,12 +29,14 @@ import { SubtitleService } from '../subtitles/SubtitleService';
 import { OcrService } from '../ocr/OcrService';
 import { EnhanceService } from '../enhance/EnhanceService';
 import { AssistantService } from '../ai/AssistantService';
+import { CreatorService } from '../creator/CreatorService';
 import { SearchService } from '../search/SearchService';
 import { SettingsService } from '../settings/SettingsService';
 import { TaskManager } from '../tasks/TaskManager';
 import { createCoreHandlers } from './handlers';
 import { createPhase3Handlers } from './handlers3';
 import { createAssistantHandlers } from './handlers4';
+import { createCreatorHandlers } from './handlers5';
 import type { EngineHost } from './host';
 
 export interface EngineOptions {
@@ -76,6 +78,7 @@ export interface EngineServices {
   ocr: OcrService;
   enhance: EnhanceService;
   assistant: AssistantService;
+  creator: CreatorService;
 }
 
 export interface Engine extends EngineServices {
@@ -129,13 +132,14 @@ export function createEngine(opts: EngineOptions): Engine {
   const ocr = new OcrService(paths, ffmpeg, tasks, projects, sessions, models, vision, capabilities, search, logs.child({ module: 'ocr' }));
   const enhance = new EnhanceService(ffmpeg, tasks, projects, sessions, media, hardware, capabilities, worker, logs.child({ module: 'render' }));
   const assistant = new AssistantService({ db, sessions, tasks, capabilities, settings, bus, logger: logs.child({ module: 'ai' }), audio, vision, subtitles, ocr, enhance, exports: exportsService });
+  const creator = new CreatorService({ db, ffmpeg, tasks, projects, sessions, media, capabilities, worker, bus, logger: logs.child({ module: 'creator' }) });
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator };
   registerCoreCapabilities(services);
   models.setTester((spec, dir) => testModel(services, spec, dir));
   bus.on('models.changed', () => void capabilities.refresh());
 
-  const handlers = { ...createCoreHandlers(services), ...createPhase3Handlers(services), ...createAssistantHandlers(services) } as ApiHandlers;
+  const handlers = { ...createCoreHandlers(services), ...createPhase3Handlers(services), ...createAssistantHandlers(services), ...createCreatorHandlers(services) } as ApiHandlers;
   let started = false;
 
   const engine: Engine = {

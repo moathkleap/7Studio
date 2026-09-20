@@ -588,3 +588,20 @@ export const AssistantMessageSchema = z.object({
   result: PlanRunResultSchema.nullable(),
 });
 export type AssistantMessage = z.infer<typeof AssistantMessageSchema>;
+
+// ---- creator (phase 5) ----
+import type { Brief, Character, CreatorScene, CreatorQaIssue, ProductionMode, Script } from '@sevenvid/core';
+export const BriefIoSchema = passthrough<Brief>((v) => typeof v === 'object' && v !== null && 'idea' in v);
+export const ScriptIoSchema = passthrough<Script>((v) => typeof v === 'object' && v !== null && 'scenes' in v);
+export const CharacterIoSchema = passthrough<Character>((v) => typeof v === 'object' && v !== null && 'name' in v);
+export const CreatorSceneIoSchema = passthrough<CreatorScene>((v) => typeof v === 'object' && v !== null && 'scene' in v);
+export const CreatorStateSchema = z.object({
+  brief: BriefIoSchema.nullable(),
+  script: ScriptIoSchema.nullable(),
+  characters: z.array(CharacterIoSchema),
+  scenes: z.array(CreatorSceneIoSchema),
+  productionMode: z.custom<ProductionMode>(),
+  productionReason: z.string().nullable(),
+});
+export type CreatorState = z.infer<typeof CreatorStateSchema>;
+export const CreatorReviewSchema = z.object({ issues: z.array(passthrough<CreatorQaIssue>()), mode: z.custom<ProductionMode>() });

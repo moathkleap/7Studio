@@ -231,7 +231,77 @@
   },
   "creator": {
     "title": "مولّد الفيديو الذكي",
-    "subtitle": "فكرة ← سكربت ← شخصيات ← مشاهد ← صوت ← فيديو ← تصدير."
+    "subtitle": "فكرة ← سكربت ← شخصيات ← مشاهد ← صوت ← فيديو ← تصدير.",
+    "noProject": "افتح أو أنشئ مشروعاً لاستخدام المولّد.",
+    "openInEditor": "افتح في المحرر",
+    "animaticMode": "لا يوجد نموذج توليد فيديو مثبّت — سيُنتج المولّد نسخة تحريكية (بطاقات storyboard وتعليق صوتي حقيقي وترجمة) يمكنك تحريرها وتصديرها.",
+    "idea": "فكرتك",
+    "ideaHint": "صِف الفيديو في جملة أو جملتين، بالعربية أو الإنجليزية.",
+    "ideaPlaceholder": "مثال: إعلان 20 ثانية عن قهوة الصباح، نبرة حماسية، ينتهي بدعوة لزيارة المتجر.",
+    "language": "اللغة",
+    "duration": "المدة (ث)",
+    "platform": "المنصة",
+    "aspect": "النسبة",
+    "tone": "النبرة",
+    "style": "الأسلوب",
+    "cta": "دعوة للتفاعل",
+    "ctaPlaceholder": "مثال: زُر متجرنا اليوم",
+    "narration": "سرد صوتي",
+    "music": "موسيقى",
+    "buildScript": "بناء السكربت",
+    "saveScript": "حفظ السكربت",
+    "narrationPlaceholder": "سرد أو حوار هذا المشهد",
+    "addCharacter": "إضافة شخصية",
+    "noCharacters": "لا توجد شخصيات بعد. أضف واحدة للحفاظ على اتساقها عبر المشاهد.",
+    "charName": "الاسم",
+    "charAge": "العمر",
+    "charAppearance": "المظهر",
+    "charHair": "الشعر",
+    "charClothing": "الملابس",
+    "charVoiceRate": "سرعة الصوت",
+    "hasReference": "مرجع محفوظ",
+    "renderStoryboard": "توليد الـ storyboard",
+    "synthVoice": "تعليق صوتي",
+    "assemble": "تجميع النسخة التحريكية",
+    "recheck": "إعادة الفحص",
+    "reviewClean": "لا توجد مشكلات. المشروع جاهز للتجميع والتصدير.",
+    "stage": {
+      "brief": "الموجز",
+      "script": "السكربت",
+      "characters": "الشخصيات",
+      "produce": "الإنتاج",
+      "review": "المراجعة"
+    },
+    "tones": {
+      "neutral": "محايدة",
+      "energetic": "حماسية",
+      "calm": "هادئة",
+      "serious": "جادة",
+      "playful": "مرحة",
+      "inspirational": "ملهمة",
+      "dramatic": "درامية"
+    },
+    "styles": {
+      "cinematic": "سينمائي",
+      "realistic": "واقعي",
+      "documentary": "وثائقي",
+      "animation": "رسوم متحركة",
+      "minimal": "بسيط",
+      "vlog": "فلوق",
+      "corporate": "مؤسسي"
+    },
+    "status": {
+      "draft": "مسودة",
+      "storyboard": "storyboard",
+      "voiced": "بصوت",
+      "generated": "مُولّد",
+      "assembled": "مُجمّع",
+      "failed": "فشل"
+    },
+    "severity": {
+      "error": "خطأ",
+      "warning": "تحذير"
+    }
   },
   "media": {
     "title": "مكتبة الوسائط",

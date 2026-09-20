@@ -18,7 +18,7 @@ phase are shown in the interface as explicitly **not available** — nothing is 
 | 2 | Media import/analysis, library, timeline, preview, basic editing, render compiler, export | ✅ |
 | 3 | Audio, subtitles, OCR, face/object detection, masking, tracking (Python AI worker) | ✅ |
 | 4 | AI assistant, command planner, execution and validation engine | ✅ |
-| 5 | AI Video Creator | 🔜 |
+| 5 | AI Video Creator (brief → script → characters → storyboard → voice → animatic → assembly → review) | ✅ |
 | 6 | AI model manager, providers, network gateway | 🔜 |
 | 7 | Export center, quality validation, diagnostics | 🔜 |
 | 8 | QA audit, performance, security review, packaging, documentation | 🔜 |
@@ -45,6 +45,8 @@ tests               Playwright end-to-end tests (browser mode + Electron)
 - **AI assistant:** a deterministic bilingual (Arabic/English) command parser turns a request into a validated plan of operations, shows it step by step with feasibility, asks a clarifying question when a request is ambiguous (“make it a minute” → trim which end, or slow down), applies it through the same undoable timeline commands and engine tasks, and **verifies every step** against the document (duration changed, mask added, effect present, cues generated). Operations that need a missing model or runtime are shown as not runnable with the reason, never faked. A local or cloud text model can widen understanding but never bypasses the schema or the verification.
 - **Enhancement:** looks (color presets), Lanczos upscaling with output validation, AI upscaling gated on a Vulkan GPU runtime, before/after split comparison.
 - **Models & runtime:** model registry with checksums, downloads through the privacy-aware network gateway (resumable, logged), real per-model tests on bundled samples, Python runtime detection and setup.
+
+- **AI Video Creator:** an idea becomes a structured brief, then a deterministic first-draft **script** (hook, beats, call to action) with no language model required — fully editable, and a text model can rewrite it when configured. Characters carry a bible and voice, and are linked into the scenes that mention them. It renders a real **storyboard card** per scene (Arabic shaped by libass), synthesizes **voiceover** with eSpeak NG, and **assembles** cards, voice and subtitles onto the same editor timeline so every editing tool applies to the result. With no image/video generation model installed it produces an honest **animatic**, clearly labelled — never a fake “generated” video. A final **review** reports empty scenes, duration drift and character inconsistency (SFace) honestly.
 
 Capabilities that need a model, a runtime or hardware this machine lacks are shown as such in the interface, with the reason and the next step.
 

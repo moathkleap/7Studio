@@ -11,7 +11,7 @@ import { TemplatesScreen } from './screens/TemplatesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { SystemScreen } from './screens/SystemScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
-import { CreatorScreen } from './screens/GatedScreens';
+import { CreatorScreen } from './screens/CreatorScreen';
 import { ModelsScreen } from './screens/ModelsScreen';
 import { MediaScreen } from './screens/MediaScreen';
 import { ExportScreen } from './screens/ExportScreen';
