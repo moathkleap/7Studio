@@ -1,21 +1,23 @@
-import { useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { AppShell } from './components/layout/AppShell';
 import { Button } from './components/ui/Button';
 import { Spinner } from './components/ui/Misc';
 import { HomeScreen } from './screens/HomeScreen';
-import { EditorScreen } from './screens/EditorScreen';
-import { ProjectsScreen } from './screens/ProjectsScreen';
-import { TemplatesScreen } from './screens/TemplatesScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { SystemScreen } from './screens/SystemScreen';
-import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
-import { CreatorScreen } from './screens/CreatorScreen';
-import { ModelsScreen } from './screens/ModelsScreen';
-import { MediaScreen } from './screens/MediaScreen';
-import { ExportScreen } from './screens/ExportScreen';
 import { useAppStore } from './store/appStore';
+
+// Home is eager (the initial route); the rest are code-split so only the opened screen is parsed.
+const EditorScreen = lazy(() => import('./screens/EditorScreen').then((m) => ({ default: m.EditorScreen })));
+const ProjectsScreen = lazy(() => import('./screens/ProjectsScreen').then((m) => ({ default: m.ProjectsScreen })));
+const TemplatesScreen = lazy(() => import('./screens/TemplatesScreen').then((m) => ({ default: m.TemplatesScreen })));
+const SettingsScreen = lazy(() => import('./screens/SettingsScreen').then((m) => ({ default: m.SettingsScreen })));
+const SystemScreen = lazy(() => import('./screens/SystemScreen').then((m) => ({ default: m.SystemScreen })));
+const DiagnosticsScreen = lazy(() => import('./screens/DiagnosticsScreen').then((m) => ({ default: m.DiagnosticsScreen })));
+const CreatorScreen = lazy(() => import('./screens/CreatorScreen').then((m) => ({ default: m.CreatorScreen })));
+const ModelsScreen = lazy(() => import('./screens/ModelsScreen').then((m) => ({ default: m.ModelsScreen })));
+const MediaScreen = lazy(() => import('./screens/MediaScreen').then((m) => ({ default: m.MediaScreen })));
+const ExportScreen = lazy(() => import('./screens/ExportScreen').then((m) => ({ default: m.ExportScreen })));
 
 const router = createHashRouter([
   {

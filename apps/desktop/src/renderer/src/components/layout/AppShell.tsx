@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router';
+import { Spinner } from '../ui/Misc';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { StatusBar } from './StatusBar';
@@ -21,7 +23,9 @@ export function AppShell() {
         <TopBar />
         <div className="flex min-h-0 flex-1">
           <main className="min-w-0 flex-1 overflow-y-auto" data-testid="main-content">
-            <Outlet />
+            <Suspense fallback={<div className="grid h-full place-items-center" data-testid="screen-loading"><Spinner /></div>}>
+              <Outlet />
+            </Suspense>
           </main>
           {assistantOpen ? <AssistantPanel /> : null}
         </div>
