@@ -19,7 +19,7 @@ phase are shown in the interface as explicitly **not available** — nothing is 
 | 3 | Audio, subtitles, OCR, face/object detection, masking, tracking (Python AI worker) | ✅ |
 | 4 | AI assistant, command planner, execution and validation engine | ✅ |
 | 5 | AI Video Creator (brief → script → characters → storyboard → voice → animatic → assembly → review) | ✅ |
-| 6 | AI model manager, providers, network gateway | 🔜 |
+| 6 | AI model manager, external provider registry, network gateway, hardware recommendations | ✅ |
 | 7 | Export center, quality validation, diagnostics | 🔜 |
 | 8 | QA audit, performance, security review, packaging, documentation | 🔜 |
 
@@ -47,6 +47,8 @@ tests               Playwright end-to-end tests (browser mode + Electron)
 - **Models & runtime:** model registry with checksums, downloads through the privacy-aware network gateway (resumable, logged), real per-model tests on bundled samples, Python runtime detection and setup.
 
 - **AI Video Creator:** an idea becomes a structured brief, then a deterministic first-draft **script** (hook, beats, call to action) with no language model required — fully editable, and a text model can rewrite it when configured. Characters carry a bible and voice, and are linked into the scenes that mention them. It renders a real **storyboard card** per scene (Arabic shaped by libass), synthesizes **voiceover** with eSpeak NG, and **assembles** cards, voice and subtitles onto the same editor timeline so every editing tool applies to the result. With no image/video generation model installed it produces an honest **animatic**, clearly labelled — never a fake “generated” video. A final **review** reports empty scenes, duration drift and character inconsistency (SFace) honestly.
+
+- **External providers:** an opt-in registry of text providers (Anthropic, any OpenAI-compatible endpoint, and local Ollama). Every request goes through the privacy-aware `NetworkGateway` — nothing leaves the machine unless external processing is enabled — and is logged. Keys are stored with the OS keychain when available (Electron safeStorage) and never returned to the interface. Configuring a provider makes the assistant's `llm.text` and subtitle **translation** capabilities available; the model manager, sha256 registry, resumable downloads and per-model tests from earlier phases round out the models & runtime surface.
 
 Capabilities that need a model, a runtime or hardware this machine lacks are shown as such in the interface, with the reason and the next step.
 

@@ -46,6 +46,35 @@ export class NetworkGateway {
     }
   }
 
+  /** Makes a gated JSON request (used by cloud/local AI providers). HTTPS only, except localhost for local services. */
+  fetchJson = async <T = unknown>(url: string, opts: { purpose: string; providerId: string | null; method?: 'GET' | 'POST'; body?: unknown; headers?: Record<string, string>; signal?: AbortSignal; timeoutMs?: number }): Promise<{ status: number; json: T }> => {
+    const blocked = this.policyFor(opts.purpose);
+    const host = safeHost(url);
+    if (blocked) {
+      this.log({ providerId: opts.providerId, host, purpose: opts.purpose, bytesOut: 0, bytesIn: 0, status: 'blocked' });
+      throw new AppError({ code: 'NETWORK_BLOCKED', operation: 'network.json', message: `Request to ${host} blocked: ${blocked}`, details: { url, purpose: opts.purpose } });
+    }
+    const bodyStr = opts.body === undefined ? undefined : JSON.stringify(opts.body);
+    try {
+      const res = await requestJson(url, { method: opts.method ?? 'POST', body: bodyStr, headers: opts.headers ?? {}, signal: opts.signal, timeoutMs: opts.timeoutMs ?? 60_000 });
+      this.log({ providerId: opts.providerId, host, purpose: opts.purpose, bytesOut: bodyStr ? Buffer.byteLength(bodyStr) : 0, bytesIn: res.bytes, status: res.status >= 200 && res.status < 300 ? 'ok' : 'failed' });
+      let json: T;
+      try {
+        json = res.text ? (JSON.parse(res.text) as T) : ({} as T);
+      } catch {
+        throw new AppError({ code: 'PROVIDER_FAILED', operation: 'network.json', message: `Non-JSON response (HTTP ${res.status}) from ${host}`, details: { status: res.status, body: res.text.slice(0, 300) } });
+      }
+      if (res.status < 200 || res.status >= 300) {
+        throw new AppError({ code: res.status === 401 || res.status === 403 ? 'PROVIDER_UNAVAILABLE' : 'PROVIDER_FAILED', operation: 'network.json', message: `HTTP ${res.status} from ${host}`, details: { status: res.status, body: res.text.slice(0, 300) } });
+      }
+      return { status: res.status, json };
+    } catch (err) {
+      const appErr = AppError.from(err, { code: 'PROVIDER_FAILED', operation: 'network.json', details: { url, purpose: opts.purpose } });
+      if (appErr.info.code !== 'NETWORK_BLOCKED') this.log({ providerId: opts.providerId, host, purpose: opts.purpose, bytesOut: bodyStr ? Buffer.byteLength(bodyStr) : 0, bytesIn: 0, status: appErr.info.code === 'TASK_CANCELLED' ? 'cancelled' : 'failed' });
+      throw appErr;
+    }
+  };
+
   /** Streams a URL to a file with resume support (HTTP Range) and redirect handling. */
   fetchToFile = async (url: string, opts: FetchOptions): Promise<{ bytes: number }> => {
     const blocked = this.policyFor(opts.purpose);
@@ -135,6 +164,46 @@ function download(url: string, opts: FetchOptions, resumeFrom: number, redirects
     });
     req.on('timeout', () => req.destroy(new AppError({ code: 'NETWORK_FAILED', operation: 'network.fetch', message: `timeout contacting ${parsed.host}` })));
     req.on('error', (err) => reject(err));
+    req.end();
+  });
+}
+
+/** Buffers a JSON HTTP(S) response. HTTPS only, except localhost for local AI services (e.g. Ollama). */
+function requestJson(url: string, opts: { method: string; body?: string; headers: Record<string, string>; signal?: AbortSignal; timeoutMs: number }): Promise<{ status: number; text: string; bytes: number }> {
+  return new Promise((resolve, reject) => {
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      reject(new AppError({ code: 'INVALID_INPUT', operation: 'network.json', message: `Invalid URL ${url}` }));
+      return;
+    }
+    const local = parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost' || parsed.hostname === '::1';
+    if (parsed.protocol !== 'https:' && !(parsed.protocol === 'http:' && local)) {
+      reject(new AppError({ code: 'NETWORK_BLOCKED', operation: 'network.json', message: `Only HTTPS is allowed for providers (${parsed.protocol})` }));
+      return;
+    }
+    const lib = parsed.protocol === 'https:' ? https : http;
+    const headers: Record<string, string> = { 'user-agent': 'sevenvid/0.1', accept: 'application/json', ...opts.headers };
+    if (opts.body !== undefined) {
+      headers['content-type'] = headers['content-type'] ?? 'application/json';
+      headers['content-length'] = String(Buffer.byteLength(opts.body));
+    }
+    const req = lib.request(parsed, { method: opts.method, headers, timeout: opts.timeoutMs }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on('data', (c: Buffer) => chunks.push(c));
+      res.on('error', reject);
+      res.on('end', () => {
+        opts.signal?.removeEventListener('abort', onAbort);
+        const buf = Buffer.concat(chunks);
+        resolve({ status: res.statusCode ?? 0, text: buf.toString('utf8'), bytes: buf.length });
+      });
+    });
+    const onAbort = () => req.destroy(new AppError({ code: 'TASK_CANCELLED', operation: 'network.json', message: 'cancelled' }));
+    opts.signal?.addEventListener('abort', onAbort, { once: true });
+    req.on('timeout', () => req.destroy(new AppError({ code: 'PROVIDER_FAILED', operation: 'network.json', message: `timeout contacting ${parsed.host}` })));
+    req.on('error', (err) => reject(err));
+    if (opts.body !== undefined) req.write(opts.body);
     req.end();
   });
 }

@@ -689,7 +689,8 @@
     "genUnavailable": "Local generation needs the diffusers runtime: {{reason}}",
     "genNeedsGpu": "Local generation needs a GPU with enough VRAM; this machine has none.",
     "needsTextProvider": "Translation needs a text model. Install a local language model or enable an external provider.",
-    "needsMusicProvider": "Music generation needs a music provider. Use your own music files from the media library, or enable a provider."
+    "needsMusicProvider": "Music generation needs a music provider. Use your own music files from the media library, or enable a provider.",
+    "providerNeedsConfig": "Enable and configure a provider in Settings → Providers"
   },
   "errors": {
     "dialogTitle": "Something went wrong",
@@ -1153,5 +1154,21 @@
       "strategySpeed": "Speed up",
       "strategySlow": "Slow down"
     }
+  },
+  "providers": {
+    "consentTitle": "External processing",
+    "consentBody": "Allow enabled cloud providers to send data off this device. Off by default; local providers (Ollama) work without it.",
+    "external": "cloud",
+    "local": "local",
+    "ready": "ready",
+    "enableExternalFirst": "Turn on external processing above to enable this cloud provider.",
+    "baseUrl": "Base URL",
+    "model": "Model",
+    "apiKey": "API key",
+    "apiKeyPlaceholder": "Paste your API key",
+    "keyStoredEncrypted": "A key is stored (encrypted).",
+    "keyStoredPlain": "A key is stored (not encrypted on this platform).",
+    "test": "Test connection",
+    "testOk": "OK — {{message}}"
   }
 }

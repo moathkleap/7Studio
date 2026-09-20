@@ -592,6 +592,7 @@ export type AssistantMessage = z.infer<typeof AssistantMessageSchema>;
 // ---- creator (phase 5) ----
 import type { Brief, Character, CreatorScene, CreatorQaIssue, ProductionMode, Script } from '@sevenvid/core';
 export const BriefIoSchema = passthrough<Brief>((v) => typeof v === 'object' && v !== null && 'idea' in v);
+export const BriefInputSchema = passthrough<Partial<Brief> & { idea: string }>((v) => typeof v === 'object' && v !== null && typeof (v as { idea?: unknown }).idea === 'string');
 export const ScriptIoSchema = passthrough<Script>((v) => typeof v === 'object' && v !== null && 'scenes' in v);
 export const CharacterIoSchema = passthrough<Character>((v) => typeof v === 'object' && v !== null && 'name' in v);
 export const CreatorSceneIoSchema = passthrough<CreatorScene>((v) => typeof v === 'object' && v !== null && 'scene' in v);
@@ -605,3 +606,23 @@ export const CreatorStateSchema = z.object({
 });
 export type CreatorState = z.infer<typeof CreatorStateSchema>;
 export const CreatorReviewSchema = z.object({ issues: z.array(passthrough<CreatorQaIssue>()), mode: z.custom<ProductionMode>() });
+
+// ---- providers (phase 6) ----
+export const ProviderStatusSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  kind: z.enum(['cloud', 'local-service']),
+  external: z.boolean(),
+  needsSecret: z.boolean(),
+  enabled: z.boolean(),
+  configured: z.boolean(),
+  hasSecret: z.boolean(),
+  secretEncrypted: z.boolean(),
+  baseUrl: z.string(),
+  model: z.string(),
+  defaultBaseUrl: z.string(),
+  defaultModel: z.string(),
+  capabilities: z.array(z.string()),
+  docsUrl: z.string(),
+});
+export type ProviderStatusInfo = z.infer<typeof ProviderStatusSchema>;

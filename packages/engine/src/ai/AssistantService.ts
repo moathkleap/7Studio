@@ -27,6 +27,7 @@ import type { SubtitleService } from '../subtitles/SubtitleService';
 import type { OcrService } from '../ocr/OcrService';
 import type { EnhanceService } from '../enhance/EnhanceService';
 import type { ExportService } from '../export/ExportService';
+import type { ProvidersService } from '../providers/ProvidersService';
 import type { AppDatabase } from '../db/database';
 
 /** Colour-grade presets the assistant applies through the shared `color` effect (kept in step with the enhance panel). */
@@ -53,6 +54,7 @@ export interface AssistantServices {
   ocr: OcrService;
   enhance: EnhanceService;
   exports: ExportService;
+  providers: ProvidersService;
 }
 
 interface ApplyParams {
@@ -252,7 +254,7 @@ export class AssistantService {
         continue;
       }
       try {
-        const r = await this.executeStep(step, projectId, params.selectedClipIds);
+        const r = await this.executeStep(step, projectId, params.selectedClipIds, ctx);
         results.push({ index: i, type: step.type, status: 'done', summaryAr: step.summaryAr, summaryEn: step.summaryEn, verified: r.verified, detailAr: r.detailAr, detailEn: r.detailEn, errorCode: null });
       } catch (err) {
         const info = AppError.from(err, { code: 'COMMAND_FAILED', operation: `assistant.${step.type}` }).info;
@@ -284,7 +286,7 @@ export class AssistantService {
 
   // ---------------------------------------------------------------------------------------- execution + verify
 
-  private async executeStep(step: PlanStep, projectId: string, selectedClipIds: string[]): Promise<{ verified: boolean | null; detailAr: string | null; detailEn: string | null }> {
+  private async executeStep(step: PlanStep, projectId: string, selectedClipIds: string[], ctx: Ctx): Promise<{ verified: boolean | null; detailAr: string | null; detailEn: string | null }> {
     const session = this.s.sessions.get(projectId);
     const before = session.document;
     const durBefore = getDocumentDurationMs(before);
@@ -434,8 +436,18 @@ export class AssistantService {
         const cuesAfter = this.doc(projectId).subtitles.reduce((n, t) => n + t.cues.length, 0);
         return verify(cuesAfter > subCuesBefore, `${(r?.cues ?? cuesAfter - subCuesBefore)}`);
       }
-      case 'translateSubtitles':
-        throw new AppError({ code: 'PROVIDER_UNAVAILABLE', operation: 'assistant.translateSubtitles', message: 'Translation needs a text model provider that is not configured' });
+      case 'translateSubtitles': {
+        const track = before.subtitles[before.subtitles.length - 1];
+        if (!track || track.cues.length === 0) throw new AppError({ code: 'INVALID_INPUT', operation: 'assistant.translateSubtitles', message: 'There are no subtitles to translate' });
+        const lines = track.cues.map((c) => c.text.replace(/\n/g, ' ').trim());
+        const { text: translated } = await this.s.providers.translate(lines.join('\n'), p.targetLanguage as string, ctx.signal);
+        const out = translated.split('\n').map((l) => l.trim()).filter((_, i) => i < lines.length);
+        if (out.length !== lines.length) throw new AppError({ code: 'PROVIDER_FAILED', operation: 'assistant.translateSubtitles', message: `Translation returned ${out.length} lines for ${lines.length} cues`, details: { expected: lines.length, got: out.length } });
+        const newTrack = { id: newId('sub'), name: `${p.targetLanguage as string}`, language: p.targetLanguage as string, cues: track.cues.map((c, i) => ({ id: newId('cue'), startMs: c.startMs, endMs: c.endMs, text: out[i]!, speaker: c.speaker })), style: track.style, enabled: true, burnIn: false, source: 'translation' as const };
+        session.execute({ type: 'subtitle.addTrack', track: newTrack }, 'ai');
+        const added = this.doc(projectId).subtitles.find((t) => t.id === newTrack.id);
+        return verify(Boolean(added && added.cues.length === track.cues.length), `${newTrack.cues.length}`);
+      }
       case 'burnSubtitles': {
         const tracks = before.subtitles;
         if (tracks.length === 0) throw new AppError({ code: 'INVALID_INPUT', operation: 'assistant.burnSubtitles', message: 'There are no subtitle tracks' });

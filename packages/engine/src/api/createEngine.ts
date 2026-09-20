@@ -30,6 +30,7 @@ import { OcrService } from '../ocr/OcrService';
 import { EnhanceService } from '../enhance/EnhanceService';
 import { AssistantService } from '../ai/AssistantService';
 import { CreatorService } from '../creator/CreatorService';
+import { ProvidersService } from '../providers/ProvidersService';
 import { SearchService } from '../search/SearchService';
 import { SettingsService } from '../settings/SettingsService';
 import { TaskManager } from '../tasks/TaskManager';
@@ -37,6 +38,7 @@ import { createCoreHandlers } from './handlers';
 import { createPhase3Handlers } from './handlers3';
 import { createAssistantHandlers } from './handlers4';
 import { createCreatorHandlers } from './handlers5';
+import { createProviderHandlers } from './handlers6';
 import type { EngineHost } from './host';
 
 export interface EngineOptions {
@@ -79,6 +81,7 @@ export interface EngineServices {
   enhance: EnhanceService;
   assistant: AssistantService;
   creator: CreatorService;
+  providers: ProvidersService;
 }
 
 export interface Engine extends EngineServices {
@@ -131,15 +134,16 @@ export function createEngine(opts: EngineOptions): Engine {
   const subtitles = new SubtitleService(db, paths, tasks, projects, sessions, worker, models, audio, capabilities, search, logs.child({ module: 'subtitles' }));
   const ocr = new OcrService(paths, ffmpeg, tasks, projects, sessions, models, vision, capabilities, search, logs.child({ module: 'ocr' }));
   const enhance = new EnhanceService(ffmpeg, tasks, projects, sessions, media, hardware, capabilities, worker, logs.child({ module: 'render' }));
-  const assistant = new AssistantService({ db, sessions, tasks, capabilities, settings, bus, logger: logs.child({ module: 'ai' }), audio, vision, subtitles, ocr, enhance, exports: exportsService });
   const creator = new CreatorService({ db, ffmpeg, tasks, projects, sessions, media, capabilities, worker, bus, logger: logs.child({ module: 'creator' }) });
+  const providers = new ProvidersService(db, settings, gateway, opts.host, capabilities, bus, logs.child({ module: 'providers' }));
+  const assistant = new AssistantService({ db, sessions, tasks, capabilities, settings, bus, logger: logs.child({ module: 'ai' }), audio, vision, subtitles, ocr, enhance, exports: exportsService, providers });
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator, providers };
   registerCoreCapabilities(services);
   models.setTester((spec, dir) => testModel(services, spec, dir));
   bus.on('models.changed', () => void capabilities.refresh());
 
-  const handlers = { ...createCoreHandlers(services), ...createPhase3Handlers(services), ...createAssistantHandlers(services), ...createCreatorHandlers(services) } as ApiHandlers;
+  const handlers = { ...createCoreHandlers(services), ...createPhase3Handlers(services), ...createAssistantHandlers(services), ...createCreatorHandlers(services), ...createProviderHandlers(services) } as ApiHandlers;
   let started = false;
 
   const engine: Engine = {
@@ -219,12 +223,7 @@ function registerCoreCapabilities(s: EngineServices): void {
   );
   s.capabilities.register('planner.deterministic', () => ({ status: 'available', providerId: 'deterministic-planner', external: false }));
   // Language-model based capabilities arrive with the assistant phase; until then their status is derived honestly from installed models.
-  s.capabilities.register('llm.text', () => {
-    const installed = ['llm/qwen2.5-3b-instruct-q4', 'llm/qwen2.5-7b-instruct-q4'].filter((m) => s.models.isInstalled(m));
-    if (installed.length === 0) return { status: 'needs-model', reasonKey: 'capabilities.modelMissing', reasonParams: { models: 'llm/qwen2.5-3b-instruct-q4' }, action: { type: 'open-models', target: 'llm/qwen2.5-3b-instruct-q4' } };
-    return { status: 'unavailable', reasonKey: 'capabilities.notImplemented', reasonParams: { models: installed.join(', ') }, action: { type: 'none', target: null } };
-  });
-  s.capabilities.register('translate', () => ({ status: 'needs-provider', reasonKey: 'capabilities.needsTextProvider', action: { type: 'open-models', target: 'llm/qwen2.5-3b-instruct-q4' } }));
+  // llm.text and translate capabilities are registered by ProvidersService (external provider registry).
   s.capabilities.register('gen.music', () => ({ status: 'needs-provider', reasonKey: 'capabilities.needsMusicProvider', action: { type: 'open-providers', target: null } }));
 }
 

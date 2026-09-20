@@ -7,6 +7,7 @@ import { migrate } from './migrations';
 import { AiRepo } from './repos/ai';
 import { AppStateRepo } from './repos/appState';
 import { CreatorRepo } from './repos/creator';
+import { ProvidersRepo } from './repos/providers';
 import { AssetsRepo } from './repos/assets';
 import { ExportsRepo } from './repos/exports';
 import { ModelsRepo } from './repos/models';
@@ -35,6 +36,7 @@ export interface AppDatabase {
   transcripts: TranscriptsRepo;
   ai: AiRepo;
   creator: CreatorRepo;
+  providers: ProvidersRepo;
   transaction<T>(fn: () => T): T;
   close(): void;
 }
@@ -59,6 +61,7 @@ export function openDatabase(file: string, logger?: Logger): AppDatabase {
       networkLog: new NetworkLogRepo(driver),
       ai: new AiRepo(driver),
       creator: new CreatorRepo(driver),
+      providers: new ProvidersRepo(driver),
       search: new SearchRepo(driver),
       transcripts: new TranscriptsRepo(driver),
       transaction: (fn) => driver.transaction(fn),

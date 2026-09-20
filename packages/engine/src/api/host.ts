@@ -17,6 +17,8 @@ export interface EngineHost {
   quit(): void;
   /** Builds a URL the renderer can load for a local file (custom protocol in Electron, HTTP in browser mode). */
   mediaUrl(path: string): string | null;
+  /** Optional OS-backed secret storage (Electron safeStorage). Absent in browser/dev, where secrets are stored unencrypted. */
+  secrets?: { available: boolean; encrypt(plain: string): string; decrypt(enc: string): string };
 }
 
 export const EXTERNAL_URL_ALLOWLIST = [

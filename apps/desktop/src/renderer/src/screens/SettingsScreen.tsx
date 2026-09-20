@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Kbd, Select, Switch } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/Misc';
-import { PhaseNotice } from '@/components/CapabilityGate';
+import { ProvidersSettings } from './ProvidersSettings';
 import { cn } from '@/lib/cn';
 
 const SECTIONS = ['general', 'appearance', 'language', 'ai', 'models', 'gpu', 'storage', 'export', 'shortcuts', 'privacy', 'providers', 'notifications', 'performance'] as const;
@@ -193,7 +193,7 @@ function SectionBody({ section, s, update }: { section: Section; s: AppSettings;
         </div>
       );
     case 'providers':
-      return <div className="py-4"><PhaseNotice phase={6} feature={t('settings.sections.providers')} /></div>;
+      return <ProvidersSettings settings={s} update={update} />;
     case 'notifications':
       return (
         <div className="divide-y divide-border">

@@ -37,9 +37,10 @@ import {
   PlanRunResultSchema,
   CreatorStateSchema,
   CreatorReviewSchema,
-  BriefIoSchema,
+  BriefInputSchema,
   ScriptIoSchema,
   CharacterIoSchema,
+  ProviderStatusSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -176,7 +177,7 @@ export const channels = {
   'assistant.meta': { input: z.object({ projectId: z.string(), action: z.enum(['undo', 'redo']) }), output: SessionStateSchema },
   // ---- creator (phase 5) ----
   'creator.state': { input: z.object({ projectId: z.string() }), output: CreatorStateSchema },
-  'creator.setBrief': { input: z.object({ projectId: z.string(), brief: BriefIoSchema }), output: CreatorStateSchema },
+  'creator.setBrief': { input: z.object({ projectId: z.string(), brief: BriefInputSchema }), output: CreatorStateSchema },
   'creator.updateScript': { input: z.object({ projectId: z.string(), script: ScriptIoSchema }), output: CreatorStateSchema },
   'creator.saveCharacter': { input: z.object({ projectId: z.string(), character: CharacterIoSchema }), output: CreatorStateSchema },
   'creator.removeCharacter': { input: z.object({ projectId: z.string(), characterId: z.string() }), output: CreatorStateSchema },
@@ -186,6 +187,11 @@ export const channels = {
   'creator.assemble': { input: z.object({ projectId: z.string() }), output: TaskInfoSchema },
   'creator.review': { input: z.object({ projectId: z.string() }), output: CreatorReviewSchema },
   'creator.clear': { input: z.object({ projectId: z.string() }), output: CreatorStateSchema },
+  // ---- providers (phase 6) ----
+  'providers.list': { input: Void, output: z.array(ProviderStatusSchema) },
+  'providers.get': { input: z.object({ providerId: z.string() }), output: ProviderStatusSchema },
+  'providers.setConfig': { input: z.object({ providerId: z.string(), enabled: z.boolean().optional(), baseUrl: z.string().optional(), model: z.string().optional(), secret: z.string().optional() }), output: ProviderStatusSchema },
+  'providers.test': { input: z.object({ providerId: z.string() }), output: z.object({ ok: z.boolean(), ms: z.number(), message: z.string() }) },
 } as const;
 
 /** Push events from the engine to the UI. */
@@ -207,6 +213,7 @@ export const events = {
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
   'assistant.updated': z.object({ projectId: z.string(), planId: z.string(), result: PlanRunResultSchema.nullable() }),
   'creator.updated': z.object({ projectId: z.string() }),
+  'providers.changed': z.object({ providerId: z.string() }),
 } as const;
 
 export type ChannelMap = typeof channels;
