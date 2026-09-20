@@ -21,7 +21,7 @@ phase are shown in the interface as explicitly **not available** — nothing is 
 | 5 | AI Video Creator (brief → script → characters → storyboard → voice → animatic → assembly → review) | ✅ |
 | 6 | AI model manager, external provider registry, network gateway, hardware recommendations | ✅ |
 | 7 | Export center, quality validation, disk-space checks, diagnostics | ✅ |
-| 8 | QA audit, performance, security review, packaging, documentation | 🔜 |
+| 8 | QA audit, performance, security review, packaging, documentation | ✅ |
 
 ## Architecture (short)
 
@@ -87,3 +87,19 @@ directory, or the system `PATH`.
 - No telemetry. The setting exists only to show that it cannot be enabled.
 - No hidden network calls: every outbound request goes through the network gateway and is logged.
 - Original media files are never modified.
+
+## Documentation
+
+| Doc | Contents |
+|---|---|
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | Processes, packages, data flow, storage, rendering |
+| [INSTALL](docs/INSTALL.md) | Prerequisites, from-source setup, Python worker, packaging |
+| [DEVELOPMENT](docs/DEVELOPMENT.md) | Commands, layout rules, adding a feature, the dev bridge |
+| [AI_MODELS](docs/AI_MODELS.md) | Model registry, install/test, families, what is not yet implemented |
+| [HARDWARE](docs/HARDWARE.md) | CPU/GPU/RAM/disk requirements, encoders, MediaPipe on Linux |
+| [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) | Common errors and fixes |
+| [PROVIDERS](docs/PROVIDERS.md) | External providers, key storage, adding a provider |
+| [TESTING](docs/TESTING.md) | Test layers, fixtures, the export matrix, sandbox limits |
+| [QA_REPORT](docs/QA_REPORT.md) | What is verified, requires a user machine, or not implemented |
+
+The full Arabic build plan is in [docs/PLAN.ar.md](docs/PLAN.ar.md).
