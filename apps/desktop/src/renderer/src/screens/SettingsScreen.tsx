@@ -58,6 +58,7 @@ export function SettingsScreen() {
 function SectionBody({ section, s, update }: { section: Section; s: AppSettings; update: (p: DeepPartial<AppSettings>) => Promise<void> }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const setAboutOpen = useAppStore((st) => st.setAboutOpen);
   switch (section) {
     case 'general':
       return (
@@ -74,6 +75,9 @@ function SectionBody({ section, s, update }: { section: Section; s: AppSettings;
               <option value="editor">{t('projects.kindEditor')}</option>
               <option value="creator">{t('projects.kindCreator')}</option>
             </Select>
+          </Field>
+          <Field inline label="Seven Studios" hint={t('about.product')}>
+            <Button action="settings.about" size="sm" variant="secondary" onClick={() => setAboutOpen(true)}>{t('about.title')}</Button>
           </Field>
         </div>
       );

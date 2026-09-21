@@ -33,6 +33,7 @@ interface AppState {
   tasksPanelOpen: boolean;
   assistantOpen: boolean;
   searchOpen: boolean;
+  aboutOpen: boolean;
   bridge: BridgeStatus;
   bootstrap(): Promise<void>;
   refreshProjects(): Promise<void>;
@@ -42,6 +43,7 @@ interface AppState {
   setTasksPanelOpen(open: boolean): void;
   setAssistantOpen(open: boolean): void;
   setSearchOpen(open: boolean): void;
+  setAboutOpen(open: boolean): void;
   showError(info: AppErrorInfo | null): void;
   reportError(err: unknown): void;
   dismissToast(id: string): void;
@@ -80,6 +82,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   tasksPanelOpen: false,
   assistantOpen: false,
   searchOpen: false,
+  aboutOpen: false,
   bridge: 'connecting',
 
   async bootstrap() {
@@ -157,6 +160,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setTasksPanelOpen: (open) => set({ tasksPanelOpen: open }),
   setAssistantOpen: (open) => set({ assistantOpen: open }),
   setSearchOpen: (open) => set({ searchOpen: open }),
+  setAboutOpen: (open) => set({ aboutOpen: open }),
   showError: (info) => set({ errorDialog: info }),
   reportError(err) {
     const info: AppErrorInfo = isAppError(err)

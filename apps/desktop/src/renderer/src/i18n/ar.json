@@ -904,6 +904,19 @@
     "select": "اختيار {{count}} ملف",
     "selected": "{{count}} محدد"
   },
+  "about": {
+    "title": "حول Seven Studios",
+    "product": "محرّر ومنشئ فيديو بالذكاء الاصطناعي",
+    "tagline": "تحرير وإنشاء الفيديو محلياً أولاً بالاعتماد على الذكاء الاصطناعي. وسائطك لا تغادر جهازك أبداً.",
+    "studio": "Seven Studios",
+    "version": "الإصدار",
+    "electron": "إلكترون",
+    "node": "Node",
+    "platform": "النظام",
+    "github": "المشروع على GitHub",
+    "docs": "التوثيق",
+    "rights": "جميع الحقوق محفوظة."
+  },
   "common": {
     "yes": "نعم",
     "no": "لا",
