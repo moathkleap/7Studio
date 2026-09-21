@@ -42,6 +42,8 @@ async function createWindow(): Promise<void> {
     show: false,
     backgroundColor: '#0b0c10',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+    // Window/taskbar icon on Windows and Linux (macOS uses the bundled .icns).
+    ...(process.platform === 'darwin' ? {} : { icon: path.join(resourcesDir(), 'icons', 'icon.png') }),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
