@@ -187,6 +187,7 @@ function SectionBody({ section, s, update }: { section: Section; s: AppSettings;
         <div className="divide-y divide-border">
           <Field inline label={t('settings.privacy.external')} hint={t('settings.privacy.externalHint')}><Switch action="settings.allowExternal" checked={s.privacy.allowExternalProviders} onCheckedChange={(v) => void update({ privacy: { allowExternalProviders: v } })} /></Field>
           <Field inline label={t('settings.privacy.downloads')}><Switch action="settings.allowDownloads" checked={s.privacy.allowModelDownloads} onCheckedChange={(v) => void update({ privacy: { allowModelDownloads: v } })} /></Field>
+          <Field inline label={t('settings.privacy.trends')} hint={t('settings.privacy.trendsHint')}><Switch action="settings.allowTrends" checked={s.privacy.allowTrends} onCheckedChange={(v) => void update({ privacy: { allowTrends: v } })} /></Field>
           <Field inline label={t('settings.privacy.askDownloads')}><Switch action="settings.askDownloads" checked={s.privacy.askBeforeEveryDownload} onCheckedChange={(v) => void update({ privacy: { askBeforeEveryDownload: v } })} /></Field>
           <Field inline label={t('settings.privacy.networkLog')}><Switch action="settings.networkLog" checked={s.privacy.networkLogging} onCheckedChange={(v) => void update({ privacy: { networkLogging: v } })} /></Field>
           <Field inline label={t('settings.privacy.telemetry')} hint={t('settings.privacy.telemetryHint')}><Switch action="settings.telemetry" checked={false} disabled onCheckedChange={() => undefined} /></Field>

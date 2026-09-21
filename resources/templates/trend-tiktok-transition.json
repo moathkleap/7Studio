@@ -1,0 +1,22 @@
+{
+  "id": "tpl-trend-tiktok-transition",
+  "name": "TikTok Transition Trend",
+  "nameAr": "ترند انتقالات تيك توك",
+  "category": "trend",
+  "description": "A 15s vertical transition trend: strong hook, beat-synced cuts, bold center captions. The trending sound is added from within TikTok at upload.",
+  "descriptionAr": "ترند انتقالات عمودي مدته 15 ثانية: هوك قوي، قصّات على الإيقاع، ترجمات وسطية بارزة. يُضاف الصوت الرائج من داخل تيك توك عند الرفع.",
+  "platformPreset": "tiktok",
+  "settings": { "width": 1080, "height": 1920, "fps": 30, "aspectPreset": "9:16" },
+  "subtitleStyle": { "fontSize": 56, "position": "center", "outlineWidth": 3, "bold": true, "marginV": 320 },
+  "exportPresetId": "tiktok",
+  "targetDurationMs": 15000,
+  "hook": "Wait for it… 👀",
+  "hashtags": ["fyp", "transition", "trend"],
+  "trendSource": "builtin",
+  "suggestedSound": {
+    "name": "Trending TikTok sound",
+    "url": "https://www.tiktok.com/music",
+    "licensed": false,
+    "source": "tiktok"
+  }
+}

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   composeCaption,
+  describeSoundUsage,
   fpsToNumber,
   getDocumentDurationMs,
   getExportPreset,
@@ -15,6 +16,7 @@ import {
   type PublishFit,
   type PublishTarget,
   type ReframeStrategy,
+  type TrendSound,
 } from '@sevenvid/core';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';
@@ -39,6 +41,10 @@ export interface PublishBuildRequest {
   strategy?: ReframeStrategy;
   caption?: string;
   hashtags?: string;
+  /** A trending sound to suggest for upload; never embedded in the exported video. */
+  sound?: TrendSound | null;
+  /** Mix level (dB) for an embedded cleared music bed, relative to the timeline audio. Default -6. */
+  musicGainDb?: number;
   outputDir?: string | null;
 }
 
@@ -59,6 +65,7 @@ export interface PublishPackage {
   trimmed: boolean;
   warnings: string[];
   validation: Record<string, unknown> | null;
+  suggestedSound: TrendSound | null;
   error: string | null;
   createdAt: string;
 }
@@ -159,6 +166,7 @@ export class PublishService {
       trimmed: false,
       warnings: [],
       validation: null,
+      suggestedSound: req.sound ?? null,
       error: null,
       createdAt: new Date().toISOString(),
     };
@@ -186,6 +194,13 @@ export class PublishService {
     if (fit.willTrim) warnings.push(`trimmed to the ${Math.round(target.maxDurationMs! / 1000)}s limit for ${target.id}`);
     if (fit.upscales) warnings.push('the source is smaller than the target canvas and was upscaled');
     if (req.strategy === 'blur-fill') warnings.push('blur-fill is not available yet; used crop instead');
+    // A copyrighted platform sound is never embedded; it is added from within the platform at upload time.
+    if (req.sound && !req.sound.licensed) warnings.push(`suggested sound "${req.sound.name}" is copyrighted and not embedded; add it from within the platform when you upload`);
+    // A cleared (licensed) sound backed by a local file is mixed in as a background bed; a URL-only one cannot be.
+    const soundUrl = req.sound?.licensed ? req.sound.url : null;
+    const embedMusicPath = soundUrl && !/^https?:/i.test(soundUrl) && fs.existsSync(soundUrl) ? soundUrl : null;
+    if (req.sound?.licensed && !embedMusicPath) warnings.push(`cleared sound "${req.sound.name}" has no local file and was not embedded; it is kept as a note`);
+    if (embedMusicPath) warnings.push(`embedded cleared sound "${req.sound!.name}" as a background music bed`);
 
     const seqFps = fpsToNumber(doc.settings.fps);
     const cappedFps = target.maxFps != null && seqFps > target.maxFps ? { num: Math.round(target.maxFps * 1000), den: 1000 } : null;
@@ -210,6 +225,7 @@ export class PublishService {
         signal: ctx.signal,
         scratchDir: path.join(project.dataDir, 'cache', 'publish'),
         finalVideoFilters: reframeFilters(record.strategy, target.width, target.height),
+        backgroundMusic: embedMusicPath ? { path: embedMusicPath, gainDb: req.musicGainDb ?? -6 } : null,
         onProgress: (ratio, message) => ctx.progress(Math.min(0.9, ratio * 0.9), message),
         onProcess: (_proc, controls) => ctx.setPauseHandlers({ pause: () => void controls.pause(), resume: () => void controls.resume() }),
       });
@@ -234,9 +250,14 @@ export class PublishService {
       const caption = composeCaption((req.caption ?? '').slice(0, target.captionMax), hashtags);
       record.captionPath = path.join(record.dir, 'caption.txt');
       fs.writeFileSync(record.captionPath, caption, 'utf8');
+      // A suggested sound is advisory only: write a human-readable note so the uploader knows how to use it.
+      if (req.sound) {
+        const note = [describeSoundUsage(req.sound), req.sound.url ? `Sound: ${req.sound.url}` : null].filter(Boolean).join('\n');
+        fs.writeFileSync(path.join(record.dir, 'sound.txt'), note, 'utf8');
+      }
       fs.writeFileSync(
         path.join(record.dir, 'metadata.json'),
-        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, project: project.name, createdAt: record.createdAt }, null, 2),
+        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, suggestedSound: req.sound ?? null, embeddedSound: Boolean(embedMusicPath), project: project.name, createdAt: record.createdAt }, null, 2),
         'utf8',
       );
 

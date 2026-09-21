@@ -27,6 +27,10 @@ export function PublishScreen() {
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState('');
   const [strategy, setStrategy] = useState<'auto' | 'crop' | 'fit'>('auto');
+  const [soundName, setSoundName] = useState('');
+  const [soundUrl, setSoundUrl] = useState('');
+  const [soundLicensed, setSoundLicensed] = useState(false);
+  const [musicGainDb, setMusicGainDb] = useState(-6);
   const [packages, setPackages] = useState<PublishPackage[]>([]);
 
   const loadTargets = useCallback(() => {
@@ -52,6 +56,7 @@ export function PublishScreen() {
 
   const build = async () => {
     if (!session || selected.size === 0) return;
+    const sound = soundName.trim() ? { name: soundName.trim(), url: soundUrl.trim() || null, licensed: soundLicensed, source: null } : undefined;
     try {
       for (const targetId of selected) {
         await getApi().invoke('publish.build', {
@@ -60,9 +65,44 @@ export function PublishScreen() {
           strategy: strategy === 'auto' ? undefined : strategy,
           caption: caption || undefined,
           hashtags: hashtags || undefined,
+          sound,
+          musicGainDb: sound?.licensed ? musicGainDb : undefined,
         });
       }
       await loadPackages();
+    } catch (err) {
+      reportError(err);
+    }
+  };
+
+  const [generatingMusic, setGeneratingMusic] = useState(false);
+  const generateMusic = async () => {
+    const prompt = soundName.trim() || hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean).join(', ');
+    setGeneratingMusic(true);
+    try {
+      const track = await getApi().invoke('music.generate', { prompt: prompt || undefined, tags: hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean) });
+      setSoundName(track.name);
+      setSoundUrl(track.file);
+      setSoundLicensed(true);
+      useAppStore.getState().pushToast({ level: 'success', titleKey: 'publish.musicGenerated', messageKey: null, params: { name: track.name }, errorId: null, taskId: null });
+    } catch (err) {
+      reportError(err);
+    } finally {
+      setGeneratingMusic(false);
+    }
+  };
+
+  const suggestAlternative = async () => {
+    const tags = hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean);
+    try {
+      const track = await getApi().invoke('music.suggest', { tags });
+      if (track) {
+        setSoundName(track.name);
+        setSoundUrl(track.file);
+        setSoundLicensed(true);
+      } else {
+        useAppStore.getState().pushToast({ level: 'info', titleKey: 'publish.soundNoAlt', messageKey: null, params: {}, errorId: null, taskId: null });
+      }
     } catch (err) {
       reportError(err);
     }
@@ -127,6 +167,35 @@ export function PublishScreen() {
                         </Select>
                       </Field>
                     </div>
+                    <div className="rounded-lg border border-border bg-surface-2 p-3" data-testid="publish-sound">
+                      <div className="text-[13px] font-medium">{t('publish.soundTitle')}</div>
+                      <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <Field label={t('publish.soundName')}>
+                          <Input value={soundName} onChange={(e) => setSoundName(e.target.value)} placeholder={t('publish.soundNamePlaceholder')} data-testid="publish-sound-name" dir="auto" />
+                        </Field>
+                        <Field label={t('publish.soundUrl')}>
+                          <Input value={soundUrl} onChange={(e) => setSoundUrl(e.target.value)} placeholder={t('publish.soundUrlPlaceholder')} data-testid="publish-sound-url" dir="ltr" />
+                        </Field>
+                      </div>
+                      <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
+                        <input type="checkbox" checked={soundLicensed} onChange={(e) => setSoundLicensed(e.target.checked)} data-testid="publish-sound-licensed" className="size-3.5 accent-accent" />
+                        {t('publish.soundLicensed')}
+                      </label>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <div className="text-[11.5px] text-faint">{t('publish.soundNote')}</div>
+                        <div className="flex items-center gap-1">
+                          <Button action="publish.suggestAlt" size="sm" variant="ghost" onClick={() => void suggestAlternative()} data-testid="publish-sound-suggest">{t('publish.soundSuggestAlt')}</Button>
+                          <Button action="publish.generateMusic" size="sm" variant="ghost" disabled={generatingMusic} onClick={() => void generateMusic()} data-testid="publish-sound-generate">{generatingMusic ? t('publish.generatingMusic') : t('publish.generateMusic')}</Button>
+                        </div>
+                      </div>
+                      {soundLicensed && soundName.trim() ? (
+                        <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
+                          <span className="whitespace-nowrap">{t('publish.musicLevel')}</span>
+                          <input type="range" min={-30} max={6} step={1} value={musicGainDb} onChange={(e) => setMusicGainDb(Number(e.target.value))} data-testid="publish-music-level" className="flex-1 accent-accent" />
+                          <span className="w-12 text-end font-mono text-[11px]" dir="ltr">{musicGainDb} dB</span>
+                        </label>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className="mt-4 flex items-center gap-3">
@@ -172,6 +241,7 @@ export function PublishScreen() {
                                 {validation.checks.map((c) => <li key={c.name} className={cn('flex items-center gap-1 rounded px-1.5 py-0.5', c.ok ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger')} title={c.detail}>{c.ok ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />}{c.name}</li>)}
                               </ul>
                             ) : null}
+                            {p.suggestedSound ? <div className="mt-1 text-muted">{t('publish.soundSuggested', { name: p.suggestedSound.name })}{p.suggestedSound.url ? <> · <a href={p.suggestedSound.url} target="_blank" rel="noreferrer" className="text-accent underline" onClick={(e) => { e.preventDefault(); void getApi().invoke('shell.openExternal', { url: p.suggestedSound!.url! }).catch(reportError); }}>{p.suggestedSound.url}</a></> : null}</div> : null}
                             {p.warnings.length ? <div className="mt-1 text-warning">{t('publish.warnings')}: {p.warnings.join('; ')}</div> : null}
                             <div className="mt-2 flex gap-1">
                               <Button action="publish.play" size="sm" variant="outline" icon={<Play />} onClick={() => void getApi().invoke('shell.openPath', { path: p.videoPath }).catch(reportError)}>{t('publish.openVideo')}</Button>

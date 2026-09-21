@@ -34,6 +34,8 @@ export interface CompileOptions {
   finalVideoFilters?: string[];
   /** Extra filters applied to the mixed audio. */
   finalAudioFilters?: string[];
+  /** A cleared background-music track mixed under the timeline audio (looped to cover the full duration). */
+  backgroundMusic?: { path: string; gainDb?: number } | null;
   /** Render the document's mask tracks (blur/pixelate/box) on the composite; needs a scratch dir for command files. */
   masks?: { scratchDir: string } | null;
   /** Bypass switches used by before/after comparisons. */
@@ -315,6 +317,18 @@ export function compileRenderGraph(opts: CompileOptions): CompiledGraph {
       lines.push(`[${idx}:a]${af.join(',')}[a${idx}]`);
       audioLabels.push(`[a${idx}]`);
     }
+  }
+
+  // A cleared background-music bed, looped to cover the whole timeline and mixed under the clip audio.
+  if (!opts.videoOnly && opts.backgroundMusic) {
+    const idx = inputs.length;
+    inputs.push({ path: opts.backgroundMusic.path, args: ['-stream_loop', '-1', '-t', sec(durationMs + 40)] });
+    const bf: string[] = [`atrim=duration=${sec(durationMs)}`, 'asetpts=PTS-STARTPTS'];
+    const gainDb = opts.backgroundMusic.gainDb ?? 0;
+    if (Math.abs(gainDb) > 0.01) bf.push(`volume=${db(gainDb)}`);
+    bf.push(`aresample=${target.sampleRate}`, `aformat=sample_fmts=fltp:channel_layouts=${target.channels === 1 ? 'mono' : 'stereo'}`);
+    lines.push(`[${idx}:a]${bf.join(',')}[music]`);
+    audioLabels.push('[music]');
   }
 
   if (!opts.videoOnly) {

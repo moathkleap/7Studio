@@ -197,6 +197,39 @@ export const AppInfoSchema = z.object({
 });
 export type AppInfo = z.infer<typeof AppInfoSchema>;
 
+/** A trending sound suggested for a template or a publish package (advisory; never embedded when copyrighted). */
+export const TrendSoundSchema = z.object({
+  name: z.string(),
+  url: z.string().nullable(),
+  licensed: z.boolean(),
+  source: z.string().nullable(),
+});
+export type TrendSound = z.infer<typeof TrendSoundSchema>;
+
+/** Result of syncing trend templates from an opt-in feed. */
+export const TrendSyncResultSchema = z.object({
+  added: z.number(),
+  updated: z.number(),
+  skipped: z.number(),
+  total: z.number(),
+  sourceHost: z.string(),
+  at: z.string(),
+});
+export type TrendSyncResult = z.infer<typeof TrendSyncResultSchema>;
+
+/** A cleared (royalty-free / user-owned) music track from the local library. */
+export const MusicTrackSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  file: z.string(),
+  tags: z.array(z.string()),
+  mood: z.string().nullable(),
+  durationMs: z.number().nullable(),
+  licensed: z.literal(true),
+  source: z.string().nullable(),
+});
+export type MusicTrack = z.infer<typeof MusicTrackSchema>;
+
 export const TemplateInfoSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -210,6 +243,11 @@ export const TemplateInfoSchema = z.object({
   subtitleStyle: z.record(z.string(), z.unknown()).nullable(),
   exportPresetId: z.string().nullable(),
   targetDurationMs: z.number().nullable(),
+  // Trend metadata (populated for category "trend" templates; null for plain templates).
+  hook: z.string().nullable(),
+  hashtags: z.array(z.string()).nullable(),
+  suggestedSound: TrendSoundSchema.nullable(),
+  trendSource: z.string().nullable(),
   createdAt: z.string(),
 });
 export type TemplateInfo = z.infer<typeof TemplateInfoSchema>;
@@ -277,6 +315,8 @@ export const PublishPackageSchema = z.object({
   trimmed: z.boolean(),
   warnings: z.array(z.string()),
   validation: z.record(z.string(), z.unknown()).nullable(),
+  // A trending sound to add at upload time; never embedded in the exported video (null when none chosen).
+  suggestedSound: TrendSoundSchema.nullable(),
   error: z.string().nullable(),
   createdAt: z.string(),
 });

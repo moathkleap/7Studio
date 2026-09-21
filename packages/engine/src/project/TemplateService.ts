@@ -1,4 +1,4 @@
-import { newId } from '@sevenvid/core';
+import { newId, parseTrendSound } from '@sevenvid/core';
 import type { TemplateInfo } from '@sevenvid/ipc';
 import type { AppDatabase } from '../db/database';
 import type { TemplateRow } from '../db/repos/templates';
@@ -22,6 +22,10 @@ export function templateRowToInfo(row: TemplateRow): TemplateInfo {
     subtitleStyle: (t.subtitleStyle as Record<string, unknown>) ?? null,
     exportPresetId: typeof t.exportPresetId === 'string' ? t.exportPresetId : null,
     targetDurationMs: typeof t.targetDurationMs === 'number' ? t.targetDurationMs : null,
+    hook: typeof t.hook === 'string' ? t.hook : null,
+    hashtags: Array.isArray(t.hashtags) ? t.hashtags.filter((h): h is string => typeof h === 'string') : null,
+    suggestedSound: parseTrendSound(t.suggestedSound),
+    trendSource: typeof t.trendSource === 'string' ? t.trendSource : null,
     createdAt: row.createdAt,
   };
 }

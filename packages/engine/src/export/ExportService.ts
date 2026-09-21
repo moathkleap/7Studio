@@ -130,7 +130,7 @@ export class ExportService {
   }
 
   /** Renders a document range to a file (shared by export and preview renders). */
-  async render(doc: ProjectDocument, outputPath: string, settings: ExportSettings, opts: { range?: CompileOptions['range']; usePreviewQuality?: boolean; pathOverrides?: Record<string, string>; signal?: AbortSignal; onProgress?: (ratio: number, message: string | null) => void; onProcess?: Parameters<typeof runFfmpeg>[0]['onProcess']; scratchDir: string; clipVideoFilters?: CompileOptions['clipVideoFilters']; finalVideoFilters?: string[]; finalAudioFilters?: string[]; bypass?: CompileOptions['bypass'] }): Promise<{ durationMs: number; warnings: string[]; encoder: string; masksApplied: number }> {
+  async render(doc: ProjectDocument, outputPath: string, settings: ExportSettings, opts: { range?: CompileOptions['range']; usePreviewQuality?: boolean; pathOverrides?: Record<string, string>; signal?: AbortSignal; onProgress?: (ratio: number, message: string | null) => void; onProcess?: Parameters<typeof runFfmpeg>[0]['onProcess']; scratchDir: string; clipVideoFilters?: CompileOptions['clipVideoFilters']; finalVideoFilters?: string[]; finalAudioFilters?: string[]; backgroundMusic?: CompileOptions['backgroundMusic']; bypass?: CompileOptions['bypass'] }): Promise<{ durationMs: number; warnings: string[]; encoder: string; masksApplied: number }> {
     const ffmpeg = this.ffmpeg.ffmpeg!;
     fs.mkdirSync(opts.scratchDir, { recursive: true });
     const seq = doc.settings;
@@ -145,7 +145,7 @@ export class ExportService {
     }
     const outputSize = settings.width && settings.height && (settings.width !== seq.width || settings.height !== seq.height) ? { width: settings.width, height: settings.height } : null;
     const finalVideoFilters = [...(opts.finalVideoFilters ?? []), ...(outputSize ? outputSizeFilters(outputSize.width, outputSize.height) : [])];
-    const graph = compileRenderGraph({ doc, target, range: opts.range ?? null, pathOverrides: opts.pathOverrides, subtitlesAssPath, fontsDir: fs.existsSync(path.join(this.paths.resources, 'fonts')) ? path.join(this.paths.resources, 'fonts') : null, clipVideoFilters: opts.clipVideoFilters, finalVideoFilters, finalAudioFilters: opts.finalAudioFilters, masks: { scratchDir: opts.scratchDir }, bypass: opts.bypass });
+    const graph = compileRenderGraph({ doc, target, range: opts.range ?? null, pathOverrides: opts.pathOverrides, subtitlesAssPath, fontsDir: fs.existsSync(path.join(this.paths.resources, 'fonts')) ? path.join(this.paths.resources, 'fonts') : null, clipVideoFilters: opts.clipVideoFilters, finalVideoFilters, finalAudioFilters: opts.finalAudioFilters, backgroundMusic: opts.backgroundMusic, masks: { scratchDir: opts.scratchDir }, bypass: opts.bypass });
     const scriptPath = path.join(opts.scratchDir, `filter-${newId()}.txt`);
     fs.writeFileSync(scriptPath, graph.filterScript, 'utf8');
     const preferHw = this.settings.get().gpu.preferHardwareEncoding && !opts.usePreviewQuality;

@@ -34,6 +34,7 @@ export class NetworkGateway {
     const p = this.settings.get().privacy;
     if (purpose.startsWith('model:')) return p.allowModelDownloads ? null : 'model downloads are disabled in Privacy settings';
     if (purpose.startsWith('provider:')) return p.allowExternalProviders ? null : 'external providers are disabled in Privacy settings';
+    if (purpose.startsWith('trends:')) return p.allowTrends ? null : 'trend sync is disabled in Privacy settings';
     return 'unknown purpose';
   }
 

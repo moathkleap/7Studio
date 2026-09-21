@@ -205,6 +205,14 @@ export class WorkerService {
     return this.call('tts.synthesize', { text, out_path: outPath, engine: opts.engine, voice: opts.voice ?? null, model_path: modelPath, model_id: opts.modelId ?? null, rate: opts.rate ?? 165 }, { signal: opts.signal, timeoutMs: 600_000 });
   }
 
+  /** Generates a music clip locally (MusicGen). Fails clearly when the backend or model is missing. */
+  generateMusic(prompt: string, outPath: string, opts: { durationMs?: number; modelId?: string; signal?: AbortSignal; onProgress?: Progress } = {}): Promise<{ out_path: string; duration_ms: number; sample_rate: number; model_id: string }> {
+    const modelId = opts.modelId ?? 'musicgen/small';
+    // Load the model directory managed by the model manager (downloaded through the gateway), never an HF cache.
+    const modelPath = this.models.isInstalled(modelId) ? this.models.dirFor(modelId) : null;
+    return this.call('music.generate', { prompt, out_path: outPath, duration_ms: opts.durationMs ?? 15000, model_id: modelId, model_path: modelPath }, { signal: opts.signal, onProgress: opts.onProgress, timeoutMs: 1_800_000 });
+  }
+
   transcribe(file: string, opts: { modelId: string; language?: 'ar' | 'en' | 'auto'; signal?: AbortSignal; onProgress?: Progress }): Promise<SttResult> {
     const dir = path.dirname(this.modelPath(opts.modelId, 'stt'));
     return this.call<SttResult>('stt.transcribe', { path: file, model_dir: dir, language: opts.language ?? 'auto', word_timestamps: true }, { signal: opts.signal, onProgress: opts.onProgress });
@@ -279,6 +287,15 @@ export class WorkerService {
       if (piperReady) return { status: 'available', providerId: 'piper' };
       if (engines.espeak?.available) return { status: 'available', providerId: 'espeak', reasonParams: { quality: 'basic' } };
       return { status: 'needs-runtime', reasonKey: 'capabilities.workerModuleMissing', reasonParams: { module: 'tts', reason: hello?.capabilities.tts?.reason ?? '' }, action: { type: 'setup-runtime', target: null } };
+    });
+    this.capabilities.register('gen.music', async () => {
+      const gate = await runtimeGate();
+      if (gate) return gate;
+      const hello = this.lastHello ?? (await this.probe());
+      const cap = hello?.capabilities.music;
+      if (!cap?.available) return { status: 'needs-runtime', reasonKey: 'capabilities.workerModuleMissing', reasonParams: { module: 'music', reason: cap?.reason ?? '' }, action: { type: 'setup-runtime', target: null } };
+      if (!this.models.isInstalled('musicgen/small')) return { status: 'needs-model', reasonKey: 'capabilities.modelMissing', reasonParams: { models: 'musicgen/small' }, action: { type: 'open-models', target: 'musicgen/small' } };
+      return { status: 'available', providerId: 'musicgen', reasonParams: { device: hello?.device ?? '' } };
     });
     this.capabilities.register('upscale.ai', async () => {
       const gate = await runtimeGate();

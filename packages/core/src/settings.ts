@@ -49,6 +49,7 @@ export const SettingsSchema = z.object({
   privacy: z.object({
     allowExternalProviders: z.boolean().default(false),
     allowModelDownloads: z.boolean().default(true),
+    allowTrends: z.boolean().default(false),
     askBeforeEveryDownload: z.boolean().default(true),
     networkLogging: z.boolean().default(true),
     telemetry: z.literal(false).default(false),

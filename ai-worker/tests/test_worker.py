@@ -3,7 +3,10 @@ import os
 import subprocess
 import sys
 
-from sevenvid_worker.capabilities import audio, faces, landmarks, segmentation, tracking, tts, vad, verify
+import pytest
+
+from sevenvid_worker.capabilities import audio, faces, landmarks, music, segmentation, tracking, tts, vad, verify
+from sevenvid_worker.rpc import WorkerError
 
 from .conftest import model_or_skip
 
@@ -143,3 +146,24 @@ def test_tts_espeak_arabic_and_english(ctx, tmp_path):
     assert ar["duration_ms"] > 800
     en = tts.synthesize({"text": "Welcome to seven vid", "out_path": str(tmp_path / "en.wav"), "engine": "espeak", "voice": "en"}, ctx)
     assert en["duration_ms"] > 500
+
+
+def test_music_probe_reports_availability_shape():
+    p = music.probe()
+    assert "available" in p
+    # Without the generation backend installed, it reports unavailable with a reason (never faked).
+    if not p["available"]:
+        assert p["reason"]
+
+
+def test_music_generate_rejects_empty_prompt(ctx, tmp_path):
+    with pytest.raises(WorkerError) as exc:
+        music.generate({"prompt": "  ", "out_path": str(tmp_path / "m.wav")}, ctx)
+    assert exc.value.code == "INVALID_INPUT"
+
+
+def test_music_generate_requires_local_model(ctx, tmp_path):
+    # A valid prompt but no local model directory must fail clearly, never reach the network.
+    with pytest.raises(WorkerError) as exc:
+        music.generate({"prompt": "calm lofi", "out_path": str(tmp_path / "m.wav"), "model_path": None}, ctx)
+    assert exc.value.code == "MODEL_NOT_INSTALLED"
