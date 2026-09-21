@@ -9,9 +9,8 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: { index: resolve(__dirname, 'src/main/index.ts') },
-        // `ws` (bundled via @sevenvid/engine) optionally require()s these native speed-ups. They are
-        // optional and wrapped in try/catch inside `ws`, so leave them as runtime requires instead of
-        // letting the bundler fail trying to resolve addons that are not installed.
+        // `ws` (used by the dev bridge) optionally requires these native addons; they are not installed and
+        // ws falls back to pure JS. Mark them external so the bundler does not try to resolve them.
         external: ['bufferutil', 'utf-8-validate'],
       },
     },
