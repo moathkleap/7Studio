@@ -11,14 +11,17 @@ const port = Number(process.env.SEVENVID_DEVBRIDGE_PORT ?? 7777);
 const webPort = Number(process.env.SEVENVID_WEB_PORT ?? 5177);
 const token = process.env.SEVENVID_DEVBRIDGE_TOKEN ?? 'dev';
 
+// `shell: true` so this works on Windows too, where `pnpm` is a `.cmd` shim that cannot be spawned directly.
 const bridge = spawn('pnpm', ['exec', 'tsx', 'packages/engine/src/devbridge/main.ts'], {
   cwd: root,
   stdio: 'inherit',
+  shell: true,
   env: { ...process.env, SEVENVID_REPO_ROOT: root, SEVENVID_DEVBRIDGE_PORT: String(port), SEVENVID_DEVBRIDGE_TOKEN: token, SEVENVID_LOG_CONSOLE: '1' },
 });
 const web = spawn('pnpm', ['--filter', '@sevenvid/desktop', 'exec', 'vite', '--config', 'vite.browser.config.ts'], {
   cwd: root,
   stdio: 'inherit',
+  shell: true,
   env: { ...process.env, SEVENVID_WEB_PORT: String(webPort), SEVENVID_DEVBRIDGE_URL: `ws://127.0.0.1:${port}/?token=${token}` },
 });
 const url = `http://127.0.0.1:${webPort}/`;
