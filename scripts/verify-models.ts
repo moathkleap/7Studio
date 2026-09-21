@@ -25,8 +25,8 @@ function readVersion(): string {
 }
 
 async function main(): Promise<void> {
-  const userData = process.env.SEVENVID_USER_DATA ?? path.join(root, '.sevenvid-dev', 'userData');
-  const resources = process.env.SEVENVID_RESOURCES ?? path.join(root, 'resources');
+  const userData = process.env.SEVENSTUDIOS_USER_DATA ?? path.join(root, '.sevenstudios-dev', 'userData');
+  const resources = process.env.SEVENSTUDIOS_RESOURCES ?? path.join(root, 'resources');
   const engine = createEngine({ host: createBrowserHost({ appVersion: readVersion(), onQuit: () => undefined, mediaUrl: (p) => `file://${p}` }), paths: { userData, resources } });
   await engine.start();
   try {

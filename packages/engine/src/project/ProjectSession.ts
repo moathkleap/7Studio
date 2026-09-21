@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { applyDocumentPatches, History, validateDocument, type Command, type Patch, type ProjectDocument } from '@sevenvid/core';
-import type { SessionState } from '@sevenvid/ipc';
+import { applyDocumentPatches, History, validateDocument, type Command, type Patch, type ProjectDocument } from '@sevenstudios/core';
+import type { SessionState } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';
 import type { Logger } from '../logging/logger';

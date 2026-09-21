@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LayoutTemplate, Save, Trash2 } from 'lucide-react';
-import type { TemplateInfo } from '@sevenvid/ipc';
+import type { TemplateInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useSessionStore } from '@/store/sessionStore';

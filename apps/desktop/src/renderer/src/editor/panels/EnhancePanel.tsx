@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Columns2, Maximize2, Palette } from 'lucide-react';
-import { newId, type Command, type ProjectDocument } from '@sevenvid/core';
-import type { CompareRenderResult, UpscaleResult } from '@sevenvid/ipc';
+import { newId, type Command, type ProjectDocument } from '@sevenstudios/core';
+import type { CompareRenderResult, UpscaleResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useCapability } from '@/components/CapabilityGate';
 import { Badge } from '@/components/ui/Badge';

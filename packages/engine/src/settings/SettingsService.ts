@@ -1,4 +1,4 @@
-import { defaultSettings, mergeSettings, SettingsSchema, type AppSettings, type DeepPartial } from '@sevenvid/core';
+import { defaultSettings, mergeSettings, SettingsSchema, type AppSettings, type DeepPartial } from '@sevenstudios/core';
 import type { SettingsRepo } from '../db/repos/settings';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

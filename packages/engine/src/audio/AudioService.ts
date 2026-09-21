@@ -1,8 +1,8 @@
 import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { AUDIO_PRESETS, getDocumentDurationMs, isAudioEffect, newId, type AudioPresetId, type Command, type ProjectDocument } from '@sevenvid/core';
-import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SessionState, SilenceDetectionResult, TaskInfo } from '@sevenvid/ipc';
+import { AUDIO_PRESETS, getDocumentDurationMs, isAudioEffect, newId, type AudioPresetId, type Command, type ProjectDocument } from '@sevenstudios/core';
+import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SessionState, SilenceDetectionResult, TaskInfo } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';
 import { runFfmpeg } from '../ffmpeg/runner';

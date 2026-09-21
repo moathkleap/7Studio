@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bot, Check, ChevronRight, Loader2, Mic, Send, Sparkles, Square, Trash2, TriangleAlert, Undo2, X } from 'lucide-react';
-import type { AssistantMessage, AssistantPlan, PlanRunResult, PlanStep, TaskInfo } from '@sevenvid/ipc';
+import type { AssistantMessage, AssistantPlan, PlanRunResult, PlanStep, TaskInfo } from '@sevenstudios/ipc';
 import { getApi, RemoteError } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { Badge } from '@/components/ui/Badge';

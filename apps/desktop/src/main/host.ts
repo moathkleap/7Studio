@@ -1,5 +1,5 @@
 import { dialog, shell, app, safeStorage, type BrowserWindow } from 'electron';
-import type { EngineHost } from '@sevenvid/engine';
+import type { EngineHost } from '@sevenstudios/engine';
 
 const FILTERS = {
   video: { name: 'Video', extensions: ['mp4', 'mov', 'mkv', 'avi', 'webm', 'm4v', 'mts', 'm2ts', 'ts', 'wmv', 'flv', '3gp', 'mpg', 'mpeg', 'mxf'] },
@@ -43,7 +43,7 @@ export function createElectronHost(getWindow: () => BrowserWindow | null, isDev:
       openExternal: (url) => shell.openExternal(url),
     },
     quit: () => app.quit(),
-    mediaUrl: (p) => `sevenvid-media://local/${encodeURIComponent(p)}`,
+    mediaUrl: (p) => `sevenstudios-media://local/${encodeURIComponent(p)}`,
     // OS-backed secret storage so provider API keys are encrypted at rest (macOS Keychain, Windows DPAPI,
     // libsecret on Linux). Evaluated lazily — `isEncryptionAvailable` is only valid once the app is ready.
     secrets: {

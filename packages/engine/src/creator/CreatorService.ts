@@ -17,8 +17,8 @@ import {
   type ProductionMode,
   type Script,
   type SequenceSettings,
-} from '@sevenvid/core';
-import type { TaskInfo } from '@sevenvid/ipc';
+} from '@sevenstudios/core';
+import type { TaskInfo } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

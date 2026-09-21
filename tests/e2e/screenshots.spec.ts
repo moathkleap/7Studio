@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const out = path.resolve(__dirname, '..', 'results', 'screenshots');
 
-test.skip(!process.env.SEVENVID_SCREENSHOTS, 'set SEVENVID_SCREENSHOTS=1 to capture screenshots');
+test.skip(!process.env.SEVENSTUDIOS_SCREENSHOTS, 'set SEVENSTUDIOS_SCREENSHOTS=1 to capture screenshots');
 
 test('capture screenshots of the main screens', async ({ page }) => {
   await page.goto('/');

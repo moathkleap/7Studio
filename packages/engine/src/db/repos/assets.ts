@@ -1,4 +1,4 @@
-import type { AppErrorInfo, Fraction } from '@sevenvid/core';
+import type { AppErrorInfo, Fraction } from '@sevenstudios/core';
 import type { Row, SqlDriver } from '../driver';
 import { fromBool, nowIso, num, parseJson, str, toBool } from './common';
 

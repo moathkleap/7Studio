@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ApiHandlers } from '@sevenvid/ipc';
-import type { AppSettings, DeepPartial } from '@sevenvid/core';
+import type { ApiHandlers } from '@sevenstudios/ipc';
+import type { AppSettings, DeepPartial } from '@sevenstudios/core';
 import type { EngineServices } from './createEngine';
 import { ZipWriter } from '../diagnostics/zip';
 import { isExternalUrlAllowed } from './host';
@@ -10,7 +10,7 @@ import { isExternalUrlAllowed } from './host';
 export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreChannel> {
   return {
     'app.info': () => ({
-      name: '7vid',
+      name: '7Studio',
       version: s.host.appVersion,
       platform: process.platform,
       arch: process.arch,
@@ -81,11 +81,11 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
       zip.addFile('errors.json', JSON.stringify(s.errors.recent(200), null, 2));
       zip.addFile('network-log.json', JSON.stringify(s.db.networkLog.recent(500), null, 2));
       for (const f of fs.readdirSync(s.paths.logs)) {
-        if (f.startsWith('sevenvid.log')) zip.addFile(`logs/${f}`, fs.readFileSync(path.join(s.paths.logs, f)));
+        if (f.startsWith('sevenstudios.log')) zip.addFile(`logs/${f}`, fs.readFileSync(path.join(s.paths.logs, f)));
       }
       const dir = input?.targetDir ?? s.paths.exports;
       fs.mkdirSync(dir, { recursive: true });
-      const file = path.join(dir, `7vid-diagnostics-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`);
+      const file = path.join(dir, `7studio-diagnostics-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`);
       const buf = zip.toBuffer();
       fs.writeFileSync(file, buf);
       return { path: file, sizeBytes: buf.length };

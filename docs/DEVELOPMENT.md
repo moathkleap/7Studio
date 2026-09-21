@@ -20,7 +20,7 @@
 
 ## Layout rules
 
-- The renderer imports only `@sevenvid/core` and `@sevenvid/ipc` — **never** `@sevenvid/engine`.
+- The renderer imports only `@sevenstudios/core` and `@sevenstudios/ipc` — **never** `@sevenstudios/engine`.
 - The engine never imports React.
 - All main↔renderer communication goes through the typed IPC contract in `packages/ipc`
   (`invoke`/`subscribe`). Add a channel there first; its zod schema is the source of truth.

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { DirEntry } from '@sevenvid/ipc';
+import type { DirEntry } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { AppPaths } from '../paths/AppPaths';
 
@@ -36,7 +36,7 @@ export class FsService {
       roots.push({ label: 'root', path: '/' });
       for (const mnt of ['/media', '/mnt', '/Volumes']) if (fs.existsSync(mnt)) roots.push({ label: mnt, path: mnt });
     }
-    const dev = process.env.SEVENVID_DEV_MEDIA_DIR;
+    const dev = process.env.SEVENSTUDIOS_DEV_MEDIA_DIR;
     if (dev && fs.existsSync(dev)) roots.unshift({ label: 'sample-media', path: dev });
     return roots;
   }

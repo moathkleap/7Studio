@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { DEFAULT_SHORTCUTS, EXPORT_PRESETS, eventToCombo, resolveShortcuts, type AppSettings, type DeepPartial } from '@sevenvid/core';
+import { DEFAULT_SHORTCUTS, EXPORT_PRESETS, eventToCombo, resolveShortcuts, type AppSettings, type DeepPartial } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Kbd, Select, Switch } from '@/components/ui/Input';

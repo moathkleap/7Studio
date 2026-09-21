@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { estimateExportBytes, fpsToNumber, getDocumentDurationMs, getExportPreset, newId, validateDocument, type ExportSettings, type ProjectDocument } from '@sevenvid/core';
-import type { ExportInfo } from '@sevenvid/ipc';
+import { estimateExportBytes, fpsToNumber, getDocumentDurationMs, getExportPreset, newId, validateDocument, type ExportSettings, type ProjectDocument } from '@sevenstudios/core';
+import type { ExportInfo } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

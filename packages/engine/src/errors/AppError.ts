@@ -1,4 +1,4 @@
-import { newId, type AppErrorInfo, type ErrorModule, type RecoveryHint } from '@sevenvid/core';
+import { newId, type AppErrorInfo, type ErrorModule, type RecoveryHint } from '@sevenstudios/core';
 import { ERROR_CODES, type ErrorCode } from './codes';
 
 export interface AppErrorInit {

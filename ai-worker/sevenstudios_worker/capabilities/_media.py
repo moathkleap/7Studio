@@ -13,7 +13,7 @@ from ..rpc import WorkerError
 
 
 def ffmpeg_path(params: dict) -> str:
-    p = params.get("ffmpeg") or os.environ.get("SEVENVID_FFMPEG_PATH") or shutil.which("ffmpeg")
+    p = params.get("ffmpeg") or os.environ.get("SEVENSTUDIOS_FFMPEG_PATH") or shutil.which("ffmpeg")
     if not p:
         raise WorkerError("FFMPEG_NOT_FOUND", "ffmpeg binary not found")
     return p

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { ChannelName, EventName, IpcResponse, SevenvidApi } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { ChannelName, EventName, IpcResponse, SevenstudiosApi } from '@sevenstudios/ipc';
 
 class RemoteError extends Error {
   constructor(readonly info: AppErrorInfo) {
@@ -9,18 +9,18 @@ class RemoteError extends Error {
   }
 }
 
-const api: SevenvidApi = {
+const api: SevenstudiosApi = {
   mode: 'electron',
   async invoke(channel: ChannelName, input?: unknown) {
-    const res = (await ipcRenderer.invoke('sevenvid:api', channel, input ?? null)) as IpcResponse<unknown>;
+    const res = (await ipcRenderer.invoke('sevenstudios:api', channel, input ?? null)) as IpcResponse<unknown>;
     if (res.ok) return res.data as never;
     throw new RemoteError(res.error);
   },
   subscribe(event: EventName, handler) {
     const listener = (_e: Electron.IpcRendererEvent, payload: unknown) => handler(payload as never);
-    ipcRenderer.on(`sevenvid:event:${event}`, listener);
-    return () => ipcRenderer.removeListener(`sevenvid:event:${event}`, listener);
+    ipcRenderer.on(`sevenstudios:event:${event}`, listener);
+    return () => ipcRenderer.removeListener(`sevenstudios:event:${event}`, listener);
   },
 };
 
-contextBridge.exposeInMainWorld('sevenvid', api);
+contextBridge.exposeInMainWorld('sevenstudios', api);

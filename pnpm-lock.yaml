@@ -41,13 +41,13 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@sevenvid/core':
+      '@sevenstudios/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@sevenvid/engine':
+      '@sevenstudios/engine':
         specifier: workspace:*
         version: link:../../packages/engine
-      '@sevenvid/ipc':
+      '@sevenstudios/ipc':
         specifier: workspace:*
         version: link:../../packages/ipc
       clsx:
@@ -132,10 +132,10 @@ importers:
 
   packages/engine:
     dependencies:
-      '@sevenvid/core':
+      '@sevenstudios/core':
         specifier: workspace:*
         version: link:../core
-      '@sevenvid/ipc':
+      '@sevenstudios/ipc':
         specifier: workspace:*
         version: link:../ipc
       immer:
@@ -166,7 +166,7 @@ importers:
 
   packages/ipc:
     dependencies:
-      '@sevenvid/core':
+      '@sevenstudios/core':
         specifier: workspace:*
         version: link:../core
       zod:

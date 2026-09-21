@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { eventToCombo, resolveShortcuts, type ShortcutAction } from '@sevenvid/core';
+import { eventToCombo, resolveShortcuts, type ShortcutAction } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { useSessionStore } from '@/store/sessionStore';
 

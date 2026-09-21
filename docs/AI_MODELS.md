@@ -4,7 +4,7 @@ Models are optional, downloaded on demand, and never bundled. The registry —
 `packages/engine/src/models/registry.ts` — lists every model with its id, capability, files + sha256
 checksums, size, VRAM/RAM needs, licence and languages. Downloads go through the privacy-aware
 `NetworkGateway` (resumable, logged), verify their sha256, and install into `<userData>/models/<id>`
-(override with `SEVENVID_MODELS_DIR`).
+(override with `SEVENSTUDIOS_MODELS_DIR`).
 
 ## Managing models
 

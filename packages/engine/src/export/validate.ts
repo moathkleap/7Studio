@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
-import { fpsToNumber, type Fraction } from '@sevenvid/core';
+import { fpsToNumber, type Fraction } from '@sevenstudios/core';
 import { probeMedia } from '../media/probe';
 
 export interface ExportCheck {

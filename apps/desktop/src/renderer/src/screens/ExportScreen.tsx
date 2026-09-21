@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Download, FolderOpen, Play, XCircle, Zap } from 'lucide-react';
-import { EXPORT_PRESETS, getExportPreset, type ExportSettings } from '@sevenvid/core';
-import type { ExportInfo } from '@sevenvid/ipc';
+import { EXPORT_PRESETS, getExportPreset, type ExportSettings } from '@sevenstudios/core';
+import type { ExportInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { useAppStore } from '@/store/appStore';

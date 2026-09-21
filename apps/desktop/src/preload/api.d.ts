@@ -1,8 +1,8 @@
-import type { SevenvidApi } from '@sevenvid/ipc';
+import type { SevenstudiosApi } from '@sevenstudios/ipc';
 
 declare global {
   interface Window {
-    sevenvid?: SevenvidApi;
+    sevenstudios?: SevenstudiosApi;
   }
 }
 

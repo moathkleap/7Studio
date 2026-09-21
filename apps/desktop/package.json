@@ -1,11 +1,11 @@
 {
-  "name": "@sevenvid/desktop",
+  "name": "@sevenstudios/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "7vid desktop application (Electron shell + React renderer)",
-  "productName": "7vid",
+  "description": "7Studio desktop application (Electron shell + React renderer)",
+  "productName": "7Studio",
   "main": "./out/main/index.js",
-  "author": "7vid",
+  "author": "7Studio",
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
@@ -16,9 +16,9 @@
     "package": "electron-vite build && electron-builder"
   },
   "dependencies": {
-    "@sevenvid/core": "workspace:*",
-    "@sevenvid/engine": "workspace:*",
-    "@sevenvid/ipc": "workspace:*",
+    "@sevenstudios/core": "workspace:*",
+    "@sevenstudios/engine": "workspace:*",
+    "@sevenstudios/ipc": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
     "i18next": "^26.4.0",

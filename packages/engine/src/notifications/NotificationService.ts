@@ -1,5 +1,5 @@
-import { newId } from '@sevenvid/core';
-import type { NotificationInfo } from '@sevenvid/ipc';
+import { newId } from '@sevenstudios/core';
+import type { NotificationInfo } from '@sevenstudios/ipc';
 import type { EventBus } from '../events/EventBus';
 import type { SettingsService } from '../settings/SettingsService';
 

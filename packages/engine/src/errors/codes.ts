@@ -1,4 +1,4 @@
-import type { ErrorModule, RecoveryHint } from '@sevenvid/core';
+import type { ErrorModule, RecoveryHint } from '@sevenstudios/core';
 
 export interface ErrorCodeSpec {
   module: ErrorModule;

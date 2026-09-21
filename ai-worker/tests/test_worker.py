@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 
-from sevenvid_worker.capabilities import audio, faces, landmarks, segmentation, tracking, tts, vad, verify
+from sevenstudios_worker.capabilities import audio, faces, landmarks, segmentation, tracking, tts, vad, verify
 
 from .conftest import model_or_skip
 
@@ -14,7 +14,7 @@ WORKER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 def test_hello_over_stdio():
     # Same launch shape as the Node WorkerClient: cwd = worker source dir, package importable via PYTHONPATH.
     env = {**os.environ, "PYTHONPATH": WORKER_DIR, "PYTHONUNBUFFERED": "1"}
-    proc = subprocess.Popen([sys.executable, "-m", "sevenvid_worker", "--stdio"], cwd=WORKER_DIR, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.Popen([sys.executable, "-m", "sevenstudios_worker", "--stdio"], cwd=WORKER_DIR, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     ready = json.loads(proc.stdout.readline())
     assert ready["method"] == "ready"
     proc.stdin.write(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "hello", "params": {}}) + "\n")

@@ -1,5 +1,5 @@
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { ChannelName, EventName, SevenvidApi } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { ChannelName, EventName, SevenstudiosApi } from '@sevenstudios/ipc';
 
 export class RemoteError extends Error {
   constructor(readonly info: AppErrorInfo) {
@@ -12,7 +12,7 @@ type Pending = { resolve: (v: unknown) => void; reject: (e: unknown) => void };
 type Status = 'connecting' | 'connected' | 'disconnected';
 
 /** Browser-mode implementation of the IPC contract over the dev bridge WebSocket. */
-export class WsClient implements SevenvidApi {
+export class WsClient implements SevenstudiosApi {
   readonly mode = 'browser' as const;
   private ws: WebSocket | null = null;
   private pending = new Map<string, Pending>();

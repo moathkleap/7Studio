@@ -8,7 +8,7 @@ Editor** and an **AI Video Creator** — over one shared timeline document and o
 ```
 ┌──────────────────────── Electron ────────────────────────┐
 │  Renderer (React 19)      Preload (contextBridge)         │
-│  packages/core + ipc  ──►  window.sevenvid.{invoke,        │
+│  packages/core + ipc  ──►  window.sevenstudios.{invoke,        │
 │                            subscribe}                      │
 │                                   │ ipcRenderer            │
 │  Main process ◄───────────────────┘                       │
@@ -39,7 +39,7 @@ Editor** and an **AI Video Creator** — over one shared timeline document and o
 | `packages/ipc` | The single source of truth for the IPC surface: every channel and event as a zod schema, with derived types. |
 | `packages/engine` | All Node-only services (see below). |
 | `apps/desktop` | Electron shell + React renderer. |
-| `ai-worker` | Python worker package (`sevenvid_worker`). |
+| `ai-worker` | Python worker package (`sevenstudios_worker`). |
 
 ### Engine services (`packages/engine/src`)
 

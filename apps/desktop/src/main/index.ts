@@ -1,9 +1,9 @@
 import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell } from 'electron';
 import { pathToFileURL } from 'node:url';
-import { AppError, createEngine, type Engine } from '@sevenvid/engine';
+import { AppError, createEngine, type Engine } from '@sevenstudios/engine';
 import { createElectronHost } from './host';
-import { buildMenu } from './menu';
+import { buildMenu, type MenuLang } from './menu';
 
 // node:sqlite is stable enough for our use but still flagged experimental in Node 22.
 process.removeAllListeners('warning');
@@ -15,7 +15,7 @@ const isDev = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
 let engine: Engine | null = null;
 
-protocol.registerSchemesAsPrivileged([{ scheme: 'sevenvid-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
+protocol.registerSchemesAsPrivileged([{ scheme: 'sevenstudios-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -42,6 +42,8 @@ async function createWindow(): Promise<void> {
     show: false,
     backgroundColor: '#0b0c10',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+    // Window/taskbar icon on Windows and Linux (macOS uses the bundled .icns).
+    ...(process.platform === 'darwin' ? {} : { icon: path.join(resourcesDir(), 'icons', 'icon.png') }),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -70,8 +72,8 @@ async function createWindow(): Promise<void> {
 function installCsp(): void {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const csp = isDev
-      ? "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file: sevenvid-media:; media-src 'self' blob: file: sevenvid-media:; font-src 'self' data:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
-      : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: sevenvid-media:; media-src 'self' blob: sevenvid-media:; font-src 'self' data:; connect-src 'self'";
+      ? "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file: sevenstudios-media:; media-src 'self' blob: file: sevenstudios-media:; font-src 'self' data:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
+      : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: sevenstudios-media:; media-src 'self' blob: sevenstudios-media:; font-src 'self' data:; connect-src 'self'";
     callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] } });
   });
 }
@@ -92,7 +94,7 @@ function installPermissions(): void {
 
 /** Serves local media the engine allows (assets and derived cache files) with Range support via net.fetch. */
 function installMediaProtocol(e: Engine): void {
-  protocol.handle('sevenvid-media', (request) => {
+  protocol.handle('sevenstudios-media', (request) => {
     const url = new URL(request.url);
     const file = decodeURIComponent(url.pathname.replace(/^\//, ''));
     const abs = process.platform === 'win32' ? file : `/${file.replace(/^\/+/, '')}`;
@@ -101,8 +103,19 @@ function installMediaProtocol(e: Engine): void {
   });
 }
 
+/** Resolves the app's UI language setting ('system' | 'ar' | 'en') to a concrete menu language. */
+function resolveMenuLang(pref: 'system' | 'ar' | 'en'): MenuLang {
+  if (pref === 'ar' || pref === 'en') return pref;
+  return app.getLocale().toLowerCase().startsWith('ar') ? 'ar' : 'en';
+}
+
+function installMenu(e: Engine): void {
+  const lang = resolveMenuLang(e.settings.get().general.language);
+  Menu.setApplicationMenu(buildMenu({ isDev, lang, openExternal: (url) => void e.invoke('shell.openExternal', { url }) }));
+}
+
 function wireIpc(e: Engine): void {
-  ipcMain.handle('sevenvid:api', async (_event, channel: string, input: unknown) => {
+  ipcMain.handle('sevenstudios:api', async (_event, channel: string, input: unknown) => {
     try {
       const data = await e.invoke(channel as never, input as never);
       return { ok: true, data: data ?? null };
@@ -112,23 +125,32 @@ function wireIpc(e: Engine): void {
   });
   e.bus.onAny((event, payload) => {
     for (const win of BrowserWindow.getAllWindows()) {
-      if (!win.isDestroyed()) win.webContents.send(`sevenvid:event:${event}`, payload);
+      if (!win.isDestroyed()) win.webContents.send(`sevenstudios:event:${event}`, payload);
     }
   });
 }
 
 app.whenReady().then(async () => {
-  app.setAppUserModelId('com.sevenvid.app');
+  app.setAppUserModelId('com.sevenstudios.app');
   engine = createEngine({
     host: createElectronHost(() => mainWindow, isDev),
-    paths: { userData: process.env.SEVENVID_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },
+    paths: { userData: process.env.SEVENSTUDIOS_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },
     logToConsole: isDev,
   });
   wireIpc(engine);
   installMediaProtocol(engine);
   installCsp();
   installPermissions();
-  Menu.setApplicationMenu(buildMenu({ isDev, openExternal: (url) => void engine?.invoke('shell.openExternal', { url }) }));
+  installMenu(engine);
+  // Rebuild the native menu in the selected language whenever the UI language setting changes.
+  let menuLang = resolveMenuLang(engine.settings.get().general.language);
+  engine.bus.on('settings.updated', (settings) => {
+    const next = resolveMenuLang(settings.general.language);
+    if (next !== menuLang) {
+      menuLang = next;
+      if (engine) installMenu(engine);
+    }
+  });
   await engine.start();
   await createWindow();
   app.on('activate', () => {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AppErrorInfo, CapabilityInfo, Command, ProjectDocument, AppSettings } from '@sevenvid/core';
+import type { AppErrorInfo, CapabilityInfo, Command, ProjectDocument, AppSettings } from '@sevenstudios/core';
 
 /** Passthrough schema for large domain objects that are validated by the core package itself. */
 export function passthrough<T>(check: (v: unknown) => boolean = () => true) {
@@ -641,7 +641,7 @@ export const AssistantMessageSchema = z.object({
 export type AssistantMessage = z.infer<typeof AssistantMessageSchema>;
 
 // ---- creator (phase 5) ----
-import type { Brief, Character, CreatorScene, CreatorQaIssue, ProductionMode, Script } from '@sevenvid/core';
+import type { Brief, Character, CreatorScene, CreatorQaIssue, ProductionMode, Script } from '@sevenstudios/core';
 export const BriefIoSchema = passthrough<Brief>((v) => typeof v === 'object' && v !== null && 'idea' in v);
 export const BriefInputSchema = passthrough<Partial<Brief> & { idea: string }>((v) => typeof v === 'object' && v !== null && typeof (v as { idea?: unknown }).idea === 'string');
 export const ScriptIoSchema = passthrough<Script>((v) => typeof v === 'object' && v !== null && 'scenes' in v);

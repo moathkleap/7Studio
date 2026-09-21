@@ -2,6 +2,7 @@ export * from './api/createEngine';
 export * from './api/host';
 export * from './api/handlers';
 export * from './paths/AppPaths';
+export * from './paths/migrateLegacy';
 export * from './errors';
 export * from './errors/ErrorLog';
 export * from './logging/logger';

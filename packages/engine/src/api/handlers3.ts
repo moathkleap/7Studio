@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import type { ApiHandlers, ModelStatusInfo, RuntimeStatus } from '@sevenvid/ipc';
-import type { HardwareSnapshot } from '@sevenvid/ipc';
+import type { ApiHandlers, ModelStatusInfo, RuntimeStatus } from '@sevenstudios/ipc';
+import type { HardwareSnapshot } from '@sevenstudios/ipc';
 import type { EngineServices } from './createEngine';
 import type { ModelStatus } from '../models/ModelManager';
 import type { ModelSpec } from '../models/registry';

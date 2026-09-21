@@ -6,7 +6,7 @@
 |---|---|---|
 | Node.js | ≥ 22.13 | The engine uses the built-in `node:sqlite`. |
 | pnpm | 10.x | `corepack enable` picks up the pinned version. |
-| FFmpeg + FFprobe | ≥ 6.0 | With `libx264/libx265/libsvtav1/libaom/libvpx/libass`. Found via `SEVENVID_FFMPEG_PATH`, bundled `resources/bin/<platform>-<arch>/`, or the system `PATH`. |
+| FFmpeg + FFprobe | ≥ 6.0 | With `libx264/libx265/libsvtav1/libaom/libvpx/libass`. Found via `SEVENSTUDIOS_FFMPEG_PATH`, bundled `resources/bin/<platform>-<arch>/`, or the system `PATH`. |
 | Python | ≥ 3.10 | Optional, for AI models (vision, speech, generation). The app runs without it; those capabilities show as `needs-runtime`. |
 
 ### System libraries
@@ -51,7 +51,7 @@ approve (the sizes are shown first).
 
 Models are **not** bundled. Open **AI Models** in the app to download the ones you need; each download is
 resumable, checksum-verified (sha256) and installed into `<userData>/models/<id>` (override with
-`SEVENVID_MODELS_DIR`). Every model has a **Test** button that runs a real inference on a bundled sample.
+`SEVENSTUDIOS_MODELS_DIR`). Every model has a **Test** button that runs a real inference on a bundled sample.
 The registry — with sizes, checksums, VRAM/RAM needs and licences — is in
 `packages/engine/src/models/registry.ts`. See `docs/AI_MODELS.md`.
 
@@ -64,7 +64,7 @@ pnpm verify:models
 ## Packaging a desktop build
 
 ```bash
-pnpm --filter @sevenvid/desktop package   # electron-vite build && electron-builder
+pnpm --filter @sevenstudios/desktop package   # electron-vite build && electron-builder
 ```
 
 Configuration is in `apps/desktop/electron-builder.yml` (Windows nsis, macOS dmg, Linux AppImage/deb).

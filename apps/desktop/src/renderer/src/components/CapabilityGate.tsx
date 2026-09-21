@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { AlertTriangle, Construction } from 'lucide-react';
-import type { CapabilityId, CapabilityInfo } from '@sevenvid/core';
+import type { CapabilityId, CapabilityInfo } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { Badge, type BadgeTone } from './ui/Badge';
 import { Button } from './ui/Button';

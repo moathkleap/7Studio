@@ -9,12 +9,12 @@ reporting an issue.
 
 7vid needs FFmpeg and FFprobe (≥ 6.0, with `libx264/libx265/libsvtav1/libaom/libvpx/libass`). It looks in:
 
-1. `SEVENVID_FFMPEG_PATH` (a directory or a binary path),
+1. `SEVENSTUDIOS_FFMPEG_PATH` (a directory or a binary path),
 2. bundled `resources/bin/<platform>-<arch>/`,
 3. the system `PATH`.
 
 Install FFmpeg (`sudo apt-get install ffmpeg`, `brew install ffmpeg`, or a static build) or set
-`SEVENVID_FFMPEG_PATH`.
+`SEVENSTUDIOS_FFMPEG_PATH`.
 
 ## MediaPipe fails to load (`libEGL.so.1` / `libGLESv2.so.2`)
 

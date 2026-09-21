@@ -26,7 +26,7 @@ export function Sidebar() {
     <nav className="flex h-full w-[212px] shrink-0 flex-col border-e border-border bg-surface" aria-label="main">
       <div className="flex h-14 items-center gap-2.5 px-5">
         <div className="grid size-7 place-items-center rounded-lg bg-accent text-[13px] font-bold text-white">7</div>
-        <span className="text-[15px] font-semibold tracking-tight">7vid</span>
+        <span className="text-[15px] font-semibold tracking-tight">7Studio</span>
       </div>
       <div className="flex flex-1 flex-col gap-0.5 px-3 py-2">
         {items.map(({ to, key, icon: Icon, ...rest }) => {

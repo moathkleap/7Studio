@@ -12,8 +12,8 @@ import {
   type Command,
   type OperationDraft,
   type ProjectDocument,
-} from '@sevenvid/core';
-import type { AssistantMessage, AssistantPlan, PlanRunResult, PlanStep, SessionState, StepResult, TaskInfo } from '@sevenvid/ipc';
+} from '@sevenstudios/core';
+import type { AssistantMessage, AssistantPlan, PlanRunResult, PlanStep, SessionState, StepResult, TaskInfo } from '@sevenstudios/ipc';
 import type { CapabilityRegistry } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';
