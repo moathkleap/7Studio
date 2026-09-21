@@ -1,6 +1,6 @@
 {
   "name": "@sevenstudios/ipc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Typed IPC contract (zod) shared by main, preload, renderer and the dev bridge",
