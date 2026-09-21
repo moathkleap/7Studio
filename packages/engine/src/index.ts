@@ -1,0 +1,24 @@
+export * from './api/createEngine';
+export * from './api/host';
+export * from './api/handlers';
+export * from './paths/AppPaths';
+export * from './errors';
+export * from './errors/ErrorLog';
+export * from './logging/logger';
+export * from './events/EventBus';
+export * from './db/database';
+export * from './db/driver';
+export * from './tasks/TaskManager';
+export * from './project/ProjectService';
+export * from './project/ProjectSession';
+export * from './project/SessionManager';
+export * from './hardware/HardwareMonitor';
+export * from './ffmpeg/locator';
+export * from './capabilities/CapabilityRegistry';
+export * from './settings/SettingsService';
+export * from './search/SearchService';
+export * from './fs/FsService';
+export * from './notifications/NotificationService';
+// NOTE: the dev bridge server (which imports `ws`) is intentionally NOT re-exported here. It is an entry
+// point used directly by scripts/dev-browser and devbridge/main; keeping it out of the barrel stops `ws`
+// (and its optional native addons bufferutil/utf-8-validate) from being bundled into the Electron main.
