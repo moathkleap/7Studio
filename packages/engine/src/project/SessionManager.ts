@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ProjectDocument } from '@sevenvid/core';
-import type { RecoveryInfo, SessionState } from '@sevenvid/ipc';
+import type { ProjectDocument } from '@sevenstudios/core';
+import type { RecoveryInfo, SessionState } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

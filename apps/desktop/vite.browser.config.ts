@@ -8,7 +8,7 @@ export default defineConfig({
   root: resolve(__dirname, 'src/renderer'),
   plugins: [react(), tailwindcss()],
   resolve: { alias: { '@': resolve(__dirname, 'src/renderer/src') } },
-  define: { 'import.meta.env.VITE_DEVBRIDGE_URL': JSON.stringify(process.env.SEVENVID_DEVBRIDGE_URL ?? '') },
-  server: { port: Number(process.env.SEVENVID_WEB_PORT ?? 5177), strictPort: true, host: '127.0.0.1' },
+  define: { 'import.meta.env.VITE_DEVBRIDGE_URL': JSON.stringify(process.env.SEVENSTUDIOS_DEVBRIDGE_URL ?? '') },
+  server: { port: Number(process.env.SEVENSTUDIOS_WEB_PORT ?? 5177), strictPort: true, host: '127.0.0.1' },
   build: { outDir: resolve(__dirname, 'out/browser'), emptyOutDir: true },
 });

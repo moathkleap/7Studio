@@ -1,4 +1,4 @@
-import { clipAtOnTrack, timelineToSourceMs, type Clip, type ProjectDocument, type SubtitleTrack, type Track } from '@sevenvid/core';
+import { clipAtOnTrack, timelineToSourceMs, type Clip, type ProjectDocument, type SubtitleTrack, type Track } from '@sevenstudios/core';
 
 export interface LayerFrame {
   clip: Clip;

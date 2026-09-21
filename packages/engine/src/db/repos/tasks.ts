@@ -1,5 +1,5 @@
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { TaskInfo, TaskStatus } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { TaskInfo, TaskStatus } from '@sevenstudios/ipc';
 import type { Row, SqlDriver } from '../driver';
 import { fromBool, nowIso, num, parseJson, str, toBool } from './common';
 

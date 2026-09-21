@@ -21,7 +21,7 @@ const SRT = `1
 
 2
 00:00:02,000 --> 00:00:03,000
-Welcome to 7vid
+Welcome to Seven Studios
 
 3
 00:00:03,100 --> 00:00:03,900
@@ -57,7 +57,7 @@ describe.skipIf(!hasFixtures)('subtitle service', () => {
         expect(text).toContain('PlayResX: 640');
       } else {
         expect(parseSubtitles(text, () => 'x')).toHaveLength(3);
-        expect(text).toContain('Welcome to 7vid');
+        expect(text).toContain('Welcome to Seven Studios');
       }
     }
     // burn-in through the export pipeline: the ASS file is generated and the render validates

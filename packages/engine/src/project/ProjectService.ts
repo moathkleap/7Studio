@@ -11,8 +11,8 @@ import {
   type ProjectDocument,
   type ProjectKind,
   type SequenceSettings,
-} from '@sevenvid/core';
-import type { ProjectSummary, ProjectVersion } from '@sevenvid/ipc';
+} from '@sevenstudios/core';
+import type { ProjectSummary, ProjectVersion } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import { toSummary, type ProjectRow } from '../db/repos/projects';
 import { AppError } from '../errors';
@@ -31,7 +31,7 @@ export interface CreateProjectInput {
   fps?: number;
 }
 
-export const MIRROR_FILE = 'project.7vid.json';
+export const MIRROR_FILE = 'project.sevenstudios.json';
 export const JOURNAL_FILE = 'journal.ndjson';
 
 export function hashDocument(json: string): string {

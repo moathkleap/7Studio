@@ -1,8 +1,8 @@
 import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { boxIou, createMaskTrack, newId, sourceBoxToSequence, timelineToSourceMs, type Command, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenvid/core';
-import type { OcrLine, OcrResult, OcrTrack, SessionState, TaskInfo } from '@sevenvid/ipc';
+import { boxIou, createMaskTrack, newId, sourceBoxToSequence, timelineToSourceMs, type Command, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenstudios/core';
+import type { OcrLine, OcrResult, OcrTrack, SessionState, TaskInfo } from '@sevenstudios/ipc';
 import type { CapabilityRegistry, CapabilityReport } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';

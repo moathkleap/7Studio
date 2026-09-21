@@ -1,6 +1,6 @@
 # Architecture
 
-7vid is a local-first desktop application built as a pnpm monorepo. It has two modules — an **AI Video
+Seven Studios is a local-first desktop application built as a pnpm monorepo. It has two modules — an **AI Video
 Editor** and an **AI Video Creator** — over one shared timeline document and one engine.
 
 ## Processes
@@ -8,7 +8,7 @@ Editor** and an **AI Video Creator** — over one shared timeline document and o
 ```
 ┌──────────────────────── Electron ────────────────────────┐
 │  Renderer (React 19)      Preload (contextBridge)         │
-│  packages/core + ipc  ──►  window.sevenvid.{invoke,        │
+│  packages/core + ipc  ──►  window.sevenstudios.{invoke,        │
 │                            subscribe}                      │
 │                                   │ ipcRenderer            │
 │  Main process ◄───────────────────┘                       │
@@ -39,7 +39,7 @@ Editor** and an **AI Video Creator** — over one shared timeline document and o
 | `packages/ipc` | The single source of truth for the IPC surface: every channel and event as a zod schema, with derived types. |
 | `packages/engine` | All Node-only services (see below). |
 | `apps/desktop` | Electron shell + React renderer. |
-| `ai-worker` | Python worker package (`sevenvid_worker`). |
+| `ai-worker` | Python worker package (`sevenstudios_worker`). |
 
 ### Engine services (`packages/engine/src`)
 
@@ -73,7 +73,7 @@ stay in sync.
 
 SQLite (`node:sqlite`, WAL, FTS5) holds projects, versions, assets, transcripts, AI conversations/plans/
 operations, characters, scripts, scenes, models, provider config, settings, tasks, exports, templates and
-the network log. Large or portable data lives in each project's `data_dir`: `project.7vid.json` (portable
+the network log. Large or portable data lives in each project's `data_dir`: `project.sevenstudios.json` (portable
 mirror), `journal.ndjson` (crash-recovery patches), `tracks/`, `cache/`, `generated/`, `exports/`.
 
 ## Rendering

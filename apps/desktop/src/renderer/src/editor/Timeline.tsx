@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Film, Layers, Lock, LockOpen, Volume2, VolumeX } from 'lucide-react';
-import { clipEndMs, formatMs, type Clip, type Command, type ProjectDocument, type Track } from '@sevenvid/core';
+import { clipEndMs, formatMs, type Clip, type Command, type ProjectDocument, type Track } from '@sevenstudios/core';
 import { getApi } from '@/api/client';
 import { useEditorStore } from '@/store/editorStore';
 import { useMediaStore } from '@/store/mediaStore';
@@ -243,7 +243,7 @@ export function Timeline({ doc, onCommand, onDropAsset }: TimelineProps) {
 
   const onDrop = (e: React.DragEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    const assetId = e.dataTransfer.getData('application/x-sevenvid-asset');
+    const assetId = e.dataTransfer.getData('application/x-sevenstudios-asset');
     if (!assetId) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;

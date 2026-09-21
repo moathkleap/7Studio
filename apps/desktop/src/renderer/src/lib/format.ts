@@ -1,4 +1,4 @@
-import { formatMs } from '@sevenvid/core';
+import { formatMs } from '@sevenstudios/core';
 
 export function formatBytes(bytes: number | null | undefined, locale = 'en'): string {
   if (bytes == null || !Number.isFinite(bytes)) return '—';

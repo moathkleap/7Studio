@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { frameDurationMs, snapToFrame, type Fraction, type NormBox } from '@sevenvid/core';
+import { frameDurationMs, snapToFrame, type Fraction, type NormBox } from '@sevenstudios/core';
 
 export type EditorTool = 'select' | 'razor';
 export type ToolTab = 'inspector' | 'audio' | 'privacy' | 'subtitles' | 'text' | 'enhance';

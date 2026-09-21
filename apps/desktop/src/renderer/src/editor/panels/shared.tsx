@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
-import type { AppErrorInfo } from '@sevenvid/core';
+import type { AppErrorInfo } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { useSyncedState } from '@/hooks/useSyncedState';
 import { Input } from '@/components/ui/Input';

@@ -1,5 +1,5 @@
-import type { ProjectKind, SequenceSettings } from '@sevenvid/core';
-import type { ProjectSummary } from '@sevenvid/ipc';
+import type { ProjectKind, SequenceSettings } from '@sevenstudios/core';
+import type { ProjectSummary } from '@sevenstudios/ipc';
 import type { Row, SqlDriver } from '../driver';
 import { nowIso, parseJson, str } from './common';
 

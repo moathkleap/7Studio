@@ -32,13 +32,10 @@ export function Sidebar() {
         data-action="about.open"
         onClick={() => setAboutOpen(true)}
         title={t('about.title')}
-        className="focus-ring flex h-14 items-center gap-2.5 px-5 text-start transition-colors hover:bg-surface-2"
+        className="focus-ring flex h-14 items-center gap-2.5 px-4 text-start transition-colors hover:bg-surface-2"
       >
         <img src={markUrl} alt="" className="size-8 shrink-0 rounded-lg shadow-sm" />
-        <div className="flex min-w-0 flex-col leading-none">
-          <span className="text-[15px] font-semibold tracking-tight">7vid</span>
-          <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-faint">Seven Studios</span>
-        </div>
+        <span className="brand-wordmark truncate text-[13px] font-bold uppercase tracking-[0.05em]">Seven Studios</span>
       </button>
       <div className="flex flex-1 flex-col gap-0.5 px-3 py-2">
         {items.map(({ to, key, icon: Icon, ...rest }) => {

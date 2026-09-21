@@ -1,14 +1,14 @@
-import type { SevenvidApi } from '@sevenvid/ipc';
+import type { SevenStudiosApi } from '@sevenstudios/ipc';
 import { WsClient } from './wsClient';
 
-let client: SevenvidApi | null = null;
+let client: SevenStudiosApi | null = null;
 let ws: WsClient | null = null;
 
 /** Returns the API: the Electron preload bridge when present, otherwise the browser-mode WebSocket client. */
-export function getApi(): SevenvidApi {
+export function getApi(): SevenStudiosApi {
   if (client) return client;
-  if (typeof window !== 'undefined' && window.sevenvid) {
-    client = window.sevenvid;
+  if (typeof window !== 'undefined' && window.sevenstudios) {
+    client = window.sevenstudios;
     return client;
   }
   const params = new URLSearchParams(window.location.search);

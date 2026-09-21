@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { frameDurationMs, getExportPreset, type ProjectDocument } from '@sevenvid/core';
+import { frameDurationMs, getExportPreset, type ProjectDocument } from '@sevenstudios/core';
 import { runFfmpeg } from '../ffmpeg/runner';
 import { compileRenderGraph, type CompileOptions } from './RenderGraphCompiler';
 import type { FfmpegLocation } from '../ffmpeg/locator';
-import type { CompareRenderResult, TaskInfo } from '@sevenvid/ipc';
+import type { CompareRenderResult, TaskInfo } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { ExportService } from '../export/ExportService';
 import type { Logger } from '../logging/logger';

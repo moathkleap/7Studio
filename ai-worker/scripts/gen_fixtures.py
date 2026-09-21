@@ -17,7 +17,7 @@ try:
     # A short video of the astronaut photo panning slowly (for face tracking tests)
     import subprocess
 
-    ffmpeg = os.environ.get("SEVENVID_FFMPEG_PATH", "ffmpeg")
+    ffmpeg = os.environ.get("SEVENSTUDIOS_FFMPEG_PATH", "ffmpeg")
     target = os.path.join(out, "face-pan-4s.mp4")
     if not os.path.exists(target):
         subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-loop", "1", "-i", os.path.join(out, "astronaut.png"), "-vf", "scale=768:768,crop=512:512:x='120*t/4':y=0,format=yuv420p", "-t", "4", "-r", "25", "-c:v", "libx264", "-preset", "veryfast", target], check=True)
@@ -49,7 +49,7 @@ try:
     img.save(os.path.join(out, "text-frame.png"))
     import subprocess
 
-    ffmpeg = os.environ.get("SEVENVID_FFMPEG_PATH", "ffmpeg")
+    ffmpeg = os.environ.get("SEVENSTUDIOS_FFMPEG_PATH", "ffmpeg")
     target = os.path.join(out, "text-3s.mp4")
     if not os.path.exists(target):
         subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-loop", "1", "-i", os.path.join(out, "text-frame.png"), "-t", "3", "-r", "25", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "veryfast", target], check=True)

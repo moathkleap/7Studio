@@ -13,7 +13,7 @@ resources/bin/
 
 The engine's FFmpeg locator resolves binaries in this order:
 
-1. `SEVENVID_FFMPEG_PATH` (an explicit directory or binary path),
+1. `SEVENSTUDIOS_FFMPEG_PATH` (an explicit directory or binary path),
 2. `resources/bin/<platform>-<arch>/` (bundled, as above),
 3. the system `PATH`.
 

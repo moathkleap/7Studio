@@ -8,7 +8,7 @@ from .rpc import RpcServer
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="sevenvid-worker")
+    parser = argparse.ArgumentParser(prog="sevenstudios-worker")
     parser.add_argument("--stdio", action="store_true", help="serve JSON-RPC over stdin/stdout (default)")
     parser.add_argument("--probe", action="store_true", help="print capability probe as JSON and exit")
     args = parser.parse_args()

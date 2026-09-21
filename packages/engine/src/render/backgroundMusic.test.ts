@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createAssetRef, createClip, createDocument } from '@sevenvid/core';
+import { applyCommand, createAssetRef, createClip, createDocument } from '@sevenstudios/core';
 import { compileRenderGraph } from './RenderGraphCompiler';
 
 function docWithAudioClip() {

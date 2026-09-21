@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { slugify, suggestClearedAlternative, type MusicQuery, type MusicTrack } from '@sevenvid/core';
+import { slugify, suggestClearedAlternative, type MusicQuery, type MusicTrack } from '@sevenstudios/core';
 import type { Logger } from '../logging/logger';
 
 /**

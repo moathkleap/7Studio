@@ -1,4 +1,4 @@
-import { CAPABILITY_IDS, type CapabilityId, type CapabilityInfo, type CapabilityMap } from '@sevenvid/core';
+import { CAPABILITY_IDS, type CapabilityId, type CapabilityInfo, type CapabilityMap } from '@sevenstudios/core';
 import type { EventBus } from '../events/EventBus';
 import type { Logger } from '../logging/logger';
 

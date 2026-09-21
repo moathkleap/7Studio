@@ -87,7 +87,7 @@ export function runFfmpeg(opts: RunFfmpegOptions): Promise<FfmpegResult> {
     opts.signal?.addEventListener('abort', onAbort, { once: true });
     if (opts.timeoutMs) {
       timer = setTimeout(() => {
-        stderrChunks.push('\n[7vid] ffmpeg timed out');
+        stderrChunks.push('\n[sevenstudios] ffmpeg timed out');
         proc.kill('SIGKILL');
       }, opts.timeoutMs);
     }

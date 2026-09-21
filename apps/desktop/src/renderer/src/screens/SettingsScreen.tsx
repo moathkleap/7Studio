@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { DEFAULT_SHORTCUTS, EXPORT_PRESETS, eventToCombo, resolveShortcuts, type AppSettings, type DeepPartial } from '@sevenvid/core';
+import { DEFAULT_SHORTCUTS, EXPORT_PRESETS, eventToCombo, resolveShortcuts, type AppSettings, type DeepPartial } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Kbd, Select, Switch } from '@/components/ui/Input';
@@ -76,7 +76,7 @@ function SectionBody({ section, s, update }: { section: Section; s: AppSettings;
               <option value="creator">{t('projects.kindCreator')}</option>
             </Select>
           </Field>
-          <Field inline label="7vid — Seven Studios" hint={t('about.product')}>
+          <Field inline label="Seven Studios" hint={t('about.product')}>
             <Button action="settings.about" size="sm" variant="secondary" onClick={() => setAboutOpen(true)}>{t('about.title')}</Button>
           </Field>
         </div>

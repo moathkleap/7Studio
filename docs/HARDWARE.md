@@ -1,6 +1,6 @@
 # Hardware
 
-7vid detects your hardware (CPU, RAM, disk, and GPU/VRAM where available) and gates heavy features on it,
+Seven Studios detects your hardware (CPU, RAM, disk, and GPU/VRAM where available) and gates heavy features on it,
 with a clear reason and the recommended spec when something cannot run. The live snapshot is on the
 **System** screen and in the status bar.
 
@@ -34,7 +34,7 @@ it never fails silently.
 
 ## Disk space
 
-Before an export starts, 7vid estimates the output size (from the bitrate, or from resolution/fps/CRF/
+Before an export starts, Seven Studios estimates the output size (from the bitrate, or from resolution/fps/CRF/
 codec in CRF mode) plus working headroom and compares it with the free space on the target volume. If it
 will not fit, the export is refused up front with the numbers. An out-of-space failure mid-render is
 reported as a disk-full error and the partial file is removed.

@@ -72,8 +72,8 @@ function listFilters(ffmpeg: string): string[] {
 /** Finds FFmpeg/FFprobe: explicit env override → bundled resources → system PATH. */
 export function locateFfmpeg(paths: AppPaths): FfmpegLocation {
   const candidates: Array<{ ffmpeg: string | null; ffprobe: string | null; source: FfmpegLocation['source'] }> = [];
-  const envF = process.env.SEVENVID_FFMPEG_PATH;
-  const envP = process.env.SEVENVID_FFPROBE_PATH;
+  const envF = process.env.SEVENSTUDIOS_FFMPEG_PATH;
+  const envP = process.env.SEVENSTUDIOS_FFPROBE_PATH;
   if (envF) candidates.push({ ffmpeg: envF, ffprobe: envP ?? path.join(path.dirname(envF), exe('ffprobe')), source: 'env' });
   const bundledDir = path.join(paths.resources, 'bin', `${process.platform}-${process.arch}`);
   candidates.push({ ffmpeg: path.join(bundledDir, exe('ffmpeg')), ffprobe: path.join(bundledDir, exe('ffprobe')), source: 'bundled' });

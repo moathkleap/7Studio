@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['@sevenvid/core', '@sevenvid/ipc', '@sevenvid/engine'] })],
+    plugins: [externalizeDepsPlugin({ exclude: ['@sevenstudios/core', '@sevenstudios/ipc', '@sevenstudios/engine'] })],
     build: {
       rollupOptions: {
         input: { index: resolve(__dirname, 'src/main/index.ts') },

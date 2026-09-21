@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { newId, type MusicTrack } from '@sevenvid/core';
+import { newId, type MusicTrack } from '@sevenstudios/core';
 import type { CapabilityRegistry } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { Logger } from '../logging/logger';

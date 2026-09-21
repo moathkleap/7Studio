@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { TaskInfo } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { TaskInfo } from '@sevenstudios/ipc';
 import { useEvent } from '@/api/hooks';
 import { useAppStore } from '@/store/appStore';
 

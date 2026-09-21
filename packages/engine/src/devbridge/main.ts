@@ -7,13 +7,13 @@ import { startDevBridge } from './server';
 
 /** Standalone entry: runs the full engine as a Node process and serves the IPC contract over WebSocket. */
 async function main(): Promise<void> {
-  const port = Number(process.env.SEVENVID_DEVBRIDGE_PORT ?? 7777);
-  const token = process.env.SEVENVID_DEVBRIDGE_TOKEN ?? crypto.randomBytes(12).toString('hex');
-  const root = process.env.SEVENVID_REPO_ROOT ?? path.resolve(process.cwd());
-  const userData = process.env.SEVENVID_USER_DATA ?? path.join(root, '.sevenvid-dev', 'userData');
-  const resources = process.env.SEVENVID_RESOURCES ?? path.join(root, 'resources');
+  const port = Number(process.env.SEVENSTUDIOS_DEVBRIDGE_PORT ?? 7777);
+  const token = process.env.SEVENSTUDIOS_DEVBRIDGE_TOKEN ?? crypto.randomBytes(12).toString('hex');
+  const root = process.env.SEVENSTUDIOS_REPO_ROOT ?? path.resolve(process.cwd());
+  const userData = process.env.SEVENSTUDIOS_USER_DATA ?? path.join(root, '.sevenstudios-dev', 'userData');
+  const resources = process.env.SEVENSTUDIOS_RESOURCES ?? path.join(root, 'resources');
   const version = readVersion(root);
-  const engine = createEngine({ host: createBrowserHost({ appVersion: version, onQuit: () => shutdown(), mediaUrl: (p) => `http://127.0.0.1:${port}/media/${token}/${encodeURIComponent(p)}` }), paths: { userData, resources }, logToConsole: process.env.SEVENVID_LOG_CONSOLE === '1' });
+  const engine = createEngine({ host: createBrowserHost({ appVersion: version, onQuit: () => shutdown(), mediaUrl: (p) => `http://127.0.0.1:${port}/media/${token}/${encodeURIComponent(p)}` }), paths: { userData, resources }, logToConsole: process.env.SEVENSTUDIOS_LOG_CONSOLE === '1' });
   const bridge = await startDevBridge(engine, { port, token });
   await engine.start();
   const info = { port: bridge.port, token, url: bridge.url, userData };

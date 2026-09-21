@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Bookmark, ChevronFirst, ChevronLast, Magnet, Pause, Play, Scissors, SkipBack, SkipForward, Square, Trash2, ZoomIn, ZoomOut, Maximize2, MousePointer2, Slice, Clapperboard, Loader2 } from 'lucide-react';
-import { formatTimecode, type Command, type ProjectDocument } from '@sevenvid/core';
+import { formatTimecode, type Command, type ProjectDocument } from '@sevenstudios/core';
 import { useEditorStore } from '@/store/editorStore';
 import { Button, IconButton } from '@/components/ui/Button';
 import { Kbd } from '@/components/ui/Input';

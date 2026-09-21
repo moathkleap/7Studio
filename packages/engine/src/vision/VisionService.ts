@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { boxIou, createMaskTrack, expandBox, maskBoxAt, newId, simplifyKeyframes, sequenceBoxToSource, sourceBoxToSequence, sourceToTimelineMs, timelineToSourceMs, type AssetRef, type Clip, type Command, type MaskKeyframe, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenvid/core';
-import type { BlurFacesResult, DetectFacesResult, DetectObjectsResult, FaceTrackInfo, MaskVerificationResult, TaskInfo, TrackTargetResult } from '@sevenvid/ipc';
+import { boxIou, createMaskTrack, expandBox, maskBoxAt, newId, simplifyKeyframes, sequenceBoxToSource, sourceBoxToSequence, sourceToTimelineMs, timelineToSourceMs, type AssetRef, type Clip, type Command, type MaskKeyframe, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenstudios/core';
+import type { BlurFacesResult, DetectFacesResult, DetectObjectsResult, FaceTrackInfo, MaskVerificationResult, TaskInfo, TrackTargetResult } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';
 import type { Logger } from '../logging/logger';

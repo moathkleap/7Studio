@@ -1,8 +1,8 @@
 import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { newId, type ProjectDocument } from '@sevenvid/core';
-import type { TaskInfo, UpscaleResult } from '@sevenvid/ipc';
+import { newId, type ProjectDocument } from '@sevenstudios/core';
+import type { TaskInfo, UpscaleResult } from '@sevenstudios/ipc';
 import type { CapabilityRegistry } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';

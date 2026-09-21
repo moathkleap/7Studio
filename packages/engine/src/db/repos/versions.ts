@@ -1,4 +1,4 @@
-import type { ProjectVersion } from '@sevenvid/ipc';
+import type { ProjectVersion } from '@sevenstudios/ipc';
 import type { Row, SqlDriver } from '../driver';
 import { nowIso, str } from './common';
 

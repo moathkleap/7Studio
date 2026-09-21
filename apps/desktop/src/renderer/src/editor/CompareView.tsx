@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Play, X } from 'lucide-react';
-import { formatMs } from '@sevenvid/core';
+import { formatMs } from '@sevenstudios/core';
 import { Badge } from '@/components/ui/Badge';
 import { Button, IconButton } from '@/components/ui/Button';
 import { useEditorStore, type CompareState } from '@/store/editorStore';

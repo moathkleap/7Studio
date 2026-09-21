@@ -46,7 +46,7 @@ export class PythonRuntime {
   readonly workerSourceDir: string;
 
   constructor(private readonly paths: AppPaths, private readonly tasks: TaskManager, private readonly logger: Logger) {
-    this.workerSourceDir = process.env.SEVENVID_WORKER_DIR ?? resolveWorkerDir(paths.resources);
+    this.workerSourceDir = process.env.SEVENSTUDIOS_WORKER_DIR ?? resolveWorkerDir(paths.resources);
     tasks.registerKind<{ extras: string[] }, PythonInfo>({
       kind: 'runtime.setup',
       lane: 'io',
@@ -69,7 +69,7 @@ export class PythonRuntime {
 
   private async workerInstalled(py: string): Promise<boolean> {
     try {
-      await execFileAsync(py, ['-c', 'import sevenvid_worker, numpy'], { timeout: 15_000, env: { ...process.env, PYTHONPATH: fs.existsSync(this.workerSourceDir) ? this.workerSourceDir : '' } });
+      await execFileAsync(py, ['-c', 'import sevenstudios_worker, numpy'], { timeout: 15_000, env: { ...process.env, PYTHONPATH: fs.existsSync(this.workerSourceDir) ? this.workerSourceDir : '' } });
       return true;
     } catch {
       return false;
@@ -80,7 +80,7 @@ export class PythonRuntime {
   async detect(refresh = false): Promise<PythonInfo | null> {
     if (this.cached && !refresh) return this.cached;
     const candidates: Array<{ path: string; source: PythonInfo['source'] }> = [];
-    if (process.env.SEVENVID_PYTHON) candidates.push({ path: process.env.SEVENVID_PYTHON, source: 'env' });
+    if (process.env.SEVENSTUDIOS_PYTHON) candidates.push({ path: process.env.SEVENSTUDIOS_PYTHON, source: 'env' });
     candidates.push({ path: venvPython(this.paths.venv), source: 'venv' });
     const devVenv = path.join(this.workerSourceDir, '.venv');
     candidates.push({ path: venvPython(devVenv), source: 'dev-venv' });

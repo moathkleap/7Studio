@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Pause, Play, RotateCcw, Trash2, X, XCircle } from 'lucide-react';
-import type { TaskInfo } from '@sevenvid/ipc';
+import type { TaskInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { formatEta } from '@/lib/format';

@@ -1,4 +1,4 @@
-import type { AppErrorInfo } from '@sevenvid/core';
+import type { AppErrorInfo } from '@sevenstudios/core';
 import type { EventBus } from '../events/EventBus';
 
 /** Keeps the most recent user-facing errors for the diagnostics panel. */

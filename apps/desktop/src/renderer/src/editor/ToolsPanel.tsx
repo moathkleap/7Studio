@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AudioLines, Captions, ScanFace, ScanText, SlidersHorizontal, Sparkles } from 'lucide-react';
-import type { Command, ProjectDocument } from '@sevenvid/core';
+import type { Command, ProjectDocument } from '@sevenstudios/core';
 import { useEditorStore, type ToolTab } from '@/store/editorStore';
 import { cn } from '@/lib/cn';
 import { Inspector } from './Inspector';

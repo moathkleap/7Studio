@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Archive } from 'lucide-react';
-import type { LogEntry, NetworkLogEntry } from '@sevenvid/ipc';
+import type { LogEntry, NetworkLogEntry } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { useAppStore } from '@/store/appStore';

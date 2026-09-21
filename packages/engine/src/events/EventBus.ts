@@ -1,4 +1,4 @@
-import type { EventName, EventPayload } from '@sevenvid/ipc';
+import type { EventName, EventPayload } from '@sevenstudios/ipc';
 
 type Handler<E extends EventName> = (payload: EventPayload<E>) => void;
 type AnyHandler = (event: EventName, payload: unknown) => void;

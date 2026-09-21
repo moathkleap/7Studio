@@ -13,7 +13,7 @@ function openExternal(url: string): void {
   void getApi().invoke('shell.openExternal', { url }).catch(() => undefined);
 }
 
-/** Branded "About 7vid" panel: the mark, the SEVEN STUDIOS wordmark, build info and project links. */
+/** Branded "About Seven Studios" panel: the mark, the SEVEN STUDIOS wordmark, build info and project links. */
 export function AboutDialog() {
   const { t } = useTranslation();
   const open = useAppStore((s) => s.aboutOpen);
@@ -30,7 +30,7 @@ export function AboutDialog() {
       <div className="flex flex-col items-center text-center">
         <img src={markUrl} alt="" className="size-20 rounded-[18px] shadow-lg" />
         <div className="brand-wordmark mt-4 text-[26px] font-bold tracking-tight">SEVEN STUDIOS</div>
-        <div className="mt-1 text-[13px] font-medium text-muted">7vid — {t('about.product')}</div>
+        <div className="mt-1 text-[13px] font-medium text-muted">{t('about.product')}</div>
         <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-muted">{t('about.tagline')}</p>
       </div>
       <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-xl border border-border bg-surface-2 px-4 py-3 text-[12.5px]">

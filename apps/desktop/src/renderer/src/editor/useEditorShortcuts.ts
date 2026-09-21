@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { clipEndMs, eventToCombo, resolveShortcuts, type Command, type ProjectDocument, type ShortcutAction } from '@sevenvid/core';
+import { clipEndMs, eventToCombo, resolveShortcuts, type Command, type ProjectDocument, type ShortcutAction } from '@sevenstudios/core';
 import { useAppStore } from '@/store/appStore';
 import { useEditorStore } from '@/store/editorStore';
 

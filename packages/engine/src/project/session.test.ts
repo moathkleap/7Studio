@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { createAssetRef, createClip, getDocumentDurationMs } from '@sevenvid/core';
+import { createAssetRef, createClip, getDocumentDurationMs } from '@sevenstudios/core';
 import { createEngine, type Engine } from '../api/createEngine';
 import { cleanup, tempDir, testHost } from '../test/helpers';
 import { JOURNAL_FILE } from './ProjectService';
@@ -48,7 +48,7 @@ describe('project sessions', () => {
     const initial = versions[versions.length - 1]!;
     s = await engine.invoke('projects.versions.restore', { projectId: summary.id, versionId: initial.id });
     expect(getDocumentDurationMs(s.document)).toBe(0);
-    const mirror = JSON.parse(fs.readFileSync(path.join(summary.dataDir, 'project.7vid.json'), 'utf8'));
+    const mirror = JSON.parse(fs.readFileSync(path.join(summary.dataDir, 'project.sevenstudios.json'), 'utf8'));
     expect(mirror.id).toBe(summary.id);
     const list = await engine.invoke('projects.list');
     expect(list.map((p) => p.id)).toContain(summary.id);

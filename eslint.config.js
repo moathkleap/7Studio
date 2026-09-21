@@ -21,14 +21,14 @@ const noEmptyHandlers = {
 };
 
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/dist/**', '**/out/**', '**/.sevenvid-dev/**', 'ai-worker/**', 'tests/fixtures/generated/**', '**/*.config.js'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', '**/out/**', '**/.sevenstudios-dev/**', 'ai-worker/**', 'tests/fixtures/generated/**', '**/*.config.js'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    plugins: { 'react-hooks': reactHooks, sevenvid: { rules: { 'no-empty-handlers': noEmptyHandlers } } },
+    plugins: { 'react-hooks': reactHooks, sevenstudios: { rules: { 'no-empty-handlers': noEmptyHandlers } } },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'sevenvid/no-empty-handlers': 'error',
+      'sevenstudios/no-empty-handlers': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],

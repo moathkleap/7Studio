@@ -70,7 +70,7 @@ export class WorkerClient {
     return new Promise((resolve, reject) => {
       let proc: ChildProcess;
       try {
-        proc = spawn(this.python, ['-m', 'sevenvid_worker', '--stdio'], { cwd: this.cwd, env: { ...process.env, ...this.env, PYTHONUNBUFFERED: '1', PYTHONIOENCODING: 'utf-8' }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+        proc = spawn(this.python, ['-m', 'sevenstudios_worker', '--stdio'], { cwd: this.cwd, env: { ...process.env, ...this.env, PYTHONUNBUFFERED: '1', PYTHONIOENCODING: 'utf-8' }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
       } catch (err) {
         reject(AppError.from(err, { code: 'WORKER_UNAVAILABLE', operation: 'worker.start' }));
         return;

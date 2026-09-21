@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createAssetRef, createClip, createDocument, createSubtitleTrack, getDocumentDurationMs, newId, type AssetRef, type ProjectDocument } from '@sevenvid/core';
+import { applyCommand, createAssetRef, createClip, createDocument, createSubtitleTrack, getDocumentDurationMs, newId, type AssetRef, type ProjectDocument } from '@sevenstudios/core';
 import { validateRenderedFile } from '../export/validate';
 import { locateFfmpeg } from '../ffmpeg/locator';
 import { runFfmpeg } from '../ffmpeg/runner';
@@ -84,7 +84,7 @@ describe.skipIf(!has)('render graph compiler', () => {
     const sub = createSubtitleTrack({ language: 'ar', id: 'sub1' });
     sub.burnIn = true;
     doc = applyCommand(doc, { type: 'subtitle.addTrack', track: sub }).doc;
-    doc = applyCommand(doc, { type: 'subtitle.setCues', trackId: 'sub1', cues: [{ id: 'q1', startMs: 500, endMs: 2500, text: 'مرحباً بكم في 7vid', speaker: null }, { id: 'q2', startMs: 3000, endMs: 5500, text: 'Hello world', speaker: null }] }).doc;
+    doc = applyCommand(doc, { type: 'subtitle.setCues', trackId: 'sub1', cues: [{ id: 'q1', startMs: 500, endMs: 2500, text: 'مرحباً بكم في Seven Studios', speaker: null }, { id: 'q2', startMs: 3000, endMs: 5500, text: 'Hello world', speaker: null }] }).doc;
     const ass = path.join(dir, 'subs.ass');
     fs.writeFileSync(ass, toAss(doc.subtitles[0]!, doc.settings));
     const full = await renderDoc(doc, dir, 'cut', { subtitlesAssPath: ass });
