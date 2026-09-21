@@ -7,7 +7,13 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin({ exclude: ['@sevenvid/core', '@sevenvid/ipc', '@sevenvid/engine'] })],
     build: {
-      rollupOptions: { input: { index: resolve(__dirname, 'src/main/index.ts') } },
+      rollupOptions: {
+        input: { index: resolve(__dirname, 'src/main/index.ts') },
+        // `ws` (bundled via @sevenvid/engine) optionally require()s these native speed-ups. They are
+        // optional and wrapped in try/catch inside `ws`, so leave them as runtime requires instead of
+        // letting the bundler fail trying to resolve addons that are not installed.
+        external: ['bufferutil', 'utf-8-validate'],
+      },
     },
   },
   preload: {
