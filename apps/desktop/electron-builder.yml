@@ -20,7 +20,7 @@ files:
 # Bundled runtime assets read by the engine from `process.resourcesPath/<path>`.
 # To bundle FFmpeg, place static ffmpeg/ffprobe binaries under resources/bin/<platform>-<arch>/
 # (e.g. linux-x64, win32-x64, darwin-arm64) before packaging. The locator also falls back to
-# SEVENVID_FFMPEG_PATH and then the system PATH, so bundling is optional.
+# SEVENSTUDIOS_FFMPEG_PATH and then the system PATH, so bundling is optional.
 extraResources:
   - from: ../../resources/fonts
     to: resources/fonts

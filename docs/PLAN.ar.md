@@ -40,7 +40,7 @@
 | Python AI Worker | `mediapipe`, `opencv-contrib-python-headless`, `onnxruntime`, `silero-vad`, `faster-whisper`/`sherpa-onnx`, `piper-tts`/`espeakng-loader`, `noisereduce`, `pyloudnorm`, `soundfile`, `realesrgan-ncnn-py`, (اختياري) `diffusers`/جسر ComfyUI | تثبيت بحسب القدرة (extras) داخل venv يديره التطبيق، بموافقة المستخدم وعرض الحجم |
 | نماذج اللغة للمساعد | مخطِّط حتمي ثنائي اللغة (دائم التوفر) + `node-llama-cpp` (GGUF محلي) + Ollama (محلي عبر HTTP) + Anthropic / OpenAI-compatible (سحابي، opt-in) | المخطِّط الحتمي يضمن عمل الأوامر المذكورة في المتطلبات بلا أي نموذج؛ النموذج يوسّع الفهم ويُخرج JSON مُتحقَّقاً منه بـ zod |
 | الاختبارات | vitest (وحدة/تكامل)، Playwright (E2E واجهة في وضع المتصفح + مواصفة Electron)، pytest (worker)، وسائط اصطناعية مولّدة بـ FFmpeg | |
-| الاسم | اسم العرض **7vid**، معرّف الحزم `sevenvid` | أسماء الحزم لا يُفضَّل أن تبدأ برقم |
+| الاسم | اسم العرض **7vid**، معرّف الحزم `sevenstudios` | أسماء الحزم لا يُفضَّل أن تبدأ برقم |
 
 ---
 
@@ -51,7 +51,7 @@
 ├─ package.json, pnpm-workspace.yaml, tsconfig.base.json, .eslintrc, .prettierrc
 ├─ apps/desktop/                 # تطبيق Electron (electron-vite)
 │  ├─ src/main/                  # bootstrap، النوافذ، IPC router، القوائم، الحوارات، safeStorage، حارس الانهيار
-│  ├─ src/preload/               # contextBridge: window.sevenvid.{invoke, subscribe} فقط
+│  ├─ src/preload/               # contextBridge: window.sevenstudios.{invoke, subscribe} فقط
 │  ├─ src/renderer/              # React: app shell، الشاشات، المكوّنات، المتاجر، i18n، الثيمات
 │  └─ electron-builder.yml       # extraResources: ffmpeg, fonts, model registry, ai-worker
 ├─ packages/core/                # TS نقي: أنواع المشروع/الخط الزمني، الأوامر + Undo/Redo، المدقق، IntentParser، وحدات الزمن/الأرقام العربية، القوالب
@@ -68,7 +68,7 @@
 │  ├─ capabilities/ (capability registry → UI gating)           ├─ privacy/ (network gateway, consent, network log)
 │  ├─ errors/ (AppError, codes, catalog)  ├─ logging/ (pino JSON files, rotation, diagnostics bundle)  ├─ search/ (FTS5 global search)
 │  └─ devbridge/ (WebSocket host يعرض نفس IPC للمتصفح/Playwright)
-├─ ai-worker/                    # حزمة Python: sevenvid_worker (JSON-RPC stdio) + capabilities/* + pyproject extras
+├─ ai-worker/                    # حزمة Python: sevenstudios_worker (JSON-RPC stdio) + capabilities/* + pyproject extras
 ├─ resources/                    # fonts (Inter, IBM Plex Sans Arabic/Noto Arabic), icons, models/registry.json, templates/*.json, presets/*.json
 ├─ tests/                        # e2e/ (playwright), fixtures/ (مولّد وسائط اصطناعية), integration/
 ├─ scripts/                      # fetch-ffmpeg, verify-models, audit-ui, gen-fixtures, dev-browser
@@ -237,7 +237,7 @@ Operation { id, type, params, inputs: Ref[], outputs: Ref[], status, error?, val
 README (عربي + إنجليزي)، ARCHITECTURE، INSTALL، DEVELOPMENT، AI_MODELS (إعداد النماذج المحلية)، HARDWARE (المتطلبات والتوصيات)، TROUBLESHOOTING، PROVIDERS (دليل دمج مزوّد جديد)، TESTING، QA_REPORT.
 
 ## 13. الافتراضات والقرارات المتخذة
-- الإطار Electron وليس Tauri (مبرر تقني في §1). الاسم `7vid`/`sevenvid`.
+- الإطار Electron وليس Tauri (مبرر تقني في §1). الاسم `7vid`/`sevenstudios`.
 - `node:sqlite` بدل better-sqlite3 (خلف واجهة مجردة يمكن تبديلها بملف واحد).
 - Python worker مطلوب للقدرات المتقدمة؛ التطبيق يعمل بدونه لكل ما يعتمد على FFmpeg/Node (تحرير، تصدير، OCR، المخطِّط الحتمي) ويعرض بقية القدرات كـ `needs-runtime`.
 - توليد الفيديو الواقعي محلياً يتطلب GPU قوياً؛ عند غيابه يعمل Creator بوضع Animatic الصادق أو بمزوّد سحابي يفعّله المستخدم صراحة.

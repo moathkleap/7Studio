@@ -40,7 +40,7 @@ export function MediaPanel({ projectId, onAdd }: { projectId: string; onAdd: (as
       </div>
       <div className="flex-1 overflow-y-auto p-2">
         {assets.length === 0 ? <EmptyState title={t('editor.noAssets')} className="py-6" /> : assets.map((a) => (
-          <div key={a.id} draggable={a.analysisStatus === 'ready' && !a.missing} onDragStart={(e) => { e.dataTransfer.setData('application/x-sevenvid-asset', a.id); e.dataTransfer.effectAllowed = 'copy'; }} className="mb-2 flex gap-2 rounded-lg border border-border bg-surface-2 p-1.5" data-testid="media-panel-item">
+          <div key={a.id} draggable={a.analysisStatus === 'ready' && !a.missing} onDragStart={(e) => { e.dataTransfer.setData('application/x-sevenstudios-asset', a.id); e.dataTransfer.effectAllowed = 'copy'; }} className="mb-2 flex gap-2 rounded-lg border border-border bg-surface-2 p-1.5" data-testid="media-panel-item">
             <div className="w-16 shrink-0"><AssetThumb asset={a} /></div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[12px] font-medium">{a.name}</div>

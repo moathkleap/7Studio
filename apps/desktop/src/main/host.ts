@@ -43,7 +43,7 @@ export function createElectronHost(getWindow: () => BrowserWindow | null, isDev:
       openExternal: (url) => shell.openExternal(url),
     },
     quit: () => app.quit(),
-    mediaUrl: (p) => `sevenvid-media://local/${encodeURIComponent(p)}`,
+    mediaUrl: (p) => `sevenstudios-media://local/${encodeURIComponent(p)}`,
     // OS-backed secret storage so provider API keys are encrypted at rest (macOS Keychain, Windows DPAPI,
     // libsecret on Linux). Evaluated lazily — `isEncryptionAvailable` is only valid once the app is ready.
     secrets: {

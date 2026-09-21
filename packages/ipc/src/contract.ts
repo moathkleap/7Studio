@@ -238,7 +238,7 @@ export type ApiHandler<C extends ChannelName> = (input: ChannelInput<C>) => Prom
 export type ApiHandlers = { [C in ChannelName]: ApiHandler<C> };
 
 /** The single API surface exposed to the renderer (preload in Electron, WebSocket client in browser mode). */
-export interface SevenvidApi {
+export interface SevenstudiosApi {
   readonly mode: 'electron' | 'browser';
   invoke<C extends ChannelName>(channel: C, input?: ChannelInput<C>): Promise<ChannelOutput<C>>;
   subscribe<E extends EventName>(event: E, handler: (payload: EventPayload<E>) => void): () => void;

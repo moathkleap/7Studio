@@ -243,7 +243,7 @@ export function Timeline({ doc, onCommand, onDropAsset }: TimelineProps) {
 
   const onDrop = (e: React.DragEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    const assetId = e.dataTransfer.getData('application/x-sevenvid-asset');
+    const assetId = e.dataTransfer.getData('application/x-sevenstudios-asset');
     if (!assetId) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;

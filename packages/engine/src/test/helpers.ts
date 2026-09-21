@@ -4,7 +4,7 @@ import path from 'node:path';
 import { createEngine, type Engine } from '../api/createEngine';
 import type { EngineHost } from '../api/host';
 
-export function tempDir(prefix = 'sevenvid-test-'): string {
+export function tempDir(prefix = 'sevenstudios-test-'): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 

@@ -118,7 +118,7 @@ export class WorkerService {
     if (!py || !py.workerInstalled) {
       throw new AppError({ code: 'WORKER_UNAVAILABLE', operation: 'worker.ensure', message: py ? `Python ${py.version} found at ${py.path} but the 7Studio worker is not installed` : 'No Python ≥ 3.10 interpreter found', details: { python: py?.path ?? null } });
     }
-    const env: Record<string, string> = { SEVENVID_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '' };
+    const env: Record<string, string> = { SEVENSTUDIOS_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '' };
     if (!py.venvReady) env.PYTHONPATH = this.runtime.workerSourceDir;
     const client = new WorkerClient(py.path, this.runtime.workerSourceDir, env, this.logger);
     try {

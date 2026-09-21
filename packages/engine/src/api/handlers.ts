@@ -81,7 +81,7 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
       zip.addFile('errors.json', JSON.stringify(s.errors.recent(200), null, 2));
       zip.addFile('network-log.json', JSON.stringify(s.db.networkLog.recent(500), null, 2));
       for (const f of fs.readdirSync(s.paths.logs)) {
-        if (f.startsWith('sevenvid.log')) zip.addFile(`logs/${f}`, fs.readFileSync(path.join(s.paths.logs, f)));
+        if (f.startsWith('sevenstudios.log')) zip.addFile(`logs/${f}`, fs.readFileSync(path.join(s.paths.logs, f)));
       }
       const dir = input?.targetDir ?? s.paths.exports;
       fs.mkdirSync(dir, { recursive: true });

@@ -7,7 +7,7 @@ import { cleanup, tempDir, testHost } from '../test/helpers';
 
 const root = path.resolve(__dirname, '../../../..');
 const fixtures = path.join(root, 'tests', 'fixtures', 'generated');
-const devModels = path.join(root, '.sevenvid-dev', 'userData', 'models');
+const devModels = path.join(root, '.sevenstudios-dev', 'userData', 'models');
 const has = fs.existsSync(path.join(fixtures, 'text-3s.mp4')) && fs.existsSync(path.join(devModels, 'tesseract', 'eng-fast', 'eng.traineddata')) && fs.existsSync(path.join(devModels, 'tesseract', 'ara-fast', 'ara.traineddata'));
 let dir: string;
 let engine: Engine;

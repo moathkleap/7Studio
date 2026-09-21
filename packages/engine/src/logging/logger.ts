@@ -37,7 +37,7 @@ export class LogHub {
 
   constructor(private readonly opts: LoggerOptions) {
     fs.mkdirSync(opts.dir, { recursive: true });
-    this.file = path.join(opts.dir, 'sevenvid.log');
+    this.file = path.join(opts.dir, 'sevenstudios.log');
     this.rotator = new RotatingFile(this.file, opts.maxFileBytes ?? 5 * 1024 * 1024, opts.maxFiles ?? 5);
     const stream = {
       write: (line: string) => {

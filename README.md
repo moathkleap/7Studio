@@ -78,10 +78,10 @@ ai-worker/.venv/bin/pip install -e "ai-worker[vision,audio,stt,tts,test]"
 
 The application detects `ai-worker/.venv` automatically in development; packaged builds create their own
 environment from **AI Models → Set up runtime**. Models are installed into `<userData>/models/<id>` (or
-`SEVENVID_MODELS_DIR`); the registry with sizes, checksums and hardware requirements lives in
+`SEVENSTUDIOS_MODELS_DIR`); the registry with sizes, checksums and hardware requirements lives in
 `packages/engine/src/models/registry.ts`.
 
-FFmpeg/FFprobe are located from `SEVENVID_FFMPEG_PATH`, the bundled `resources/bin/<platform>-<arch>/`
+FFmpeg/FFprobe are located from `SEVENSTUDIOS_FFMPEG_PATH`, the bundled `resources/bin/<platform>-<arch>/`
 directory, or the system `PATH`.
 
 ## Privacy

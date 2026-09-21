@@ -10,7 +10,7 @@ import path from 'node:path';
 
 const out = path.resolve(__dirname, '..', 'tests', 'fixtures', 'generated');
 fs.mkdirSync(out, { recursive: true });
-const ffmpeg = process.env.SEVENVID_FFMPEG_PATH ?? 'ffmpeg';
+const ffmpeg = process.env.SEVENSTUDIOS_FFMPEG_PATH ?? 'ffmpeg';
 
 function run(args: string[]): void {
   execFileSync(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: 'inherit' });

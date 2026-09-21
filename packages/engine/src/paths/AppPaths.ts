@@ -25,19 +25,19 @@ export interface ResolvePathsOptions {
 
 /** Resolves all application directories. Env overrides let tests and browser mode run in an isolated tree. */
 export function resolveAppPaths(opts: ResolvePathsOptions = {}): AppPaths {
-  const userData = path.resolve(opts.userData ?? process.env.SEVENVID_USER_DATA ?? path.join(os.homedir(), '.sevenvid'));
-  const resources = path.resolve(opts.resources ?? process.env.SEVENVID_RESOURCES ?? path.join(process.cwd(), 'resources'));
+  const userData = path.resolve(opts.userData ?? process.env.SEVENSTUDIOS_USER_DATA ?? path.join(os.homedir(), '.sevenstudios'));
+  const resources = path.resolve(opts.resources ?? process.env.SEVENSTUDIOS_RESOURCES ?? path.join(process.cwd(), 'resources'));
   return {
     userData,
-    projects: path.resolve(opts.projectsDir ?? process.env.SEVENVID_PROJECTS_DIR ?? path.join(userData, 'projects')),
+    projects: path.resolve(opts.projectsDir ?? process.env.SEVENSTUDIOS_PROJECTS_DIR ?? path.join(userData, 'projects')),
     cache: path.join(userData, 'cache'),
     logs: path.join(userData, 'logs'),
-    models: path.resolve(opts.modelsDir ?? process.env.SEVENVID_MODELS_DIR ?? path.join(userData, 'models')),
-    exports: path.resolve(opts.exportsDir ?? process.env.SEVENVID_EXPORTS_DIR ?? path.join(userData, 'exports')),
+    models: path.resolve(opts.modelsDir ?? process.env.SEVENSTUDIOS_MODELS_DIR ?? path.join(userData, 'models')),
+    exports: path.resolve(opts.exportsDir ?? process.env.SEVENSTUDIOS_EXPORTS_DIR ?? path.join(userData, 'exports')),
     resources,
     tmp: path.join(userData, 'tmp'),
     venv: path.join(userData, 'python-venv'),
-    db: path.join(userData, 'sevenvid.db'),
+    db: path.join(userData, 'sevenstudios.db'),
   };
 }
 

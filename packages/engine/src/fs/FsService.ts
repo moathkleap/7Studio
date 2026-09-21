@@ -36,7 +36,7 @@ export class FsService {
       roots.push({ label: 'root', path: '/' });
       for (const mnt of ['/media', '/mnt', '/Volumes']) if (fs.existsSync(mnt)) roots.push({ label: mnt, path: mnt });
     }
-    const dev = process.env.SEVENVID_DEV_MEDIA_DIR;
+    const dev = process.env.SEVENSTUDIOS_DEV_MEDIA_DIR;
     if (dev && fs.existsSync(dev)) roots.unshift({ label: 'sample-media', path: dev });
     return roots;
   }
