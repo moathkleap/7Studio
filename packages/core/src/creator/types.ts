@@ -17,7 +17,6 @@ export const BriefSchema = z.object({
   tone: CreatorToneSchema.default('neutral'),
   style: CreatorStyleSchema.default('cinematic'),
   aspect: z.enum(['16:9', '9:16', '1:1', '4:5', '4:3']).default('9:16'),
-  platform: z.enum(['youtube', 'tiktok', 'reels', 'instagram-post', 'shorts', 'presentation', 'custom']).default('tiktok'),
   narration: z.boolean().default(true),
   music: z.boolean().default(true),
   audience: z.string().default(''),

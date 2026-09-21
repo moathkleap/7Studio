@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ASPECT_PRESETS,
-  PLATFORM_PRESETS,
   BriefSchema,
   buildScript,
   createClip,
@@ -93,11 +92,9 @@ export class CreatorService {
     return dir;
   }
 
+  // The brief only chooses a production canvas (aspect ratio). The target social platform(s) are
+  // picked later, after editing, on the Publish screen — a single edit can be published to many.
   private sequenceForBrief(brief: Brief): Pick<SequenceSettings, 'width' | 'height' | 'aspectPreset' | 'platformPreset'> {
-    if (brief.platform !== 'custom' && brief.platform in PLATFORM_PRESETS) {
-      const pp = PLATFORM_PRESETS[brief.platform as keyof typeof PLATFORM_PRESETS];
-      return { width: pp.width, height: pp.height, aspectPreset: pp.aspect, platformPreset: pp.id };
-    }
     const ap = ASPECT_PRESETS[brief.aspect as keyof typeof ASPECT_PRESETS];
     return { width: ap.width, height: ap.height, aspectPreset: ap.id, platformPreset: 'custom' };
   }

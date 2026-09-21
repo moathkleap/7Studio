@@ -115,7 +115,7 @@ function BriefForm({ projectId, brief, onDone }: { projectId: string; brief: Bri
   const { t } = useTranslation();
   const reportError = useAppStore((s) => s.reportError);
   const [form, setForm] = useState<Brief>(
-    brief ?? { idea: '', language: 'ar', durationSec: 30, tone: 'neutral', style: 'cinematic', aspect: '9:16', platform: 'tiktok', narration: true, music: true, audience: '', callToAction: '' },
+    brief ?? { idea: '', language: 'ar', durationSec: 30, tone: 'neutral', style: 'cinematic', aspect: '9:16', narration: true, music: true, audience: '', callToAction: '' },
   );
   const [busy, setBusy] = useState(false);
   const set = <K extends keyof Brief>(k: K, v: Brief[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -147,13 +147,8 @@ function BriefForm({ projectId, brief, onDone }: { projectId: string; brief: Bri
           <Field label={t('creator.duration')}>
             <Input type="number" min={5} max={1800} value={form.durationSec} data-testid="creator-duration" onChange={(e) => set('durationSec', Math.max(5, Number(e.target.value) || 30))} />
           </Field>
-          <Field label={t('creator.platform')}>
-            <Select value={form.platform} data-testid="creator-platform" onChange={(e) => set('platform', e.target.value as Brief['platform'])}>
-              {['tiktok', 'reels', 'shorts', 'youtube', 'instagram-post', 'presentation', 'custom'].map((p) => <option key={p} value={p}>{p}</option>)}
-            </Select>
-          </Field>
-          <Field label={t('creator.aspect')}>
-            <Select value={form.aspect} onChange={(e) => set('aspect', e.target.value as Brief['aspect'])}>
+          <Field label={t('creator.aspect')} hint={t('creator.aspectHint')}>
+            <Select value={form.aspect} data-testid="creator-aspect" onChange={(e) => set('aspect', e.target.value as Brief['aspect'])}>
               {['9:16', '16:9', '1:1', '4:5', '4:3'].map((a) => <option key={a} value={a}>{a}</option>)}
             </Select>
           </Field>
