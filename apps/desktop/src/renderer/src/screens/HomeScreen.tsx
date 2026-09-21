@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { EmptyState, StatRow } from '@/components/ui/Misc';
 import { CreateProjectDialog } from './ProjectsScreen';
+import markUrl from '@/assets/brand/mark.png';
 
 export function HomeScreen() {
   const { t, i18n } = useTranslation();
@@ -32,9 +33,13 @@ export function HomeScreen() {
   };
   return (
     <div className="mx-auto max-w-6xl px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-[26px] font-semibold tracking-tight">{t('home.title')}</h1>
-        <p className="mt-1 text-muted">{t('home.subtitle')}</p>
+      <div className="mb-8 flex items-center gap-5">
+        <img src={markUrl} alt="" className="size-20 shrink-0 rounded-[20px] shadow-lg" />
+        <div className="min-w-0">
+          <div className="brand-wordmark text-[30px] font-bold leading-none tracking-tight">SEVEN STUDIOS</div>
+          <h1 className="mt-2 text-[17px] font-semibold tracking-tight">{t('home.title')}</h1>
+          <p className="mt-0.5 text-[13.5px] text-muted">{t('home.subtitle')}</p>
+        </div>
       </div>
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <QuickAction icon={<Plus />} label={t('home.newProject')} action="home.newProject" onClick={() => setCreateOpen(true)} primary />
