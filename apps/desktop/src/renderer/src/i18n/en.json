@@ -513,6 +513,8 @@
     "soundUrlPlaceholder": "https://…",
     "soundLicensed": "Cleared to use (royalty-free or mine)",
     "soundNote": "Copyrighted sounds are never added to the export — add them from within the platform when you upload.",
+    "soundSuggestAlt": "Suggest cleared alternative",
+    "soundNoAlt": "No cleared alternative found in your music library.",
     "soundSuggested": "Sound: {{name}}",
     "target": {
       "youtubeVideo": "YouTube video",
@@ -536,6 +538,14 @@
     "saveCurrent": "Save current project as template",
     "deleteConfirm": "Delete template \"{{name}}\"?",
     "targetDuration": "Target duration",
+    "trends": {
+      "sync": "Sync trends",
+      "syncing": "Syncing…",
+      "url": "Trends feed URL",
+      "note": "Fetches trend templates (formats, captions, suggested sounds) from an opt-in feed through the privacy-aware network gateway. No copyrighted audio is downloaded or embedded.",
+      "enable": "Enable trend sync in Privacy settings",
+      "synced": "Trends synced: {{added}} added, {{updated}} updated"
+    },
     "category": {
       "youtube": "YouTube",
       "shorts": "Shorts",
@@ -546,6 +556,7 @@
       "educational": "Educational",
       "presentation": "Presentation",
       "social": "Social media",
+      "trend": "Trend",
       "custom": "Custom"
     }
   },
@@ -631,6 +642,8 @@
       "external": "Allow external (cloud) providers",
       "externalHint": "Off by default. Media never leaves this device unless you enable and use a cloud provider.",
       "downloads": "Allow model downloads",
+      "trends": "Allow trend sync",
+      "trendsHint": "Off by default. When on, trend templates are fetched from an opt-in feed through the network gateway. No copyrighted audio is downloaded or embedded.",
       "askDownloads": "Ask before every download",
       "networkLog": "Log every network request",
       "telemetry": "Telemetry",

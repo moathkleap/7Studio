@@ -45,6 +45,8 @@ import {
   PublishPackageSchema,
   ReframeStrategySchema,
   TrendSoundSchema,
+  TrendSyncResultSchema,
+  MusicTrackSchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -123,6 +125,9 @@ export const channels = {
   'templates.list': { input: Void, output: z.array(TemplateInfoSchema) },
   'templates.delete': { input: z.object({ templateId: z.string() }), output: z.object({ deleted: z.boolean() }) },
   'templates.saveFromProject': { input: z.object({ projectId: z.string(), name: z.string().min(1), category: z.string().optional() }), output: TemplateInfoSchema },
+  'trends.sync': { input: z.object({ url: z.string().url() }), output: TrendSyncResultSchema },
+  'music.list': { input: Void, output: z.array(MusicTrackSchema) },
+  'music.suggest': { input: z.object({ mood: z.string().nullable().optional(), tags: z.array(z.string()).optional() }), output: MusicTrackSchema.nullable() },
   'exports.list': { input: z.object({ projectId: z.string().optional(), limit: z.number().optional() }).optional(), output: z.array(ExportInfoSchema) },
   'network.recent': { input: z.object({ limit: z.number().optional() }).optional(), output: z.array(NetworkLogEntrySchema) },
   'media.import': { input: z.object({ paths: z.array(z.string()).min(1), projectId: z.string().nullable() }), output: z.object({ assets: z.array(AssetInfoSchema), skipped: z.array(z.object({ path: z.string(), reason: z.enum(['not-found', 'unsupported', 'duplicate']) })) }) },
@@ -221,6 +226,7 @@ export const events = {
   'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
   'publish.changed': z.object({ packageId: z.string(), status: z.string() }),
+  'trends.changed': z.object({ added: z.number(), updated: z.number() }),
   'assistant.updated': z.object({ projectId: z.string(), planId: z.string(), result: PlanRunResultSchema.nullable() }),
   'creator.updated': z.object({ projectId: z.string() }),
   'providers.changed': z.object({ providerId: z.string() }),

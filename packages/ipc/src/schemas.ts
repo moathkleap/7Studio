@@ -206,6 +206,30 @@ export const TrendSoundSchema = z.object({
 });
 export type TrendSound = z.infer<typeof TrendSoundSchema>;
 
+/** Result of syncing trend templates from an opt-in feed. */
+export const TrendSyncResultSchema = z.object({
+  added: z.number(),
+  updated: z.number(),
+  skipped: z.number(),
+  total: z.number(),
+  sourceHost: z.string(),
+  at: z.string(),
+});
+export type TrendSyncResult = z.infer<typeof TrendSyncResultSchema>;
+
+/** A cleared (royalty-free / user-owned) music track from the local library. */
+export const MusicTrackSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  file: z.string(),
+  tags: z.array(z.string()),
+  mood: z.string().nullable(),
+  durationMs: z.number().nullable(),
+  licensed: z.literal(true),
+  source: z.string().nullable(),
+});
+export type MusicTrack = z.infer<typeof MusicTrackSchema>;
+
 export const TemplateInfoSchema = z.object({
   id: z.string(),
   name: z.string(),

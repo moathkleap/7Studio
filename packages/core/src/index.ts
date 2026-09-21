@@ -8,6 +8,7 @@ export * from './document/history';
 export * from './document/validate';
 export * from './presets';
 export * from './publish';
+export * from './trends';
 export * from './settings';
 export * from './shortcuts';
 export * from './capabilities';

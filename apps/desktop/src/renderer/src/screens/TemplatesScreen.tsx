@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LayoutTemplate, Save, Trash2 } from 'lucide-react';
+import { LayoutTemplate, RefreshCw, Save, Trash2 } from 'lucide-react';
 import type { TemplateInfo } from '@sevenvid/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
@@ -21,6 +21,10 @@ export function TemplatesScreen() {
   const [useTemplate, setUseTemplate] = useState<TemplateInfo | null>(null);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
+  const [trendsOpen, setTrendsOpen] = useState(false);
+  const [trendUrl, setTrendUrl] = useState('');
+  const [enableTrends, setEnableTrends] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const load = useCallback(() => getApi().invoke('templates.list').then(setTemplates).catch(reportError), [reportError]);
   useEffect(() => {
     void load();
@@ -33,6 +37,21 @@ export function TemplatesScreen() {
       await load();
     } catch (err) {
       reportError(err);
+    }
+  };
+  const syncTrends = async () => {
+    if (!trendUrl.trim()) return;
+    setSyncing(true);
+    try {
+      if (enableTrends) await getApi().invoke('settings.update', { patch: { privacy: { allowTrends: true } } });
+      const result = await getApi().invoke('trends.sync', { url: trendUrl.trim() });
+      setTrendsOpen(false);
+      await load();
+      useAppStore.getState().pushToast({ level: 'success', titleKey: 'templates.trends.synced', messageKey: null, params: { added: result.added, updated: result.updated }, errorId: null, taskId: null });
+    } catch (err) {
+      reportError(err);
+    } finally {
+      setSyncing(false);
     }
   };
   const save = async () => {
@@ -48,7 +67,12 @@ export function TemplatesScreen() {
   };
   return (
     <div className="mx-auto max-w-6xl px-8 py-8">
-      <PageHeader title={t('templates.title')} subtitle={t('templates.subtitle')} actions={<Button action="templates.saveCurrent" icon={<Save />} disabled={!session} onClick={() => setSaveOpen(true)}>{t('templates.saveCurrent')}</Button>} />
+      <PageHeader title={t('templates.title')} subtitle={t('templates.subtitle')} actions={
+        <>
+          <Button action="templates.syncTrends" variant="outline" icon={<RefreshCw />} onClick={() => setTrendsOpen(true)}>{t('templates.trends.sync')}</Button>
+          <Button action="templates.saveCurrent" icon={<Save />} disabled={!session} onClick={() => setSaveOpen(true)}>{t('templates.saveCurrent')}</Button>
+        </>
+      } />
       {templates.length === 0 ? <EmptyState icon={<LayoutTemplate />} title={t('templates.empty')} /> : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((tpl) => (
@@ -79,6 +103,19 @@ export function TemplatesScreen() {
         </>
       }>
         <Field label={t('common.name')}><Input autoFocus value={saveName} onChange={(e) => setSaveName(e.target.value)} /></Field>
+      </Dialog>
+      <Dialog open={trendsOpen} onOpenChange={setTrendsOpen} title={t('templates.trends.sync')} size="sm" footer={
+        <>
+          <Button action="templates.trends.cancel" variant="ghost" onClick={() => setTrendsOpen(false)}>{t('common.cancel')}</Button>
+          <Button action="templates.trends.submit" variant="primary" disabled={!trendUrl.trim() || syncing} onClick={() => void syncTrends()}>{syncing ? t('templates.trends.syncing') : t('templates.trends.sync')}</Button>
+        </>
+      }>
+        <p className="mb-3 text-[12.5px] text-muted">{t('templates.trends.note')}</p>
+        <Field label={t('templates.trends.url')}><Input autoFocus dir="ltr" placeholder="https://…" value={trendUrl} onChange={(e) => setTrendUrl(e.target.value)} /></Field>
+        <label className="mt-3 flex items-center gap-2 text-[12px] text-muted">
+          <input type="checkbox" checked={enableTrends} onChange={(e) => setEnableTrends(e.target.checked)} className="size-3.5 accent-accent" data-testid="templates-trends-enable" />
+          {t('templates.trends.enable')}
+        </label>
       </Dialog>
     </div>
   );

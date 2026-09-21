@@ -73,6 +73,22 @@ export function PublishScreen() {
     }
   };
 
+  const suggestAlternative = async () => {
+    const tags = hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean);
+    try {
+      const track = await getApi().invoke('music.suggest', { tags });
+      if (track) {
+        setSoundName(track.name);
+        setSoundUrl(track.file);
+        setSoundLicensed(true);
+      } else {
+        useAppStore.getState().pushToast({ level: 'info', titleKey: 'publish.soundNoAlt', messageKey: null, params: {}, errorId: null, taskId: null });
+      }
+    } catch (err) {
+      reportError(err);
+    }
+  };
+
   const targetName = (p: PublishTargetInfo | undefined, id: string) => (p ? t(p.nameKey) : id);
   const byId = useMemo(() => new Map(targets.map((x) => [x.id, x])), [targets]);
 
@@ -146,7 +162,10 @@ export function PublishScreen() {
                         <input type="checkbox" checked={soundLicensed} onChange={(e) => setSoundLicensed(e.target.checked)} data-testid="publish-sound-licensed" className="size-3.5 accent-accent" />
                         {t('publish.soundLicensed')}
                       </label>
-                      <div className="mt-2 text-[11.5px] text-faint">{t('publish.soundNote')}</div>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <div className="text-[11.5px] text-faint">{t('publish.soundNote')}</div>
+                        <Button action="publish.suggestAlt" size="sm" variant="ghost" onClick={() => void suggestAlternative()} data-testid="publish-sound-suggest">{t('publish.soundSuggestAlt')}</Button>
+                      </div>
                     </div>
                   </div>
 
