@@ -12,6 +12,7 @@ import { HardwareMonitor } from '../hardware/HardwareMonitor';
 import { LogHub, type Logger } from '../logging/logger';
 import { NotificationService } from '../notifications/NotificationService';
 import { ensureAppDirs, resolveAppPaths, type AppPaths, type ResolvePathsOptions } from '../paths/AppPaths';
+import { migrateLegacyUserData, type LegacyMigration } from '../paths/migrateLegacy';
 import { ProjectService } from '../project/ProjectService';
 import { SessionManager } from '../project/SessionManager';
 import { TemplateService } from '../project/TemplateService';
@@ -98,10 +99,26 @@ export interface Engine extends EngineServices {
 
 export function createEngine(opts: EngineOptions): Engine {
   const paths = resolveAppPaths(opts.paths);
+  // Migrate the pre-rename user-data directory (7vid / .sevenvid) into the new
+  // location before any file in the tree is opened. The legacy dir is derived
+  // from the new dir's name, so only the real 7Studio/.sevenstudios locations
+  // trigger it; custom or isolated paths (tests, browser dev tree) are skipped.
+  // Best effort: never block startup on a migration error.
+  let legacyMigration: LegacyMigration | null = null;
+  try {
+    legacyMigration = migrateLegacyUserData(paths.userData);
+  } catch (err) {
+    legacyMigration = { migrated: false, from: null, to: null, note: err instanceof Error ? err.message : String(err) };
+  }
   ensureAppDirs(paths);
   const bus = new EventBus();
   const logs = new LogHub({ dir: paths.logs, level: opts.logLevel ?? (opts.host.isDev ? 'debug' : 'info'), console: opts.logToConsole ?? false, onEntry: (e) => bus.emit('log', e) });
   const logger = logs.child({ module: 'engine' });
+  if (legacyMigration?.migrated) {
+    logger.info({ operation: 'migrate.legacyUserData', from: legacyMigration.from, to: legacyMigration.to }, 'migrated legacy user-data directory to the new location');
+  } else if (legacyMigration?.note && !['no-legacy', 'no-legacy-mapping', 'target-exists', 'same-path'].includes(legacyMigration.note)) {
+    logger.warn({ operation: 'migrate.legacyUserData', note: legacyMigration.note }, 'legacy user-data migration did not complete');
+  }
   const db = openDatabase(paths.db, logger);
   const settings = new SettingsService(db.settings, bus, logs.child({ module: 'settings' }));
   const ffmpeg = locateFfmpeg(paths);
