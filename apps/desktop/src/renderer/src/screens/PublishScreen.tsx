@@ -27,6 +27,9 @@ export function PublishScreen() {
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState('');
   const [strategy, setStrategy] = useState<'auto' | 'crop' | 'fit'>('auto');
+  const [soundName, setSoundName] = useState('');
+  const [soundUrl, setSoundUrl] = useState('');
+  const [soundLicensed, setSoundLicensed] = useState(false);
   const [packages, setPackages] = useState<PublishPackage[]>([]);
 
   const loadTargets = useCallback(() => {
@@ -52,6 +55,7 @@ export function PublishScreen() {
 
   const build = async () => {
     if (!session || selected.size === 0) return;
+    const sound = soundName.trim() ? { name: soundName.trim(), url: soundUrl.trim() || null, licensed: soundLicensed, source: null } : undefined;
     try {
       for (const targetId of selected) {
         await getApi().invoke('publish.build', {
@@ -60,6 +64,7 @@ export function PublishScreen() {
           strategy: strategy === 'auto' ? undefined : strategy,
           caption: caption || undefined,
           hashtags: hashtags || undefined,
+          sound,
         });
       }
       await loadPackages();
@@ -127,6 +132,22 @@ export function PublishScreen() {
                         </Select>
                       </Field>
                     </div>
+                    <div className="rounded-lg border border-border bg-surface-2 p-3" data-testid="publish-sound">
+                      <div className="text-[13px] font-medium">{t('publish.soundTitle')}</div>
+                      <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <Field label={t('publish.soundName')}>
+                          <Input value={soundName} onChange={(e) => setSoundName(e.target.value)} placeholder={t('publish.soundNamePlaceholder')} data-testid="publish-sound-name" dir="auto" />
+                        </Field>
+                        <Field label={t('publish.soundUrl')}>
+                          <Input value={soundUrl} onChange={(e) => setSoundUrl(e.target.value)} placeholder={t('publish.soundUrlPlaceholder')} data-testid="publish-sound-url" dir="ltr" />
+                        </Field>
+                      </div>
+                      <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
+                        <input type="checkbox" checked={soundLicensed} onChange={(e) => setSoundLicensed(e.target.checked)} data-testid="publish-sound-licensed" className="size-3.5 accent-accent" />
+                        {t('publish.soundLicensed')}
+                      </label>
+                      <div className="mt-2 text-[11.5px] text-faint">{t('publish.soundNote')}</div>
+                    </div>
                   </div>
 
                   <div className="mt-4 flex items-center gap-3">
@@ -172,6 +193,7 @@ export function PublishScreen() {
                                 {validation.checks.map((c) => <li key={c.name} className={cn('flex items-center gap-1 rounded px-1.5 py-0.5', c.ok ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger')} title={c.detail}>{c.ok ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />}{c.name}</li>)}
                               </ul>
                             ) : null}
+                            {p.suggestedSound ? <div className="mt-1 text-muted">{t('publish.soundSuggested', { name: p.suggestedSound.name })}{p.suggestedSound.url ? <> · <a href={p.suggestedSound.url} target="_blank" rel="noreferrer" className="text-accent underline" onClick={(e) => { e.preventDefault(); void getApi().invoke('shell.openExternal', { url: p.suggestedSound!.url! }).catch(reportError); }}>{p.suggestedSound.url}</a></> : null}</div> : null}
                             {p.warnings.length ? <div className="mt-1 text-warning">{t('publish.warnings')}: {p.warnings.join('; ')}</div> : null}
                             <div className="mt-2 flex gap-1">
                               <Button action="publish.play" size="sm" variant="outline" icon={<Play />} onClick={() => void getApi().invoke('shell.openPath', { path: p.videoPath }).catch(reportError)}>{t('publish.openVideo')}</Button>

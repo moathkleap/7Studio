@@ -64,6 +64,50 @@ export function getPublishTarget(id: string): PublishTarget | undefined {
   return PUBLISH_TARGETS.find((x) => x.id === id);
 }
 
+/**
+ * A trending sound suggested for a template or attached to a publish package.
+ *
+ * The audio itself is never embedded into an exported package: a copyrighted platform sound
+ * (`licensed: false`) is added from within TikTok/Instagram at upload time, and only cleared
+ * audio (`licensed: true` — royalty-free, user-owned or locally generated) may be added to the
+ * edit. The suggestion is advisory metadata that keeps exports honest and rights-clean.
+ */
+export interface TrendSound {
+  name: string;
+  /** Link to the sound on its platform, so it can be found and applied at upload time (null if unknown). */
+  url: string | null;
+  /** True when the sound is cleared to embed (royalty-free / user-owned / locally generated). */
+  licensed: boolean;
+  /** Where the sound comes from, e.g. 'tiktok', 'instagram', 'local' (null if unknown). */
+  source: string | null;
+}
+
+/** Whether a suggested sound may be embedded in an export, or must be added from within the platform. */
+export function canEmbedSound(sound: TrendSound): boolean {
+  return sound.licensed;
+}
+
+/** A short, honest note on how a suggested sound may be used, shown in the UI and written into a package. */
+export function describeSoundUsage(sound: TrendSound): string {
+  return sound.licensed
+    ? `"${sound.name}" is cleared to use and may be added to the edit.`
+    : `"${sound.name}" is a copyrighted platform sound and is not embedded; add it from within the app when you upload.`;
+}
+
+/** Normalizes unknown JSON (a template field or an IPC payload) into a TrendSound, or null when it has no name. */
+export function parseTrendSound(input: unknown): TrendSound | null {
+  if (!input || typeof input !== 'object') return null;
+  const o = input as Record<string, unknown>;
+  const name = typeof o.name === 'string' ? o.name.trim() : '';
+  if (!name) return null;
+  return {
+    name,
+    url: typeof o.url === 'string' && o.url.trim() ? o.url.trim() : null,
+    licensed: o.licensed === true,
+    source: typeof o.source === 'string' && o.source.trim() ? o.source.trim() : null,
+  };
+}
+
 export interface PublishFit {
   targetId: string;
   sourceAspect: number;

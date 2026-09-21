@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   composeCaption,
+  describeSoundUsage,
   fpsToNumber,
   getDocumentDurationMs,
   getExportPreset,
@@ -15,6 +16,7 @@ import {
   type PublishFit,
   type PublishTarget,
   type ReframeStrategy,
+  type TrendSound,
 } from '@sevenvid/core';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';
@@ -39,6 +41,8 @@ export interface PublishBuildRequest {
   strategy?: ReframeStrategy;
   caption?: string;
   hashtags?: string;
+  /** A trending sound to suggest for upload; never embedded in the exported video. */
+  sound?: TrendSound | null;
   outputDir?: string | null;
 }
 
@@ -59,6 +63,7 @@ export interface PublishPackage {
   trimmed: boolean;
   warnings: string[];
   validation: Record<string, unknown> | null;
+  suggestedSound: TrendSound | null;
   error: string | null;
   createdAt: string;
 }
@@ -159,6 +164,7 @@ export class PublishService {
       trimmed: false,
       warnings: [],
       validation: null,
+      suggestedSound: req.sound ?? null,
       error: null,
       createdAt: new Date().toISOString(),
     };
@@ -186,6 +192,8 @@ export class PublishService {
     if (fit.willTrim) warnings.push(`trimmed to the ${Math.round(target.maxDurationMs! / 1000)}s limit for ${target.id}`);
     if (fit.upscales) warnings.push('the source is smaller than the target canvas and was upscaled');
     if (req.strategy === 'blur-fill') warnings.push('blur-fill is not available yet; used crop instead');
+    // A suggested sound is never embedded here; a copyrighted platform sound must be added at upload time.
+    if (req.sound && !req.sound.licensed) warnings.push(`suggested sound "${req.sound.name}" is copyrighted and not embedded; add it from within the platform when you upload`);
 
     const seqFps = fpsToNumber(doc.settings.fps);
     const cappedFps = target.maxFps != null && seqFps > target.maxFps ? { num: Math.round(target.maxFps * 1000), den: 1000 } : null;
@@ -234,9 +242,14 @@ export class PublishService {
       const caption = composeCaption((req.caption ?? '').slice(0, target.captionMax), hashtags);
       record.captionPath = path.join(record.dir, 'caption.txt');
       fs.writeFileSync(record.captionPath, caption, 'utf8');
+      // A suggested sound is advisory only: write a human-readable note so the uploader knows how to use it.
+      if (req.sound) {
+        const note = [describeSoundUsage(req.sound), req.sound.url ? `Sound: ${req.sound.url}` : null].filter(Boolean).join('\n');
+        fs.writeFileSync(path.join(record.dir, 'sound.txt'), note, 'utf8');
+      }
       fs.writeFileSync(
         path.join(record.dir, 'metadata.json'),
-        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, project: project.name, createdAt: record.createdAt }, null, 2),
+        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, suggestedSound: req.sound ?? null, project: project.name, createdAt: record.createdAt }, null, 2),
         'utf8',
       );
 

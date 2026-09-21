@@ -38,8 +38,9 @@ describe.skipIf(!hasFixtures)('publish packaging', () => {
     expect(targets.find((t) => t.id === 'youtube-video')!.fit?.needsReframe).toBe(false);
 
     // build a vertical (crop) package and a 16:9 (fit) package
+    const sound = { name: 'Trending sound', url: 'https://www.tiktok.com/music', licensed: false, source: 'tiktok' };
     for (const [targetId, w, h] of [['tiktok', 1080, 1920], ['youtube-video', 1920, 1080]] as const) {
-      const started = await engine.invoke('publish.build', { projectId: project.id, targetId, caption: 'Hello world', hashtags: '#Travel travel #sunset' });
+      const started = await engine.invoke('publish.build', { projectId: project.id, targetId, caption: 'Hello world', hashtags: '#Travel travel #sunset', sound });
       expect(['queued', 'running']).toContain(started.status);
       const done = await engine.tasks.wait(started.taskId!);
       expect(done.status, `${targetId}: ${JSON.stringify(done.error)}`).toBe('done');
@@ -60,6 +61,12 @@ describe.skipIf(!hasFixtures)('publish packaging', () => {
       const meta = JSON.parse(fs.readFileSync(path.join(pkg.dir, 'metadata.json'), 'utf8'));
       expect(meta.target).toBe(targetId);
       expect(meta.hashtags).toContain('Travel');
+      // a suggested (copyrighted) sound is carried as advisory metadata, never embedded
+      expect(pkg.suggestedSound?.name).toBe('Trending sound');
+      expect(meta.suggestedSound.licensed).toBe(false);
+      expect(pkg.warnings.some((w) => w.includes('not embedded'))).toBe(true);
+      const soundNote = fs.readFileSync(path.join(pkg.dir, 'sound.txt'), 'utf8');
+      expect(soundNote).toContain('add it from within the app');
     }
 
     const recent = await engine.invoke('publish.recent', {});

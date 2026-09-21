@@ -197,6 +197,15 @@ export const AppInfoSchema = z.object({
 });
 export type AppInfo = z.infer<typeof AppInfoSchema>;
 
+/** A trending sound suggested for a template or a publish package (advisory; never embedded when copyrighted). */
+export const TrendSoundSchema = z.object({
+  name: z.string(),
+  url: z.string().nullable(),
+  licensed: z.boolean(),
+  source: z.string().nullable(),
+});
+export type TrendSound = z.infer<typeof TrendSoundSchema>;
+
 export const TemplateInfoSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -210,6 +219,11 @@ export const TemplateInfoSchema = z.object({
   subtitleStyle: z.record(z.string(), z.unknown()).nullable(),
   exportPresetId: z.string().nullable(),
   targetDurationMs: z.number().nullable(),
+  // Trend metadata (populated for category "trend" templates; null for plain templates).
+  hook: z.string().nullable(),
+  hashtags: z.array(z.string()).nullable(),
+  suggestedSound: TrendSoundSchema.nullable(),
+  trendSource: z.string().nullable(),
   createdAt: z.string(),
 });
 export type TemplateInfo = z.infer<typeof TemplateInfoSchema>;
@@ -277,6 +291,8 @@ export const PublishPackageSchema = z.object({
   trimmed: z.boolean(),
   warnings: z.array(z.string()),
   validation: z.record(z.string(), z.unknown()).nullable(),
+  // A trending sound to add at upload time; never embedded in the exported video (null when none chosen).
+  suggestedSound: TrendSoundSchema.nullable(),
   error: z.string().nullable(),
   createdAt: z.string(),
 });

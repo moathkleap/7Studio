@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PUBLISH_TARGETS, composeCaption, getPublishTarget, normalizeHashtags, planPublishFit } from './publish';
+import { PUBLISH_TARGETS, canEmbedSound, composeCaption, describeSoundUsage, getPublishTarget, normalizeHashtags, parseTrendSound, planPublishFit } from './publish';
 
 describe('publish targets', () => {
   it('exposes distinct targets for the major platforms with sane canvases', () => {
@@ -38,5 +38,36 @@ describe('publish targets', () => {
     expect(composeCaption('Hello world', ['a', 'b'])).toBe('Hello world\n\n#a #b');
     expect(composeCaption('Only text', [])).toBe('Only text');
     expect(composeCaption('', ['a'])).toBe('#a');
+  });
+});
+
+describe('trend sounds', () => {
+  it('parses well-formed sound JSON and requires a name', () => {
+    expect(parseTrendSound({ name: '  Beat drop ', url: ' https://tiktok.com/music ', licensed: false, source: 'tiktok' })).toEqual({
+      name: 'Beat drop',
+      url: 'https://tiktok.com/music',
+      licensed: false,
+      source: 'tiktok',
+    });
+    // missing/blank name -> null
+    expect(parseTrendSound({ url: 'https://x' })).toBeNull();
+    expect(parseTrendSound({ name: '   ' })).toBeNull();
+    expect(parseTrendSound(null)).toBeNull();
+    expect(parseTrendSound('nope')).toBeNull();
+  });
+
+  it('defaults licensed to false and blank fields to null', () => {
+    expect(parseTrendSound({ name: 'x' })).toEqual({ name: 'x', url: null, licensed: false, source: null });
+    // licensed is strictly boolean true; a truthy non-true value stays false
+    expect(parseTrendSound({ name: 'x', licensed: 'yes' })?.licensed).toBe(false);
+  });
+
+  it('embeds only licensed sounds and describes usage honestly', () => {
+    const copyrighted = { name: 'Trending sound', url: null, licensed: false, source: 'tiktok' };
+    const cleared = { name: 'My track', url: null, licensed: true, source: 'local' };
+    expect(canEmbedSound(copyrighted)).toBe(false);
+    expect(canEmbedSound(cleared)).toBe(true);
+    expect(describeSoundUsage(copyrighted)).toContain('not embedded');
+    expect(describeSoundUsage(cleared)).toContain('cleared to use');
   });
 });
