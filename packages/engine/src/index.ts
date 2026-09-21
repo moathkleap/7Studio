@@ -19,4 +19,6 @@ export * from './settings/SettingsService';
 export * from './search/SearchService';
 export * from './fs/FsService';
 export * from './notifications/NotificationService';
-export * from './devbridge/server';
+// NOTE: the dev bridge server (which imports `ws`) is intentionally NOT re-exported here. It is an entry
+// point used directly by scripts/dev-browser and devbridge/main; keeping it out of the barrel stops `ws`
+// (and its optional native addons bufferutil/utf-8-validate) from being bundled into the Electron main.
