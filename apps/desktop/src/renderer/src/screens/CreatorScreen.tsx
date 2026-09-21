@@ -307,13 +307,17 @@ function ProducePanel({ projectId, state, onAssembled }: { projectId: string; st
   const running = (kind: string) => task?.kind === kind;
   return (
     <div className="space-y-4" data-testid="creator-produce">
-      <div className="flex flex-wrap gap-2">
-        <Button action="creator.storyboard" variant="outline" icon={<ImageIcon />} loading={running('creator.storyboard')} disabled={Boolean(task)} onClick={() => void start('creator.storyboard')} data-testid="creator-storyboard">{t('creator.renderStoryboard')}</Button>
-        <CapabilityGate id="tts" compact>
-          <Button action="creator.voice" variant="outline" icon={<Mic />} loading={running('creator.voice')} disabled={Boolean(task)} onClick={() => void start('creator.voice')} data-testid="creator-voice">{t('creator.synthVoice')}</Button>
-        </CapabilityGate>
-        <Button action="creator.assemble" variant="primary" icon={<Clapperboard />} loading={running('creator.assemble')} disabled={Boolean(task)} onClick={() => void start('creator.assemble')} data-testid="creator-assemble">{t('creator.assemble')}</Button>
-      </div>
+      {/* Storyboard rendering and assembly both drive FFmpeg. Gate the whole action row on it so a missing
+          FFmpeg shows an honest reason and a next step (open System) instead of a button that silently fails. */}
+      <CapabilityGate id="render.export" compact>
+        <div className="flex flex-wrap gap-2">
+          <Button action="creator.storyboard" variant="outline" icon={<ImageIcon />} loading={running('creator.storyboard')} disabled={Boolean(task)} onClick={() => void start('creator.storyboard')} data-testid="creator-storyboard">{t('creator.renderStoryboard')}</Button>
+          <CapabilityGate id="tts" compact>
+            <Button action="creator.voice" variant="outline" icon={<Mic />} loading={running('creator.voice')} disabled={Boolean(task)} onClick={() => void start('creator.voice')} data-testid="creator-voice">{t('creator.synthVoice')}</Button>
+          </CapabilityGate>
+          <Button action="creator.assemble" variant="primary" icon={<Clapperboard />} loading={running('creator.assemble')} disabled={Boolean(task)} onClick={() => void start('creator.assemble')} data-testid="creator-assemble">{t('creator.assemble')}</Button>
+        </div>
+      </CapabilityGate>
       {task ? (
         <div data-testid="creator-progress">
           <div className="h-1 overflow-hidden rounded-full bg-surface-2"><div className="h-full bg-accent transition-[width]" style={{ width: `${Math.round(progress * 100)}%` }} /></div>
