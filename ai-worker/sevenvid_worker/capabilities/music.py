@@ -47,22 +47,24 @@ def generate(params: dict, ctx) -> dict[str, Any]:
     prompt = str(params.get("prompt", "")).strip()
     out_path = params["out_path"]
     duration_ms = int(params.get("duration_ms", 15000))
-    model_path = params.get("model_path")  # local dir; None to use the default cached model id
-    model_id = params.get("model_id") or "facebook/musicgen-small"
+    model_path = params.get("model_path")  # local dir managed by the model manager (downloaded via the gateway)
+    model_id = params.get("model_id") or "musicgen/small"
     if not prompt:
         raise WorkerError("INVALID_INPUT", "prompt is empty")
+    # Only load from the locally managed model directory; never let transformers reach the network.
+    if not model_path or not os.path.isdir(model_path):
+        raise WorkerError("MODEL_NOT_INSTALLED", "music model is not installed", {"model": model_id})
     try:
         import torch
         from transformers import AutoProcessor, MusicgenForConditionalGeneration
     except Exception as e:  # noqa: BLE001
         raise WorkerError("PROVIDER_UNAVAILABLE", f"music generation backend missing: {e}")
 
-    source = model_path if model_path and os.path.isdir(model_path) else model_id
     try:
-        processor = AutoProcessor.from_pretrained(source)
-        model = MusicgenForConditionalGeneration.from_pretrained(source)
+        processor = AutoProcessor.from_pretrained(model_path, local_files_only=True)
+        model = MusicgenForConditionalGeneration.from_pretrained(model_path, local_files_only=True)
     except Exception as e:  # noqa: BLE001
-        raise WorkerError("MODEL_NOT_INSTALLED", f"could not load music model from {source}: {e}", {"model": model_id})
+        raise WorkerError("MODEL_NOT_INSTALLED", f"could not load music model from {model_path}: {e}", {"model": model_id})
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)

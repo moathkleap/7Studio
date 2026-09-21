@@ -160,3 +160,10 @@ def test_music_generate_rejects_empty_prompt(ctx, tmp_path):
     with pytest.raises(WorkerError) as exc:
         music.generate({"prompt": "  ", "out_path": str(tmp_path / "m.wav")}, ctx)
     assert exc.value.code == "INVALID_INPUT"
+
+
+def test_music_generate_requires_local_model(ctx, tmp_path):
+    # A valid prompt but no local model directory must fail clearly, never reach the network.
+    with pytest.raises(WorkerError) as exc:
+        music.generate({"prompt": "calm lofi", "out_path": str(tmp_path / "m.wav"), "model_path": None}, ctx)
+    assert exc.value.code == "MODEL_NOT_INSTALLED"

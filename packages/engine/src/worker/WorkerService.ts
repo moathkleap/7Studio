@@ -207,8 +207,10 @@ export class WorkerService {
 
   /** Generates a music clip locally (MusicGen). Fails clearly when the backend or model is missing. */
   generateMusic(prompt: string, outPath: string, opts: { durationMs?: number; modelId?: string; signal?: AbortSignal; onProgress?: Progress } = {}): Promise<{ out_path: string; duration_ms: number; sample_rate: number; model_id: string }> {
-    const modelPath = opts.modelId ? this.models.pathFor(opts.modelId) : null;
-    return this.call('music.generate', { prompt, out_path: outPath, duration_ms: opts.durationMs ?? 15000, model_id: opts.modelId ?? null, model_path: modelPath }, { signal: opts.signal, onProgress: opts.onProgress, timeoutMs: 1_800_000 });
+    const modelId = opts.modelId ?? 'musicgen/small';
+    // Load the model directory managed by the model manager (downloaded through the gateway), never an HF cache.
+    const modelPath = this.models.isInstalled(modelId) ? this.models.dirFor(modelId) : null;
+    return this.call('music.generate', { prompt, out_path: outPath, duration_ms: opts.durationMs ?? 15000, model_id: modelId, model_path: modelPath }, { signal: opts.signal, onProgress: opts.onProgress, timeoutMs: 1_800_000 });
   }
 
   transcribe(file: string, opts: { modelId: string; language?: 'ar' | 'en' | 'auto'; signal?: AbortSignal; onProgress?: Progress }): Promise<SttResult> {
@@ -292,6 +294,7 @@ export class WorkerService {
       const hello = this.lastHello ?? (await this.probe());
       const cap = hello?.capabilities.music;
       if (!cap?.available) return { status: 'needs-runtime', reasonKey: 'capabilities.workerModuleMissing', reasonParams: { module: 'music', reason: cap?.reason ?? '' }, action: { type: 'setup-runtime', target: null } };
+      if (!this.models.isInstalled('musicgen/small')) return { status: 'needs-model', reasonKey: 'capabilities.modelMissing', reasonParams: { models: 'musicgen/small' }, action: { type: 'open-models', target: 'musicgen/small' } };
       return { status: 'available', providerId: 'musicgen', reasonParams: { device: hello?.device ?? '' } };
     });
     this.capabilities.register('upscale.ai', async () => {
