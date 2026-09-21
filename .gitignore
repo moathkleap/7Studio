@@ -13,6 +13,7 @@ coverage/
 ai-worker/.venv/
 ai-worker/**/__pycache__/
 ai-worker/.pytest_cache/
+ai-worker/*.egg-info/
 tests/fixtures/generated/
 tests/results/
 playwright-report/
