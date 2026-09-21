@@ -515,6 +515,11 @@
     "soundNote": "Copyrighted sounds are never added to the export — add them from within the platform when you upload.",
     "soundSuggestAlt": "Suggest cleared alternative",
     "soundNoAlt": "No cleared alternative found in your music library.",
+    "musicLevel": "Music level",
+    "generateMusic": "Generate music",
+    "generatingMusic": "Generating…",
+    "musicGenerated": "Generated \"{{name}}\" and added it to your library.",
+    "musicGenUnavailable": "Local music generation needs a model and runtime — see AI Models.",
     "soundSuggested": "Sound: {{name}}",
     "target": {
       "youtubeVideo": "YouTube video",

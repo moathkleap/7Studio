@@ -30,6 +30,7 @@ export function PublishScreen() {
   const [soundName, setSoundName] = useState('');
   const [soundUrl, setSoundUrl] = useState('');
   const [soundLicensed, setSoundLicensed] = useState(false);
+  const [musicGainDb, setMusicGainDb] = useState(-6);
   const [packages, setPackages] = useState<PublishPackage[]>([]);
 
   const loadTargets = useCallback(() => {
@@ -65,11 +66,29 @@ export function PublishScreen() {
           caption: caption || undefined,
           hashtags: hashtags || undefined,
           sound,
+          musicGainDb: sound?.licensed ? musicGainDb : undefined,
         });
       }
       await loadPackages();
     } catch (err) {
       reportError(err);
+    }
+  };
+
+  const [generatingMusic, setGeneratingMusic] = useState(false);
+  const generateMusic = async () => {
+    const prompt = soundName.trim() || hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean).join(', ');
+    setGeneratingMusic(true);
+    try {
+      const track = await getApi().invoke('music.generate', { prompt: prompt || undefined, tags: hashtags.split(/[\s,#]+/).map((x) => x.trim()).filter(Boolean) });
+      setSoundName(track.name);
+      setSoundUrl(track.file);
+      setSoundLicensed(true);
+      useAppStore.getState().pushToast({ level: 'success', titleKey: 'publish.musicGenerated', messageKey: null, params: { name: track.name }, errorId: null, taskId: null });
+    } catch (err) {
+      reportError(err);
+    } finally {
+      setGeneratingMusic(false);
     }
   };
 
@@ -164,8 +183,18 @@ export function PublishScreen() {
                       </label>
                       <div className="mt-2 flex items-center justify-between gap-2">
                         <div className="text-[11.5px] text-faint">{t('publish.soundNote')}</div>
-                        <Button action="publish.suggestAlt" size="sm" variant="ghost" onClick={() => void suggestAlternative()} data-testid="publish-sound-suggest">{t('publish.soundSuggestAlt')}</Button>
+                        <div className="flex items-center gap-1">
+                          <Button action="publish.suggestAlt" size="sm" variant="ghost" onClick={() => void suggestAlternative()} data-testid="publish-sound-suggest">{t('publish.soundSuggestAlt')}</Button>
+                          <Button action="publish.generateMusic" size="sm" variant="ghost" disabled={generatingMusic} onClick={() => void generateMusic()} data-testid="publish-sound-generate">{generatingMusic ? t('publish.generatingMusic') : t('publish.generateMusic')}</Button>
+                        </div>
                       </div>
+                      {soundLicensed && soundName.trim() ? (
+                        <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
+                          <span className="whitespace-nowrap">{t('publish.musicLevel')}</span>
+                          <input type="range" min={-30} max={6} step={1} value={musicGainDb} onChange={(e) => setMusicGainDb(Number(e.target.value))} data-testid="publish-music-level" className="flex-1 accent-accent" />
+                          <span className="w-12 text-end font-mono text-[11px]" dir="ltr">{musicGainDb} dB</span>
+                        </label>
+                      ) : null}
                     </div>
                   </div>
 

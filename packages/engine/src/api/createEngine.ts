@@ -17,6 +17,7 @@ import { SessionManager } from '../project/SessionManager';
 import { TemplateService } from '../project/TemplateService';
 import { TrendsService } from '../trends/TrendsService';
 import { MusicLibraryService } from '../music/MusicLibraryService';
+import { MusicGenService } from '../music/MusicGenService';
 import { MediaService } from '../media/MediaService';
 import { ExportService } from '../export/ExportService';
 import { PublishService } from '../publish/PublishService';
@@ -72,6 +73,7 @@ export interface EngineServices {
   templates: TemplateService;
   trends: TrendsService;
   music: MusicLibraryService;
+  musicGen: MusicGenService;
   media: MediaService;
   exports: ExportService;
   publish: PublishService;
@@ -138,6 +140,7 @@ export function createEngine(opts: EngineOptions): Engine {
   const trends = new TrendsService(db, gateway, search, bus, logs.child({ module: 'trends' }));
   const music = new MusicLibraryService([path.join(paths.resources, 'music'), path.join(paths.userData, 'music')], logs.child({ module: 'music' }));
   const worker = new WorkerService(paths, runtime, models, ffmpeg, capabilities, hardware, logs.child({ module: 'worker' }));
+  const musicGen = new MusicGenService(paths, tasks, worker, capabilities, logs.child({ module: 'music' }));
   const audio = new AudioService(ffmpeg, tasks, projects, sessions, worker, capabilities, logs.child({ module: 'audio' }));
   const vision = new VisionService(ffmpeg, tasks, projects, sessions, worker, previews, logs.child({ module: 'vision' }));
   const subtitles = new SubtitleService(db, paths, tasks, projects, sessions, worker, models, audio, capabilities, search, logs.child({ module: 'subtitles' }));
@@ -147,7 +150,7 @@ export function createEngine(opts: EngineOptions): Engine {
   const providers = new ProvidersService(db, settings, gateway, opts.host, capabilities, bus, logs.child({ module: 'providers' }));
   const assistant = new AssistantService({ db, sessions, tasks, capabilities, settings, bus, logger: logs.child({ module: 'ai' }), audio, vision, subtitles, ocr, enhance, exports: exportsService, providers });
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, trends, music, media, exports: exportsService, publish, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator, providers };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, trends, music, musicGen, media, exports: exportsService, publish, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator, providers };
   registerCoreCapabilities(services);
   models.setTester((spec, dir) => testModel(services, spec, dir));
   bus.on('models.changed', () => void capabilities.refresh());
@@ -233,7 +236,7 @@ function registerCoreCapabilities(s: EngineServices): void {
   s.capabilities.register('planner.deterministic', () => ({ status: 'available', providerId: 'deterministic-planner', external: false }));
   // Language-model based capabilities arrive with the assistant phase; until then their status is derived honestly from installed models.
   // llm.text and translate capabilities are registered by ProvidersService (external provider registry).
-  s.capabilities.register('gen.music', () => ({ status: 'needs-provider', reasonKey: 'capabilities.needsMusicProvider', action: { type: 'open-providers', target: null } }));
+  // gen.music is registered by WorkerService (local MusicGen), gated on the Python worker and a model.
 }
 
 /** Real smoke test per model family, run on bundled sample media. Never reports success without an actual inference. */

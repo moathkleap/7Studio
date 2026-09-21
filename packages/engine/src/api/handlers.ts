@@ -126,6 +126,7 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
     'trends.sync': ({ url }) => s.trends.sync(url),
     'music.list': () => s.music.list(),
     'music.suggest': ({ mood, tags }) => s.music.suggest({ mood, tags }),
+    'music.generate': (input) => s.musicGen.generate(input),
     'exports.list': (input) => s.db.exports.list({ projectId: input?.projectId, limit: input?.limit }),
     'network.recent': (input) => s.db.networkLog.recent(input?.limit ?? 200),
     'media.import': ({ paths, projectId }) => s.media.import(paths, projectId),
@@ -164,7 +165,7 @@ export type CoreChannel =
   | 'search.query' | 'logs.tail' | 'diagnostics.exportBundle' | 'errors.recent' | 'notifications.recent'
   | 'fs.listDir' | 'fs.roots' | 'fs.exists' | 'dialog.pickFiles' | 'dialog.pickDirectory' | 'dialog.saveFile'
   | 'shell.openPath' | 'shell.showInFolder' | 'shell.openExternal' | 'app.quit'
-  | 'templates.list' | 'templates.delete' | 'templates.saveFromProject' | 'trends.sync' | 'music.list' | 'music.suggest' | 'exports.list' | 'network.recent'
+  | 'templates.list' | 'templates.delete' | 'templates.saveFromProject' | 'trends.sync' | 'music.list' | 'music.suggest' | 'music.generate' | 'exports.list' | 'network.recent'
   | 'media.import' | 'media.list' | 'media.get' | 'media.update' | 'media.remove' | 'media.relink' | 'media.reanalyze' | 'media.waveform' | 'media.url' | 'media.setPlaybackCapabilities' | 'media.addToTimeline'
   | 'export.start' | 'export.get' | 'export.estimate' | 'export.encoders' | 'render.previewRange' | 'render.extractFrame'
   | 'publish.targets' | 'publish.build' | 'publish.get' | 'publish.recent';

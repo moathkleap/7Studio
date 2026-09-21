@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from . import audio, faceembed, faces, gen, landmarks, objects, segmentation, stt, system, tracking, tts, upscale, vad, verify
+from . import audio, faceembed, faces, gen, landmarks, music, objects, segmentation, stt, system, tracking, tts, upscale, vad, verify
 
 MODULES = {
     "system": system,
@@ -19,6 +19,7 @@ MODULES = {
     "faceembed": faceembed,
     "upscale": upscale,
     "gen": gen,
+    "music": music,
 }
 
 

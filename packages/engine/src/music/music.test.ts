@@ -36,3 +36,12 @@ describe('MusicLibraryService', () => {
     expect(none).toBeNull();
   });
 });
+
+describe('MusicGenService', () => {
+  it('refuses to generate when gen.music is not available (no worker/model), honestly', async () => {
+    dir = tempDir();
+    engine = testEngine(dir);
+    // No Python worker/model in the test environment → gen.music is not available.
+    await expect(engine.invoke('music.generate', { prompt: 'calm lofi beat' })).rejects.toMatchObject({ info: { code: 'WORKER_UNAVAILABLE' } });
+  });
+});

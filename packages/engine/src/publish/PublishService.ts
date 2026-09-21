@@ -43,6 +43,8 @@ export interface PublishBuildRequest {
   hashtags?: string;
   /** A trending sound to suggest for upload; never embedded in the exported video. */
   sound?: TrendSound | null;
+  /** Mix level (dB) for an embedded cleared music bed, relative to the timeline audio. Default -6. */
+  musicGainDb?: number;
   outputDir?: string | null;
 }
 
@@ -223,7 +225,7 @@ export class PublishService {
         signal: ctx.signal,
         scratchDir: path.join(project.dataDir, 'cache', 'publish'),
         finalVideoFilters: reframeFilters(record.strategy, target.width, target.height),
-        backgroundMusic: embedMusicPath ? { path: embedMusicPath, gainDb: -6 } : null,
+        backgroundMusic: embedMusicPath ? { path: embedMusicPath, gainDb: req.musicGainDb ?? -6 } : null,
         onProgress: (ratio, message) => ctx.progress(Math.min(0.9, ratio * 0.9), message),
         onProcess: (_proc, controls) => ctx.setPauseHandlers({ pause: () => void controls.pause(), resume: () => void controls.resume() }),
       });

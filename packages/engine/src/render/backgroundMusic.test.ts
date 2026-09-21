@@ -30,6 +30,12 @@ describe('compileRenderGraph background music', () => {
     expect(graph.filterScript).not.toContain('[music]');
   });
 
+  it('applies no volume filter to the music at 0 dB', () => {
+    const graph = compileRenderGraph({ doc: docWithAudioClip(), target, backgroundMusic: { path: '/music/bed.mp3', gainDb: 0 } });
+    const musicLine = graph.filterScript.split(';\n').find((l) => l.endsWith('[music]'))!;
+    expect(musicLine).not.toContain('volume=');
+  });
+
   it('mixes music even when the timeline has no audio (music becomes the only source)', () => {
     let doc = createDocument({ name: 'silent', settings: { width: 1080, height: 1920, fps: { num: 30, den: 1 } } });
     const image = createAssetRef({ id: 'ast_img', kind: 'image', name: 'img.png', sourcePath: '/tmp/img.png', durationMs: 5000, width: 1080, height: 1920, fps: null, hasVideo: true, hasAudio: false });
