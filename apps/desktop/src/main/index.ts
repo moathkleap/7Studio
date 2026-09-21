@@ -3,7 +3,7 @@ import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell } from
 import { pathToFileURL } from 'node:url';
 import { AppError, createEngine, type Engine } from '@sevenvid/engine';
 import { createElectronHost } from './host';
-import { buildMenu } from './menu';
+import { buildMenu, type MenuLang } from './menu';
 
 // node:sqlite is stable enough for our use but still flagged experimental in Node 22.
 process.removeAllListeners('warning');
@@ -87,6 +87,17 @@ function installMediaProtocol(e: Engine): void {
   });
 }
 
+/** Resolves the app's UI language setting ('system' | 'ar' | 'en') to a concrete menu language. */
+function resolveMenuLang(pref: 'system' | 'ar' | 'en'): MenuLang {
+  if (pref === 'ar' || pref === 'en') return pref;
+  return app.getLocale().toLowerCase().startsWith('ar') ? 'ar' : 'en';
+}
+
+function installMenu(e: Engine): void {
+  const lang = resolveMenuLang(e.settings.get().general.language);
+  Menu.setApplicationMenu(buildMenu({ isDev, lang, openExternal: (url) => void e.invoke('shell.openExternal', { url }) }));
+}
+
 function wireIpc(e: Engine): void {
   ipcMain.handle('sevenvid:api', async (_event, channel: string, input: unknown) => {
     try {
@@ -113,7 +124,16 @@ app.whenReady().then(async () => {
   wireIpc(engine);
   installMediaProtocol(engine);
   installCsp();
-  Menu.setApplicationMenu(buildMenu({ isDev, openExternal: (url) => void engine?.invoke('shell.openExternal', { url }) }));
+  installMenu(engine);
+  // Rebuild the native menu in the selected language whenever the UI language setting changes.
+  let menuLang = resolveMenuLang(engine.settings.get().general.language);
+  engine.bus.on('settings.updated', (settings) => {
+    const next = resolveMenuLang(settings.general.language);
+    if (next !== menuLang) {
+      menuLang = next;
+      if (engine) installMenu(engine);
+    }
+  });
   await engine.start();
   await createWindow();
   app.on('activate', () => {
