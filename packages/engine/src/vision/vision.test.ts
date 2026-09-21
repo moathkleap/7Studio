@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { maskBoxAt } from '@sevenvid/core';
-import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenvid/ipc';
+import { maskBoxAt } from '@sevenstudios/core';
+import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenstudios/ipc';
 import { createEngine, type Engine } from '../api/createEngine';
 import { cleanup, tempDir, testHost } from '../test/helpers';
 
 const root = path.resolve(__dirname, '../../../..');
 const fixtures = path.join(root, 'tests', 'fixtures', 'generated');
-const devModels = path.join(root, '.sevenvid-dev', 'userData', 'models');
+const devModels = path.join(root, '.sevenstudios-dev', 'userData', 'models');
 const venv = process.platform === 'win32' ? path.join(root, 'ai-worker', '.venv', 'Scripts', 'python.exe') : path.join(root, 'ai-worker', '.venv', 'bin', 'python');
 const has = fs.existsSync(venv) && fs.existsSync(path.join(devModels, 'opencv', 'yunet-2023mar', 'face_detection_yunet_2023mar.onnx')) && fs.existsSync(path.join(fixtures, 'face-pan-4s.mp4'));
 
@@ -37,7 +37,7 @@ async function runTask<T>(task: { id: string }): Promise<T> {
 
 describe.skipIf(!has)('vision service (python worker)', () => {
   beforeAll(() => {
-    process.env.SEVENVID_WORKER_DIR = path.join(root, 'ai-worker');
+    process.env.SEVENSTUDIOS_WORKER_DIR = path.join(root, 'ai-worker');
   });
 
   it('detects faces, blurs them with tracking, verifies the blur and exports', async () => {

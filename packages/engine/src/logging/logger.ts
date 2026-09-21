@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import pino, { type Logger as PinoLogger } from 'pino';
-import type { LogEntry } from '@sevenvid/ipc';
+import type { LogEntry } from '@sevenstudios/ipc';
 
 export type Logger = PinoLogger;
 
@@ -37,7 +37,7 @@ export class LogHub {
 
   constructor(private readonly opts: LoggerOptions) {
     fs.mkdirSync(opts.dir, { recursive: true });
-    this.file = path.join(opts.dir, 'sevenvid.log');
+    this.file = path.join(opts.dir, 'sevenstudios.log');
     this.rotator = new RotatingFile(this.file, opts.maxFileBytes ?? 5 * 1024 * 1024, opts.maxFiles ?? 5);
     const stream = {
       write: (line: string) => {

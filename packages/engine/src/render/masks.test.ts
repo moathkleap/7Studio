@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createAssetRef, createClip, createDocument, createMaskTrack, type AssetRef, type MaskTrack, type ProjectDocument } from '@sevenvid/core';
+import { applyCommand, createAssetRef, createClip, createDocument, createMaskTrack, type AssetRef, type MaskTrack, type ProjectDocument } from '@sevenstudios/core';
 import { validateRenderedFile } from '../export/validate';
 import { locateFfmpeg } from '../ffmpeg/locator';
 import { runFfmpeg } from '../ffmpeg/runner';

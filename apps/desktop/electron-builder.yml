@@ -1,10 +1,10 @@
-# electron-builder configuration for 7vid.
-# Run `pnpm --filter @sevenvid/desktop package` (electron-vite build && electron-builder).
+# electron-builder configuration for Seven Studios.
+# Run `pnpm --filter @sevenstudios/desktop package` (electron-vite build && electron-builder).
 # Icons: drop icon.icns (mac), icon.ico (win) and a 512×512 icon.png (linux) into
 # apps/desktop/build-resources/ before a release build; electron-builder picks them up from buildResources.
-appId: com.sevenvid.app
-productName: 7vid
-copyright: Copyright © 2026 7vid
+appId: com.sevenstudios.app
+productName: Seven Studios
+copyright: Copyright © 2026 Seven Studios
 
 directories:
   output: release
@@ -20,7 +20,7 @@ files:
 # Bundled runtime assets read by the engine from `process.resourcesPath/<path>`.
 # To bundle FFmpeg, place static ffmpeg/ffprobe binaries under resources/bin/<platform>-<arch>/
 # (e.g. linux-x64, win32-x64, darwin-arm64) before packaging. The locator also falls back to
-# SEVENVID_FFMPEG_PATH and then the system PATH, so bundling is optional.
+# SEVENSTUDIOS_FFMPEG_PATH and then the system PATH, so bundling is optional.
 extraResources:
   - from: ../../resources/fonts
     to: resources/fonts
@@ -99,7 +99,7 @@ linux:
   artifactName: ${productName}-${version}-${arch}.${ext}
   desktop:
     entry:
-      Name: 7vid
+      Name: Seven Studios
       Comment: Local-first AI video editor and creator
       Categories: AudioVideo;Video;AudioVideoEditing;
 

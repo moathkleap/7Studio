@@ -1,6 +1,6 @@
 # Testing
 
-7vid is built with a "verify by measurement" rule: no feature reports success without proof. The test
+Seven Studios is built with a "verify by measurement" rule: no feature reports success without proof. The test
 suite reflects that — it renders real files and measures them, rather than asserting that a function was
 called.
 

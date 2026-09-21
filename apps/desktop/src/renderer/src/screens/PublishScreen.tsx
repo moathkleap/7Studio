@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, FolderOpen, Play, Share2, XCircle } from 'lucide-react';
-import type { PublishPackage, PublishTargetInfo } from '@sevenvid/ipc';
+import type { PublishPackage, PublishTargetInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { useAppStore } from '@/store/appStore';

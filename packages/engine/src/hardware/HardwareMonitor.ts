@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import si from 'systeminformation';
-import type { HardwareSnapshot } from '@sevenvid/ipc';
+import type { HardwareSnapshot } from '@sevenstudios/ipc';
 import type { EventBus } from '../events/EventBus';
 import type { FfmpegLocation } from '../ffmpeg/locator';
 import type { Logger } from '../logging/logger';

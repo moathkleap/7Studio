@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Copy, ScanText, ShieldCheck } from 'lucide-react';
-import { formatMs, type ProjectDocument } from '@sevenvid/core';
-import type { OcrResult } from '@sevenvid/ipc';
+import { formatMs, type ProjectDocument } from '@sevenstudios/core';
+import type { OcrResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { CapabilityGate, useCapability } from '@/components/CapabilityGate';
 import { Badge } from '@/components/ui/Badge';

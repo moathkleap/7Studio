@@ -1,4 +1,4 @@
-import { formatAssTime, formatSrtTime, formatVttTime, type SubtitleCue, type SubtitleStyle, type SubtitleTrack } from '@sevenvid/core';
+import { formatAssTime, formatSrtTime, formatVttTime, type SubtitleCue, type SubtitleStyle, type SubtitleTrack } from '@sevenstudios/core';
 
 export function toSrt(cues: SubtitleCue[]): string {
   const sorted = [...cues].sort((a, b) => a.startMs - b.startMs);

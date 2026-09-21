@@ -121,7 +121,7 @@ function download(url: string, opts: FetchOptions, resumeFrom: number, redirects
       return;
     }
     const lib = parsed.protocol === 'https:' ? https : http;
-    const headers: Record<string, string> = { 'user-agent': 'sevenvid/0.1', ...(opts.headers ?? {}) };
+    const headers: Record<string, string> = { 'user-agent': 'sevenstudios/0.1', ...(opts.headers ?? {}) };
     if (resumeFrom > 0) headers.range = `bytes=${resumeFrom}-`;
     const req = lib.request(parsed, { method: 'GET', headers, timeout: opts.timeoutMs ?? 60_000 }, (res) => {
       const status = res.statusCode ?? 0;
@@ -185,7 +185,7 @@ function requestJson(url: string, opts: { method: string; body?: string; headers
       return;
     }
     const lib = parsed.protocol === 'https:' ? https : http;
-    const headers: Record<string, string> = { 'user-agent': 'sevenvid/0.1', accept: 'application/json', ...opts.headers };
+    const headers: Record<string, string> = { 'user-agent': 'sevenstudios/0.1', accept: 'application/json', ...opts.headers };
     if (opts.body !== undefined) {
       headers['content-type'] = headers['content-type'] ?? 'application/json';
       headers['content-length'] = String(Buffer.byteLength(opts.body));

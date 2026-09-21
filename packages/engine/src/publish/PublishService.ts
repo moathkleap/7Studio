@@ -17,7 +17,7 @@ import {
   type PublishTarget,
   type ReframeStrategy,
   type TrendSound,
-} from '@sevenvid/core';
+} from '@sevenstudios/core';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';
 import type { FfmpegLocation } from '../ffmpeg/locator';

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { AppSettings, CapabilityMap, AppErrorInfo, DeepPartial } from '@sevenvid/core';
-import type { AppInfo, HardwareSnapshot, NotificationInfo, ProjectSummary, RecoveryInfo, TaskInfo } from '@sevenvid/ipc';
+import type { AppSettings, CapabilityMap, AppErrorInfo, DeepPartial } from '@sevenstudios/core';
+import type { AppInfo, HardwareSnapshot, NotificationInfo, ProjectSummary, RecoveryInfo, TaskInfo } from '@sevenstudios/ipc';
 import { getApi, getBridge } from '../api/client';
 import { applyLanguage, detectLanguage } from '../i18n';
 

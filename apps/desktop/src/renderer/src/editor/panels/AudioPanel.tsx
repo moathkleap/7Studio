@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Activity, Scissors, Volume2, Waves } from 'lucide-react';
-import { AUDIO_PRESETS, formatMs, isAudioEffect, type Command, type ProjectDocument } from '@sevenvid/core';
-import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SilenceDetectionResult } from '@sevenvid/ipc';
+import { AUDIO_PRESETS, formatMs, isAudioEffect, type Command, type ProjectDocument } from '@sevenstudios/core';
+import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SilenceDetectionResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useCapability } from '@/components/CapabilityGate';
 import { Badge } from '@/components/ui/Badge';

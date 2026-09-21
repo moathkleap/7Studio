@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { MaskKeyframe, MaskTrack } from '@sevenvid/core';
+import type { MaskKeyframe, MaskTrack } from '@sevenstudios/core';
 import { escapeFilterPath } from './filterUtils';
 
 export interface MaskStageInput {

@@ -1,20 +1,20 @@
 # Troubleshooting
 
-Every error in 7vid has a stable code, a translated message and recovery hints. The **Diagnostics** screen
+Every error in Seven Studios has a stable code, a translated message and recovery hints. The **Diagnostics** screen
 shows live logs, errors, the task history and the network log, and can export a single **diagnostics
 bundle** (zip) with system info, settings, capabilities, tasks, errors and rotated logs — attach it when
 reporting an issue.
 
 ## FFmpeg not found (`FFMPEG_NOT_FOUND`)
 
-7vid needs FFmpeg and FFprobe (≥ 6.0, with `libx264/libx265/libsvtav1/libaom/libvpx/libass`). It looks in:
+Seven Studios needs FFmpeg and FFprobe (≥ 6.0, with `libx264/libx265/libsvtav1/libaom/libvpx/libass`). It looks in:
 
-1. `SEVENVID_FFMPEG_PATH` (a directory or a binary path),
+1. `SEVENSTUDIOS_FFMPEG_PATH` (a directory or a binary path),
 2. bundled `resources/bin/<platform>-<arch>/`,
 3. the system `PATH`.
 
 Install FFmpeg (`sudo apt-get install ffmpeg`, `brew install ffmpeg`, or a static build) or set
-`SEVENVID_FFMPEG_PATH`.
+`SEVENSTUDIOS_FFMPEG_PATH`.
 
 ## MediaPipe fails to load (`libEGL.so.1` / `libGLESv2.so.2`)
 
@@ -49,7 +49,7 @@ partial file. Free space (delete caches under the project `data_dir/cache`, old 
 
 ## The app didn't shut down cleanly
 
-On the next launch, 7vid restores the last valid project snapshot plus the `journal.ndjson` patches and
+On the next launch, Seven Studios restores the last valid project snapshot plus the `journal.ndjson` patches and
 offers recovery. Tasks that were `running` are marked `interrupted` with a retry option — nothing is
 reported as completed that did not finish.
 
@@ -61,6 +61,6 @@ keys are stored with the OS keychain when available and never shown back in the 
 
 ## Nothing plays in the preview
 
-Some containers/codecs (HEVC, ProRes, MKV, AVI) are not directly decodable in the preview; 7vid generates
+Some containers/codecs (HEVC, ProRes, MKV, AVI) are not directly decodable in the preview; Seven Studios generates
 a proxy for them in the background. Wait for the proxy task to finish (Diagnostics → Tasks), or check the
 source imported correctly in the Media library.

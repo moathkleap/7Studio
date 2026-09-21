@@ -1,4 +1,4 @@
-import { trendItemToTemplate, type TrendFeedItem } from '@sevenvid/core';
+import { trendItemToTemplate, type TrendFeedItem } from '@sevenstudios/core';
 import type { AppDatabase } from '../db/database';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell } from 'electron';
 import { pathToFileURL } from 'node:url';
-import { AppError, createEngine, type Engine } from '@sevenvid/engine';
+import { AppError, createEngine, type Engine } from '@sevenstudios/engine';
 import { createElectronHost } from './host';
 import { buildMenu, type MenuLang } from './menu';
 
@@ -16,7 +16,7 @@ let mainWindow: BrowserWindow | null = null;
 let splashWindow: BrowserWindow | null = null;
 let engine: Engine | null = null;
 
-protocol.registerSchemesAsPrivileged([{ scheme: 'sevenvid-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
+protocol.registerSchemesAsPrivileged([{ scheme: 'sevenstudios-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -111,15 +111,15 @@ async function createWindow(): Promise<void> {
 function installCsp(): void {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const csp = isDev
-      ? "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file: sevenvid-media:; media-src 'self' blob: file: sevenvid-media:; font-src 'self' data:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
-      : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: sevenvid-media:; media-src 'self' blob: sevenvid-media:; font-src 'self' data:; connect-src 'self'";
+      ? "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file: sevenstudios-media:; media-src 'self' blob: file: sevenstudios-media:; font-src 'self' data:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
+      : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: sevenstudios-media:; media-src 'self' blob: sevenstudios-media:; font-src 'self' data:; connect-src 'self'";
     callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] } });
   });
 }
 
 /** Serves local media the engine allows (assets and derived cache files) with Range support via net.fetch. */
 function installMediaProtocol(e: Engine): void {
-  protocol.handle('sevenvid-media', (request) => {
+  protocol.handle('sevenstudios-media', (request) => {
     const url = new URL(request.url);
     const file = decodeURIComponent(url.pathname.replace(/^\//, ''));
     const abs = process.platform === 'win32' ? file : `/${file.replace(/^\/+/, '')}`;
@@ -140,7 +140,7 @@ function installMenu(e: Engine): void {
 }
 
 function wireIpc(e: Engine): void {
-  ipcMain.handle('sevenvid:api', async (_event, channel: string, input: unknown) => {
+  ipcMain.handle('sevenstudios:api', async (_event, channel: string, input: unknown) => {
     try {
       const data = await e.invoke(channel as never, input as never);
       return { ok: true, data: data ?? null };
@@ -150,17 +150,17 @@ function wireIpc(e: Engine): void {
   });
   e.bus.onAny((event, payload) => {
     for (const win of BrowserWindow.getAllWindows()) {
-      if (!win.isDestroyed()) win.webContents.send(`sevenvid:event:${event}`, payload);
+      if (!win.isDestroyed()) win.webContents.send(`sevenstudios:event:${event}`, payload);
     }
   });
 }
 
 app.whenReady().then(async () => {
-  app.setAppUserModelId('com.sevenvid.app');
+  app.setAppUserModelId('com.sevenstudios.app');
   createSplash();
   engine = createEngine({
     host: createElectronHost(() => mainWindow, isDev),
-    paths: { userData: process.env.SEVENVID_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },
+    paths: { userData: process.env.SEVENSTUDIOS_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },
     logToConsole: isDev,
   });
   wireIpc(engine);

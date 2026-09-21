@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createSubtitleTrack, getDocumentDurationMs, newId, type ProjectDocument, type SubtitleCue } from '@sevenvid/core';
-import type { SessionState, TaskInfo, TranscribeResult } from '@sevenvid/ipc';
+import { createSubtitleTrack, getDocumentDurationMs, newId, type ProjectDocument, type SubtitleCue } from '@sevenstudios/core';
+import type { SessionState, TaskInfo, TranscribeResult } from '@sevenstudios/ipc';
 import type { AudioService } from '../audio/AudioService';
 import type { CapabilityRegistry } from '../capabilities/CapabilityRegistry';
 import type { AppDatabase } from '../db/database';

@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const webPort = 5177;
 const bridgePort = 7778;
 const token = 'e2e-token';
-const userData = path.join(root, '.sevenvid-dev', 'e2e-userData');
+const userData = path.join(root, '.sevenstudios-dev', 'e2e-userData');
 
 /**
  * Browser-mode end-to-end tests: the real engine runs as a Node process behind the WebSocket dev bridge
@@ -28,7 +28,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: `rm -rf "${userData}" && SEVENVID_USER_DATA="${userData}" SEVENVID_REPO_ROOT="${root}" SEVENVID_DEVBRIDGE_PORT=${bridgePort} SEVENVID_DEVBRIDGE_TOKEN=${token} SEVENVID_DEV_MEDIA_DIR="${path.join(root, 'tests', 'fixtures', 'generated')}" SEVENVID_MODELS_DIR="${path.join(root, '.sevenvid-dev', 'userData', 'models')}" pnpm exec tsx packages/engine/src/devbridge/main.ts`,
+      command: `rm -rf "${userData}" && SEVENSTUDIOS_USER_DATA="${userData}" SEVENSTUDIOS_REPO_ROOT="${root}" SEVENSTUDIOS_DEVBRIDGE_PORT=${bridgePort} SEVENSTUDIOS_DEVBRIDGE_TOKEN=${token} SEVENSTUDIOS_DEV_MEDIA_DIR="${path.join(root, 'tests', 'fixtures', 'generated')}" SEVENSTUDIOS_MODELS_DIR="${path.join(root, '.sevenstudios-dev', 'userData', 'models')}" pnpm exec tsx packages/engine/src/devbridge/main.ts`,
       cwd: root,
       url: `http://127.0.0.1:${bridgePort}/health`,
       reuseExistingServer: false,
@@ -37,7 +37,7 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      command: `SEVENVID_WEB_PORT=${webPort} SEVENVID_DEVBRIDGE_URL="ws://127.0.0.1:${bridgePort}/?token=${token}" pnpm --filter @sevenvid/desktop exec vite --config vite.browser.config.ts`,
+      command: `SEVENSTUDIOS_WEB_PORT=${webPort} SEVENSTUDIOS_DEVBRIDGE_URL="ws://127.0.0.1:${bridgePort}/?token=${token}" pnpm --filter @sevenstudios/desktop exec vite --config vite.browser.config.ts`,
       cwd: root,
       url: `http://127.0.0.1:${webPort}/`,
       reuseExistingServer: false,

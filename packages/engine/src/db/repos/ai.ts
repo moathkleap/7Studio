@@ -1,4 +1,4 @@
-import type { AssistantPlan, PlanRunResult } from '@sevenvid/ipc';
+import type { AssistantPlan, PlanRunResult } from '@sevenstudios/ipc';
 import type { Row, SqlDriver } from '../driver';
 import { nowIso, parseJson, str } from './common';
 

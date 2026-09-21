@@ -1,4 +1,4 @@
-import type { ExportSettings, VideoCodecId } from '@sevenvid/core';
+import type { ExportSettings, VideoCodecId } from '@sevenstudios/core';
 import { testEncoder, type FfmpegLocation } from '../ffmpeg/locator';
 
 export interface EncoderChoice {

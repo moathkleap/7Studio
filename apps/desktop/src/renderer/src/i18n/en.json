@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "7vid",
+    "name": "Seven Studios",
     "tagline": "Local-first AI video editor and creator",
     "loading": "Starting the engine…",
     "bootFailed": "The application engine could not start",
@@ -50,7 +50,7 @@
     "browserMode": "Browser mode"
   },
   "home": {
-    "title": "Welcome to 7vid",
+    "title": "Welcome to Seven Studios",
     "subtitle": "Tell the application what you want and stay in control.",
     "newProject": "New project",
     "openProject": "Open project",
@@ -311,7 +311,7 @@
     "subtitle": "Videos, images, audio, characters and generated assets. Originals are never modified.",
     "import": "Import media",
     "empty": "The library is empty.",
-    "emptyHint": "Import videos, images or audio to start. Files stay where they are; 7vid only references them.",
+    "emptyHint": "Import videos, images or audio to start. Files stay where they are; Seven Studios only references them.",
     "search": "Search media…",
     "analyzing": "Analyzing",
     "analysisFailed": "Analysis failed",
@@ -653,7 +653,7 @@
       "askDownloads": "Ask before every download",
       "networkLog": "Log every network request",
       "telemetry": "Telemetry",
-      "telemetryHint": "7vid has no telemetry. This cannot be turned on."
+      "telemetryHint": "Seven Studios has no telemetry. This cannot be turned on."
     },
     "providers": {
       "hint": "Cloud providers are configured here once they are available (Phase 6)."
@@ -761,7 +761,7 @@
     },
     "phaseNotice": "{{feature}} is scheduled for Phase {{phase}} of the roadmap and is not available in this build. Nothing here is simulated.",
     "pythonMissing": "No Python 3.10+ interpreter was found. Install Python, then set up the AI runtime from System.",
-    "workerNotInstalled": "Python was found at {{python}} but the 7vid AI worker is not installed yet. Set up the AI runtime to enable vision, speech and generation.",
+    "workerNotInstalled": "Python was found at {{python}} but the Seven Studios AI worker is not installed yet. Set up the AI runtime to enable vision, speech and generation.",
     "workerFailed": "The AI worker could not start: {{error}}",
     "workerModuleMissing": "The worker module \"{{module}}\" is not available: {{reason}}",
     "modelMissing": "Required model(s) not installed: {{models}}",
@@ -868,7 +868,7 @@
   },
   "assistant": {
     "title": "AI Assistant",
-    "placeholder": "Tell 7vid what to do, in Arabic or English…",
+    "placeholder": "Tell Seven Studios what to do, in Arabic or English…",
     "send": "Send",
     "hint": "Example: احذف أول 20 ثانية وطمس الوجه",
     "clear": "Clear conversation",

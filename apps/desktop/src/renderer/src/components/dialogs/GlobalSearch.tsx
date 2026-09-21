@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Search } from 'lucide-react';
-import type { SearchResult } from '@sevenvid/ipc';
+import type { SearchResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useSessionStore } from '@/store/sessionStore';

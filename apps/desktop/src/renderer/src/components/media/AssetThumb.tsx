@@ -1,5 +1,5 @@
 import { FileAudio, FileImage, FileVideo } from 'lucide-react';
-import type { AssetInfo } from '@sevenvid/ipc';
+import type { AssetInfo } from '@sevenstudios/ipc';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { formatDuration } from '@/lib/format';
 import { cn } from '@/lib/cn';

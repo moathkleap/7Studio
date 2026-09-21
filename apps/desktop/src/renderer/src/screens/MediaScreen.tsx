@@ -3,7 +3,7 @@ import { useSyncedState } from '@/hooks/useSyncedState';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Heart, Link2, Plus, RefreshCw, Search, Trash2, Upload, X } from 'lucide-react';
-import type { AssetInfo } from '@sevenvid/ipc';
+import type { AssetInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useMediaStore } from '@/store/mediaStore';
@@ -89,7 +89,7 @@ export function MediaScreen() {
               const analyzing = a.analysisStatus === 'pending' || a.analysisStatus === 'running';
               const task = Object.values(tasks).find((x) => (x.kind === 'media.analyze' || x.kind === 'media.proxy') && x.params.assetId === a.id && (x.status === 'running' || x.status === 'queued'));
               return (
-                <button key={a.id} type="button" data-action="media.select" data-asset-id={a.id} data-testid="media-card" onClick={() => setSelected(a.id)} draggable onDragStart={(e) => { e.dataTransfer.setData('application/x-sevenvid-asset', a.id); e.dataTransfer.effectAllowed = 'copy'; }} className={cn('focus-ring flex flex-col gap-2 rounded-xl border bg-surface p-2 text-start transition-colors hover:border-border-strong', selected === a.id ? 'border-accent' : 'border-border')}>
+                <button key={a.id} type="button" data-action="media.select" data-asset-id={a.id} data-testid="media-card" onClick={() => setSelected(a.id)} draggable onDragStart={(e) => { e.dataTransfer.setData('application/x-sevenstudios-asset', a.id); e.dataTransfer.effectAllowed = 'copy'; }} className={cn('focus-ring flex flex-col gap-2 rounded-xl border bg-surface p-2 text-start transition-colors hover:border-border-strong', selected === a.id ? 'border-accent' : 'border-border')}>
                   <AssetThumb asset={a} />
                   <div className="flex items-center gap-2 px-1">
                     <span className="min-w-0 flex-1 truncate text-[13px] font-medium">{a.name}</span>

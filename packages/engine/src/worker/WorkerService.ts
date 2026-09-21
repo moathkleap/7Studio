@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { CapabilityId } from '@sevenvid/core';
+import type { CapabilityId } from '@sevenstudios/core';
 import type { CapabilityRegistry, CapabilityReport } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';
@@ -116,9 +116,9 @@ export class WorkerService {
     if (this.client?.running) return this.client;
     const py = await this.runtime.detect();
     if (!py || !py.workerInstalled) {
-      throw new AppError({ code: 'WORKER_UNAVAILABLE', operation: 'worker.ensure', message: py ? `Python ${py.version} found at ${py.path} but the 7vid worker is not installed` : 'No Python ≥ 3.10 interpreter found', details: { python: py?.path ?? null } });
+      throw new AppError({ code: 'WORKER_UNAVAILABLE', operation: 'worker.ensure', message: py ? `Python ${py.version} found at ${py.path} but the Seven Studios worker is not installed` : 'No Python ≥ 3.10 interpreter found', details: { python: py?.path ?? null } });
     }
-    const env: Record<string, string> = { SEVENVID_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '' };
+    const env: Record<string, string> = { SEVENSTUDIOS_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '' };
     if (!py.venvReady) env.PYTHONPATH = this.runtime.workerSourceDir;
     const client = new WorkerClient(py.path, this.runtime.workerSourceDir, env, this.logger);
     try {

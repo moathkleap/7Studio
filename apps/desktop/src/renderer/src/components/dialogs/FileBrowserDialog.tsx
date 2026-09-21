@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUp, FileAudio, FileImage, FileVideo, Folder } from 'lucide-react';
-import type { DirEntry } from '@sevenvid/ipc';
+import type { DirEntry } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { formatBytes } from '@/lib/format';

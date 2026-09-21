@@ -1,5 +1,5 @@
-import { newId } from '@sevenvid/core';
-import type { TaskInfo, TaskStatus } from '@sevenvid/ipc';
+import { newId } from '@sevenstudios/core';
+import type { TaskInfo, TaskStatus } from '@sevenstudios/ipc';
 import type { TasksRepo } from '../db/repos/tasks';
 import { AppError } from '../errors';
 import type { EventBus } from '../events/EventBus';

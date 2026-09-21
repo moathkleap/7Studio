@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createAssetRef, createClip, newId, type AssetRef, type ProjectDocument } from '@sevenvid/core';
-import type { AssetInfo, SessionState, TaskInfo } from '@sevenvid/ipc';
+import { createAssetRef, createClip, newId, type AssetRef, type ProjectDocument } from '@sevenstudios/core';
+import type { AssetInfo, SessionState, TaskInfo } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import type { AssetRow } from '../db/repos/assets';
 import { AppError } from '../errors';

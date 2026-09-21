@@ -1,5 +1,5 @@
 {
-  "name": "@sevenvid/engine",
+  "name": "@sevenstudios/engine",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@sevenvid/core": "workspace:*",
-    "@sevenvid/ipc": "workspace:*",
+    "@sevenstudios/core": "workspace:*",
+    "@sevenstudios/ipc": "workspace:*",
     "immer": "^10.1.1",
     "pino": "^10.3.0",
     "systeminformation": "^5.27.0",

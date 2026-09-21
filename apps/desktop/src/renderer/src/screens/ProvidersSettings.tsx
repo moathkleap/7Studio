@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Cloud, HardDrive, ShieldCheck } from 'lucide-react';
-import type { AppSettings, DeepPartial } from '@sevenvid/core';
-import type { ProviderStatusInfo } from '@sevenvid/ipc';
+import type { AppSettings, DeepPartial } from '@sevenstudios/core';
+import type { ProviderStatusInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { Badge } from '@/components/ui/Badge';

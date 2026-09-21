@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
-title 7vid
+title Seven Studios
 cd /d "%~dp0"
 
 echo ============================================
-echo   7vid - starting
+echo   Seven Studios - starting
 echo ============================================
 echo.
 

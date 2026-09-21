@@ -6,7 +6,7 @@ import pytest
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 FIXTURES = os.path.join(ROOT, "tests", "fixtures", "generated")
-MODELS = os.environ.get("SEVENVID_MODELS_DIR", os.path.join(ROOT, ".sevenvid-dev", "userData", "models"))
+MODELS = os.environ.get("SEVENSTUDIOS_MODELS_DIR", os.path.join(ROOT, ".sevenstudios-dev", "userData", "models"))
 
 
 @pytest.fixture(scope="session")

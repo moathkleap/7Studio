@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Command } from '@sevenvid/core';
-import type { SessionState } from '@sevenvid/ipc';
+import type { Command } from '@sevenstudios/core';
+import type { SessionState } from '@sevenstudios/ipc';
 import { getApi } from '../api/client';
 import { useAppStore } from './appStore';
 
