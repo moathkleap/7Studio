@@ -214,6 +214,16 @@ export class WorkerService {
     return this.call('faces.embedImage', { path: imagePath, det_model_path: this.modelPath('opencv/yunet-2023mar', 'vision.faceEmbedding'), rec_model_path: this.modelPath('opencv/sface-2021dec', 'vision.faceEmbedding') });
   }
 
+  /** Person/background segmentation on one image or a frame at `tMs`; writes a grayscale alpha mask to `outPath` when given. */
+  segmentPerson(imagePath: string, opts: { outPath?: string; tMs?: number; threshold?: number; signal?: AbortSignal } = {}): Promise<{ width: number; height: number; coverage: number; mask_path: string | null }> {
+    return this.call('segment.image', { path: imagePath, model_path: this.modelPath('mediapipe/selfie-segmenter', 'vision.segmentation'), out_path: opts.outPath ?? null, t_ms: opts.tMs ?? null, threshold: opts.threshold ?? 0.5 }, { signal: opts.signal });
+  }
+
+  /** Up to 478 face landmarks per face on one image or a frame at `tMs`, with a tight bounding box for precise masks. */
+  faceLandmarksImage(imagePath: string, opts: { numFaces?: number; includePoints?: boolean; tMs?: number; signal?: AbortSignal } = {}): Promise<{ faces: Array<{ count: number; box: Box; points?: number[][] }>; width: number; height: number }> {
+    return this.call('landmarks.detectImage', { path: imagePath, model_path: this.modelPath('mediapipe/face-landmarker', 'vision.faces'), num_faces: opts.numFaces ?? 5, include_points: opts.includePoints ?? true, t_ms: opts.tMs ?? null }, { signal: opts.signal });
+  }
+
   async stop(): Promise<void> {
     await this.client?.stop();
     this.client = null;
@@ -244,11 +254,7 @@ export class WorkerService {
     workerCap('objects', ['mediapipe/efficientdet-lite0'], 'vision.objects');
     workerCap('tracking', ['opencv/yunet-2023mar'], 'vision.tracking');
     workerCap('faceembed', ['opencv/yunet-2023mar', 'opencv/sface-2021dec'], 'vision.faceEmbedding');
-    this.capabilities.register('vision.segmentation', async () => {
-      const gate = await runtimeGate();
-      if (gate) return gate;
-      return this.models.isInstalled('mediapipe/selfie-segmenter') ? { status: 'available', providerId: 'worker-vision' } : { status: 'needs-model', reasonKey: 'capabilities.modelMissing', reasonParams: { models: 'mediapipe/selfie-segmenter' }, action: { type: 'open-models', target: 'mediapipe/selfie-segmenter' } };
-    });
+    workerCap('segmentation', ['mediapipe/selfie-segmenter'], 'vision.segmentation');
     this.capabilities.register('python.runtime', async () => {
       const gate = await runtimeGate();
       if (gate) return gate;

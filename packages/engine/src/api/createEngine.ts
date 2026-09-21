@@ -258,6 +258,15 @@ async function testModel(s: EngineServices, spec: ModelSpec, dir: string): Promi
       const r = await s.worker.vad(sample('speech-sample.wav'));
       return { ok: r.speech.length >= 1 && r.speech_ratio > 0.2, message: `${r.speech.length} speech segment(s), ${Math.round(r.speech_ratio * 100)}% speech` };
     }
+    case 'mediapipe/selfie-segmenter': {
+      const r = await s.worker.segmentPerson(sample('face-sample.jpg'));
+      return { ok: r.coverage > 0.05 && r.coverage < 0.99, message: `person mask covers ${(r.coverage * 100).toFixed(0)}% of the sample` };
+    }
+    case 'mediapipe/face-landmarker': {
+      const r = await s.worker.faceLandmarksImage(sample('face-sample.jpg'), { includePoints: false });
+      const pts = r.faces[0]?.count ?? 0;
+      return { ok: r.faces.length >= 1 && pts >= 400, message: `${r.faces.length} face(s), ${pts} landmarks` };
+    }
     case 'tesseract/eng-fast': {
       const r = await s.ocr.recognizeFile(sample('text-sample.png'), ['en']);
       return { ok: /OPEN/i.test(r.text), message: r.text ? `recognized: ${r.text.replace(/\n/g, ' | ').slice(0, 80)}` : 'no text recognized' };

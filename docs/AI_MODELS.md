@@ -43,15 +43,17 @@ installed on the user's machine and verified there:
 - **wan/2.1-t2v-1.3b** — local text-to-video generation (needs ≥ 8–12 GB VRAM). Without it, the Creator
   runs in honest **animatic** mode.
 
-## Not yet implemented
+## Segmentation and face landmarks
 
-These models install and checksum-verify, but their runtime **inference** is not implemented in this
-build, so `verify:models` reports them as **skipped** (no test harness) and no feature consumes them yet:
+- **mediapipe/selfie-segmenter** (`vision.segmentation`) — person/background segmentation. The worker returns
+  a foreground confidence mask and coverage for an image or a frame (`WorkerService.segmentPerson`), and can
+  write a grayscale alpha-mask PNG for compositing.
+- **mediapipe/face-landmarker** (`vision.faces`) — up to 478 face landmarks per face with a tight bounding
+  box, for precise face masks (`WorkerService.faceLandmarksImage`).
 
-- **mediapipe/selfie-segmenter** (`vision.segmentation`) — person/background segmentation.
-- **mediapipe/face-landmarker** (`vision.faces`) — 478-point landmarks for finer masks.
-
-They are listed honestly rather than presented as working features.
+Both run real inference and pass their `verify:models` self-test (segmentation reports the mask coverage,
+the landmarker reports the point count). A background-blur render and a landmark-based precise face mask are
+natural UI features that build on these engine capabilities.
 
 ## Test samples
 

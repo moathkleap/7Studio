@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 
-from sevenvid_worker.capabilities import audio, faces, tracking, tts, vad, verify
+from sevenvid_worker.capabilities import audio, faces, landmarks, segmentation, tracking, tts, vad, verify
 
 from .conftest import model_or_skip
 
@@ -65,6 +65,26 @@ def test_faces_detected_in_photo_and_video(fixtures_dir, ctx):
     assert video["total_faces"] >= 6
     none = faces.detect_video({"path": os.path.join(fixtures_dir, "moving-box-6s.mp4"), "model_path": model, "sample_fps": 1}, ctx)
     assert none["total_faces"] == 0
+
+
+def test_person_segmentation_covers_the_subject(fixtures_dir, ctx, tmp_path):
+    model = model_or_skip("mediapipe/selfie-segmenter/selfie_segmenter.tflite")
+    out = str(tmp_path / "mask.png")
+    r = segmentation.segment_image({"path": os.path.join(fixtures_dir, "astronaut.png"), "model_path": model, "out_path": out}, ctx)
+    # the subject fills a large part of the frame, but not all of it
+    assert 0.1 < r["coverage"] < 0.95, r["coverage"]
+    assert os.path.exists(out) and os.path.getsize(out) > 0
+
+
+def test_face_landmarks_returns_full_mesh(fixtures_dir, ctx):
+    model = model_or_skip("mediapipe/face-landmarker/face_landmarker.task")
+    r = landmarks.detect_image({"path": os.path.join(fixtures_dir, "astronaut.png"), "model_path": model}, ctx)
+    assert len(r["faces"]) >= 1
+    face = r["faces"][0]
+    assert face["count"] == 478
+    assert len(face["points"]) == 478
+    # the face box is a plausible sub-region of the image
+    assert 0 < face["box"]["w"] < 0.9 and 0 < face["box"]["h"] < 0.9
 
 
 def test_tracking_follows_moving_box(fixtures_dir, ctx):

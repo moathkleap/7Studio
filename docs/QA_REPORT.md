@@ -17,7 +17,7 @@ An honest account of what has been verified, and how. Status legend:
 | `pnpm test` (Vitest) | ✅ 112 unit/integration tests in 24 files |
 | `pnpm test:py` (pytest) | ✅ 8 worker tests |
 | `pnpm test:e2e` (Playwright) | ✅ 16 specs — 15 passing, 1 (screenshot capture) skipped |
-| `pnpm verify:models` | ✅ 8 passed / 0 failed / 2 skipped of 10 installed (with `libEGL1`+`libgles2`; 6 pass without) |
+| `pnpm verify:models` | ✅ 10 passed / 0 failed / 0 skipped of 10 installed (needs `libEGL1`+`libgles2` for the MediaPipe models) |
 
 ## By area
 
@@ -59,8 +59,10 @@ An honest account of what has been verified, and how. Status legend:
 - ✅ Registry with sha256, resumable gated downloads, per-model real tests, hardware-fit recommendations.
 - ✅ External providers (Anthropic / OpenAI-compatible / Ollama) contract-tested against a local mock;
   gated + logged network; API keys encrypted with the OS keychain (`safeStorage`) and never returned.
-- ❌ `vision.segmentation` (selfie-segmenter) and the face-landmarker model install and checksum-verify,
-  but their inference is not implemented — reported as skipped, not faked.
+- ✅ Person segmentation (`vision.segmentation`, selfie-segmenter) and 478-point face landmarks
+  (face-landmarker) run real inference in the worker and pass their `verify:models` self-test; exposed as
+  `WorkerService.segmentPerson` / `faceLandmarksImage`. A background-blur render and a landmark-based
+  precise face mask are the natural UI features to build on them next.
 
 ### Cross-cutting
 - ✅ i18n (ar/en) at key parity with full RTL/LTR; dark/light theming.
@@ -73,6 +75,7 @@ An honest account of what has been verified, and how. Status legend:
 
 ## Known limitations
 - MediaPipe requires `libEGL1`/`libgles2` on Linux (documented in HARDWARE/TROUBLESHOOTING).
-- Segmentation and face-landmark inference are not implemented in this build.
+- Person segmentation and face landmarks run and verify at the engine level; the UI features that consume
+  them (background blur, landmark-based precise masks) are not built yet.
 - GPU-only features (AI upscaling, local image/video generation) and large models are verified on a user
   machine, not in the build sandbox.
