@@ -31,7 +31,7 @@ async function run(task: { id: string }) {
 describe('creator service', () => {
   it('captures a brief, builds a script and scene list, and sets the sequence aspect', async () => {
     const project = await setup();
-    const state = await engine.invoke('creator.setBrief', { projectId: project.id, brief: { idea: 'قهوة الصباح تمنحك طاقة. جودة عالية.', language: 'ar', durationSec: 10, platform: 'tiktok' } });
+    const state = await engine.invoke('creator.setBrief', { projectId: project.id, brief: { idea: 'قهوة الصباح تمنحك طاقة. جودة عالية.', language: 'ar', durationSec: 10, aspect: '9:16' } });
     expect(state.brief?.idea).toContain('قهوة');
     expect(state.script?.scenes.length).toBeGreaterThanOrEqual(3);
     expect(state.scenes.length).toBe(state.script?.scenes.length);
