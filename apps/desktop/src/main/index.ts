@@ -13,6 +13,7 @@ process.on('warning', (w) => {
 
 const isDev = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
+let splashWindow: BrowserWindow | null = null;
 let engine: Engine | null = null;
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'sevenvid-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: false } }]);
@@ -31,6 +32,41 @@ if (!gotLock) {
 
 function resourcesDir(): string {
   return app.isPackaged ? path.join(process.resourcesPath, 'resources') : path.resolve(__dirname, '../../../../resources');
+}
+
+/** A lightweight branded splash shown immediately on launch and dismissed once the main window is
+ *  ready. Everything is wrapped defensively so a splash failure can never block or delay startup. */
+function createSplash(): void {
+  try {
+    splashWindow = new BrowserWindow({
+      width: 480,
+      height: 320,
+      frame: false,
+      resizable: false,
+      center: true,
+      show: false,
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      backgroundColor: '#0d0e13',
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+    });
+    splashWindow.once('ready-to-show', () => splashWindow?.show());
+    splashWindow.on('closed', () => (splashWindow = null));
+    void splashWindow.loadFile(path.join(resourcesDir(), 'splash.html')).catch(() => closeSplash());
+    // Safety net: never let the splash outlive startup, even if the main window never signals ready.
+    setTimeout(closeSplash, 30000);
+  } catch {
+    closeSplash();
+  }
+}
+
+function closeSplash(): void {
+  try {
+    if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
+  } catch {
+    /* ignore */
+  }
+  splashWindow = null;
 }
 
 async function createWindow(): Promise<void> {
@@ -53,7 +89,10 @@ async function createWindow(): Promise<void> {
       spellcheck: false,
     },
   });
-  mainWindow.once('ready-to-show', () => mainWindow?.show());
+  mainWindow.once('ready-to-show', () => {
+    closeSplash();
+    mainWindow?.show();
+  });
   mainWindow.on('closed', () => (mainWindow = null));
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     void engine?.invoke('shell.openExternal', { url }).catch(() => undefined);
@@ -118,6 +157,7 @@ function wireIpc(e: Engine): void {
 
 app.whenReady().then(async () => {
   app.setAppUserModelId('com.sevenvid.app');
+  createSplash();
   engine = createEngine({
     host: createElectronHost(() => mainWindow, isDev),
     paths: { userData: process.env.SEVENVID_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },

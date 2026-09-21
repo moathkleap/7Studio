@@ -34,6 +34,8 @@ extraResources:
     to: resources/test
   - from: ../../resources/icons
     to: resources/icons
+  - from: ../../resources/splash.html
+    to: resources/splash.html
   - from: ../../resources/bin
     to: resources/bin
     filter: ['**/*']
