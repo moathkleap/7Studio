@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSyncedState } from '@/hooks/useSyncedState';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { FileAudio, FileImage, FileVideo, Heart, Link2, Plus, RefreshCw, Search, Trash2, Upload, X } from 'lucide-react';
+import { Heart, Link2, Plus, RefreshCw, Search, Trash2, Upload, X } from 'lucide-react';
 import type { AssetInfo } from '@sevenvid/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useMediaStore } from '@/store/mediaStore';
 import { useSessionStore } from '@/store/sessionStore';
-import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { usePickFiles } from '@/hooks/usePickFiles';
 import { formatBytes, formatDuration } from '@/lib/format';
 import { cn } from '@/lib/cn';
@@ -17,22 +16,11 @@ import { Button, IconButton } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { EmptyState, PageHeader, Spinner, StatRow } from '@/components/ui/Misc';
 import { CapabilityGate } from '@/components/CapabilityGate';
+import { AssetThumb } from '@/components/media/AssetThumb';
 import { FileBrowserDialog } from '@/components/dialogs/FileBrowserDialog';
 
 type Category = 'all' | 'video' | 'image' | 'audio' | 'music' | 'voice' | 'character' | 'generated' | 'favorites';
 const CATEGORIES: Category[] = ['all', 'video', 'image', 'audio', 'music', 'voice', 'character', 'generated', 'favorites'];
-
-export function AssetThumb({ asset, className }: { asset: AssetInfo; className?: string }) {
-  const url = useMediaUrl(asset.thumbnailPath);
-  const Icon = asset.kind === 'image' ? FileImage : asset.kind === 'audio' || asset.kind === 'music' || asset.kind === 'voice' ? FileAudio : FileVideo;
-  return (
-    <div className={cn('relative grid aspect-video w-full place-items-center overflow-hidden rounded-lg bg-surface-3', className)}>
-      {url ? <img src={url} alt="" className="size-full object-cover" draggable={false} /> : <Icon className="size-8 text-faint" />}
-      {asset.durationMs != null ? <span className="absolute bottom-1.5 end-1.5 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[11px] text-white" dir="ltr">{formatDuration(asset.durationMs)}</span> : null}
-      {asset.missing ? <span className="absolute inset-0 grid place-items-center bg-danger/30 text-[12px] font-medium text-white">{'missing'}</span> : null}
-    </div>
-  );
-}
 
 export function MediaScreen() {
   const { t } = useTranslation();

@@ -4,7 +4,9 @@
     "tagline": "Local-first AI video editor and creator",
     "loading": "Starting the engine…",
     "bootFailed": "The application engine could not start",
-    "reload": "Reload"
+    "reload": "Reload",
+    "screenError": "This screen failed to load",
+    "screenErrorBody": "A part of the app could not be loaded. Retry, or reload the app."
   },
   "nav": {
     "home": "Home",

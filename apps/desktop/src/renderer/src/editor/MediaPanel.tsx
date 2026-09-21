@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button, IconButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/Misc';
 import { FileBrowserDialog } from '@/components/dialogs/FileBrowserDialog';
-import { AssetThumb } from '@/screens/MediaScreen';
+import { AssetThumb } from '@/components/media/AssetThumb';
 
 /** Compact project media list inside the editor: import, drag to timeline, one-click add. */
 export function MediaPanel({ projectId, onAdd }: { projectId: string; onAdd: (asset: AssetInfo) => void }) {
