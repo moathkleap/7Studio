@@ -85,6 +85,15 @@ body {
 
 [data-density='compact'] body { font-size: 13px; }
 
+/* Arabic / RTL typography: lead the stack with the Arabic-designed face so Arabic text,
+   Latin fragments and digits share one harmonized family (IBM Plex Sans Arabic ships a
+   matching Latin subset), and give diacritics a little more line height. */
+:root[lang='ar'] { --font-sans: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', 'Inter', 'Segoe UI', system-ui, sans-serif; }
+:root[lang='ar'] body { line-height: 1.6; }
+/* Arabic is cursive — letter-spacing breaks the joins between letters, so neutralize any
+   tracking (e.g. Tailwind's tracking-* utilities on section headers) in Arabic. */
+:root[lang='ar'] * { letter-spacing: 0 !important; }
+
 input, textarea, select { user-select: text; }
 ::selection { background: var(--accent-soft); }
 
