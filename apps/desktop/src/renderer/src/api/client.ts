@@ -1,4 +1,4 @@
-import type { SevenvidApi } from '@sevenvid/ipc';
+import type { SevenvidApi } from '@sevenstudios/ipc';
 import { WsClient } from './wsClient';
 
 let client: SevenvidApi | null = null;

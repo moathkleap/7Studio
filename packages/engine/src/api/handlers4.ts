@@ -1,4 +1,4 @@
-import type { ApiHandlers } from '@sevenvid/ipc';
+import type { ApiHandlers } from '@sevenstudios/ipc';
 import type { EngineServices } from './createEngine';
 
 export type AssistantChannel = 'assistant.plan' | 'assistant.apply' | 'assistant.history' | 'assistant.clear' | 'assistant.meta';

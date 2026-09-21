@@ -1,5 +1,5 @@
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { ChannelName, EventName, SevenvidApi } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { ChannelName, EventName, SevenvidApi } from '@sevenstudios/ipc';
 
 export class RemoteError extends Error {
   constructor(readonly info: AppErrorInfo) {

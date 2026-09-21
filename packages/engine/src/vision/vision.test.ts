@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { maskBoxAt } from '@sevenvid/core';
-import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenvid/ipc';
+import { maskBoxAt } from '@sevenstudios/core';
+import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenstudios/ipc';
 import { createEngine, type Engine } from '../api/createEngine';
 import { cleanup, tempDir, testHost } from '../test/helpers';
 

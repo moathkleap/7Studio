@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ApiHandlers } from '@sevenvid/ipc';
-import type { AppSettings, DeepPartial } from '@sevenvid/core';
+import type { ApiHandlers } from '@sevenstudios/ipc';
+import type { AppSettings, DeepPartial } from '@sevenstudios/core';
 import type { EngineServices } from './createEngine';
 import { ZipWriter } from '../diagnostics/zip';
 import { isExternalUrlAllowed } from './host';

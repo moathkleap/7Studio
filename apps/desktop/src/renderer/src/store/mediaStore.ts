@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AssetInfo } from '@sevenvid/ipc';
+import type { AssetInfo } from '@sevenstudios/ipc';
 import { getApi } from '../api/client';
 import { useAppStore } from './appStore';
 

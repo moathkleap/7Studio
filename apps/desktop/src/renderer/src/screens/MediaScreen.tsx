@@ -3,7 +3,7 @@ import { useSyncedState } from '@/hooks/useSyncedState';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Heart, Link2, Plus, RefreshCw, Search, Trash2, Upload, X } from 'lucide-react';
-import type { AssetInfo } from '@sevenvid/ipc';
+import type { AssetInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useMediaStore } from '@/store/mediaStore';

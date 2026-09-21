@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { DirEntry } from '@sevenvid/ipc';
+import type { DirEntry } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { AppPaths } from '../paths/AppPaths';
 

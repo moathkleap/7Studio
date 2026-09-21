@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { AppErrorInfo } from '@sevenvid/core';
-import type { ChannelName, EventName, IpcResponse, SevenvidApi } from '@sevenvid/ipc';
+import type { AppErrorInfo } from '@sevenstudios/core';
+import type { ChannelName, EventName, IpcResponse, SevenvidApi } from '@sevenstudios/ipc';
 
 class RemoteError extends Error {
   constructor(readonly info: AppErrorInfo) {

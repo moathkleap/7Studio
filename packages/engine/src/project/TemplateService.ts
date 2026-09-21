@@ -1,5 +1,5 @@
-import { newId } from '@sevenvid/core';
-import type { TemplateInfo } from '@sevenvid/ipc';
+import { newId } from '@sevenstudios/core';
+import type { TemplateInfo } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import type { TemplateRow } from '../db/repos/templates';
 import { AppError } from '../errors';

@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import type { CapabilityId } from '@sevenvid/core';
+import type { CapabilityId } from '@sevenstudios/core';
 import type { EngineHost } from '../api/host';
 import type { CapabilityRegistry, CapabilityReport } from '../capabilities/CapabilityRegistry';
 import type { AppDatabase } from '../db/database';

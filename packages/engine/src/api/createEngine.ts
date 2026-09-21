@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { channels, type ApiHandlers, type ChannelInput, type ChannelName, type ChannelOutput } from '@sevenvid/ipc';
+import { channels, type ApiHandlers, type ChannelInput, type ChannelName, type ChannelOutput } from '@sevenstudios/ipc';
 import { CapabilityRegistry, type CapabilityReport } from '../capabilities/CapabilityRegistry';
 import { openDatabase, type AppDatabase } from '../db/database';
 import { AppError } from '../errors';

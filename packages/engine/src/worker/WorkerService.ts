@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { CapabilityId } from '@sevenvid/core';
+import type { CapabilityId } from '@sevenstudios/core';
 import type { CapabilityRegistry, CapabilityReport } from '../capabilities/CapabilityRegistry';
 import { AppError } from '../errors';
 import type { FfmpegLocation } from '../ffmpeg/locator';

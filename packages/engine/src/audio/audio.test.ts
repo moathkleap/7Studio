@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { getDocumentDurationMs } from '@sevenvid/core';
-import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SilenceDetectionResult } from '@sevenvid/ipc';
+import { getDocumentDurationMs } from '@sevenstudios/core';
+import type { EnhancePreviewResult, LoudnessResult, RemoveSilenceResult, SilenceDetectionResult } from '@sevenstudios/ipc';
 import { createEngine, type Engine } from '../api/createEngine';
 import { cleanup, tempDir, testHost } from '../test/helpers';
 

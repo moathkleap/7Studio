@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Crosshair, Eye, EyeOff, ScanFace, ShieldCheck, Trash2, XCircle } from 'lucide-react';
-import { formatMs, type Command, type MaskTrack, type ProjectDocument } from '@sevenvid/core';
-import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenvid/ipc';
+import { formatMs, type Command, type MaskTrack, type ProjectDocument } from '@sevenstudios/core';
+import type { BlurFacesResult, DetectFacesResult, MaskVerificationResult, TrackTargetResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { useCapability, CapabilityGate } from '@/components/CapabilityGate';

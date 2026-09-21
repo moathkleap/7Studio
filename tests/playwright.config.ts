@@ -37,7 +37,7 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      command: `SEVENVID_WEB_PORT=${webPort} SEVENVID_DEVBRIDGE_URL="ws://127.0.0.1:${bridgePort}/?token=${token}" pnpm --filter @sevenvid/desktop exec vite --config vite.browser.config.ts`,
+      command: `SEVENVID_WEB_PORT=${webPort} SEVENVID_DEVBRIDGE_URL="ws://127.0.0.1:${bridgePort}/?token=${token}" pnpm --filter @sevenstudios/desktop exec vite --config vite.browser.config.ts`,
       cwd: root,
       url: `http://127.0.0.1:${webPort}/`,
       reuseExistingServer: false,

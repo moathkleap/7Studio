@@ -1,4 +1,4 @@
-import { clipEndMs, fpsToNumber, getDocumentDurationMs, isAudioEffect, type Clip, type Effect, type Fraction, type ProjectDocument, type Track } from '@sevenvid/core';
+import { clipEndMs, fpsToNumber, getDocumentDurationMs, isAudioEffect, type Clip, type Effect, type Fraction, type ProjectDocument, type Track } from '@sevenstudios/core';
 import { AppError } from '../errors';
 import { escapeFilterPath } from './filterUtils';
 import { compileMaskStage } from './masks';

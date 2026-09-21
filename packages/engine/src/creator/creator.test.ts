@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { allClips, getDocumentDurationMs } from '@sevenvid/core';
+import { allClips, getDocumentDurationMs } from '@sevenstudios/core';
 import { createEngine, type Engine } from '../api/createEngine';
 import { cleanup, tempDir, testHost } from '../test/helpers';
 

@@ -1,8 +1,8 @@
 # electron-builder configuration for 7Studio.
-# Run `pnpm --filter @sevenvid/desktop package` (electron-vite build && electron-builder).
+# Run `pnpm --filter @sevenstudios/desktop package` (electron-vite build && electron-builder).
 # Icons: drop icon.icns (mac), icon.ico (win) and a 512×512 icon.png (linux) into
 # apps/desktop/build-resources/ before a release build; electron-builder picks them up from buildResources.
-appId: com.sevenvid.app
+appId: com.sevenstudios.app
 productName: 7Studio
 copyright: Copyright © 2026 7Studio
 

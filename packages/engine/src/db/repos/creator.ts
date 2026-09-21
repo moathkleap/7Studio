@@ -1,4 +1,4 @@
-import type { Brief, Character, CreatorScene, Script } from '@sevenvid/core';
+import type { Brief, Character, CreatorScene, Script } from '@sevenstudios/core';
 import type { Row, SqlDriver } from '../driver';
 import { nowIso, parseJson, str } from './common';
 

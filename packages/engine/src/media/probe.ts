@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { parseFps, type Fraction } from '@sevenvid/core';
+import { parseFps, type Fraction } from '@sevenstudios/core';
 import { AppError } from '../errors';
 import { runFfprobe } from '../ffmpeg/runner';
 import { mediaKindFromPath } from '../fs/FsService';

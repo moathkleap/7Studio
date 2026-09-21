@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Upload } from 'lucide-react';
-import type { AssetInfo } from '@sevenvid/ipc';
+import type { AssetInfo } from '@sevenstudios/ipc';
 import { useMediaStore } from '@/store/mediaStore';
 import { usePickFiles } from '@/hooks/usePickFiles';
 import { useAppStore } from '@/store/appStore';

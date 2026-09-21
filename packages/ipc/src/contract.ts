@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AppErrorInfo } from '@sevenvid/core';
+import type { AppErrorInfo } from '@sevenstudios/core';
 import {
   AppErrorInfoSchema,
   AppInfoSchema,

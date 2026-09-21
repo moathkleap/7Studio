@@ -1,5 +1,5 @@
 import { dialog, shell, app, safeStorage, type BrowserWindow } from 'electron';
-import type { EngineHost } from '@sevenvid/engine';
+import type { EngineHost } from '@sevenstudios/engine';
 
 const FILTERS = {
   video: { name: 'Video', extensions: ['mp4', 'mov', 'mkv', 'avi', 'webm', 'm4v', 'mts', 'm2ts', 'ts', 'wmv', 'flv', '3gp', 'mpg', 'mpeg', 'mxf'] },

@@ -1,4 +1,4 @@
-import type { SearchResult } from '@sevenvid/ipc';
+import type { SearchResult } from '@sevenstudios/ipc';
 import type { AppDatabase } from '../db/database';
 import type { SearchEntityType } from '../db/repos/search';
 

@@ -18,7 +18,7 @@ const bridge = spawn('pnpm', ['exec', 'tsx', 'packages/engine/src/devbridge/main
   shell: true,
   env: { ...process.env, SEVENVID_REPO_ROOT: root, SEVENVID_DEVBRIDGE_PORT: String(port), SEVENVID_DEVBRIDGE_TOKEN: token, SEVENVID_LOG_CONSOLE: '1' },
 });
-const web = spawn('pnpm', ['--filter', '@sevenvid/desktop', 'exec', 'vite', '--config', 'vite.browser.config.ts'], {
+const web = spawn('pnpm', ['--filter', '@sevenstudios/desktop', 'exec', 'vite', '--config', 'vite.browser.config.ts'], {
   cwd: root,
   stdio: 'inherit',
   shell: true,

@@ -1,7 +1,7 @@
 import { useSyncedState } from '@/hooks/useSyncedState';
 import { useTranslation } from 'react-i18next';
 import { Copy, Image as ImageIcon, Trash2 } from 'lucide-react';
-import { ASPECT_PRESETS, PLATFORM_PRESETS, findClip, formatMs, newId, numberToFps, type Clip, type Command, type Effect, type ProjectDocument } from '@sevenvid/core';
+import { ASPECT_PRESETS, PLATFORM_PRESETS, findClip, formatMs, newId, numberToFps, type Clip, type Command, type Effect, type ProjectDocument } from '@sevenstudios/core';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
 import { useEditorStore } from '@/store/editorStore';

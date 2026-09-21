@@ -1,4 +1,4 @@
-import type { CapabilityId } from '@sevenvid/core';
+import type { CapabilityId } from '@sevenstudios/core';
 
 export interface ModelFile {
   url: string;

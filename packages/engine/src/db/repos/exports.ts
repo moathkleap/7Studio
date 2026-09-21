@@ -1,4 +1,4 @@
-import type { AppErrorInfo } from '@sevenvid/core';
+import type { AppErrorInfo } from '@sevenstudios/core';
 import type { Row, SqlDriver } from '../driver';
 import { nowIso, num, parseJson, str } from './common';
 

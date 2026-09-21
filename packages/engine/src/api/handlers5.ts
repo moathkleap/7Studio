@@ -1,5 +1,5 @@
-import type { ApiHandlers } from '@sevenvid/ipc';
-import type { Character, Script } from '@sevenvid/core';
+import type { ApiHandlers } from '@sevenstudios/ipc';
+import type { Character, Script } from '@sevenstudios/core';
 import type { EngineServices } from './createEngine';
 
 export type CreatorChannel =

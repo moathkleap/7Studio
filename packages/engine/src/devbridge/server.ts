@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { isChannel, type ChannelName } from '@sevenvid/ipc';
+import { isChannel, type ChannelName } from '@sevenstudios/ipc';
 import { AppError } from '../errors';
 import type { Engine } from '../api/createEngine';
 

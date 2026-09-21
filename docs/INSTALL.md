@@ -64,7 +64,7 @@ pnpm verify:models
 ## Packaging a desktop build
 
 ```bash
-pnpm --filter @sevenvid/desktop package   # electron-vite build && electron-builder
+pnpm --filter @sevenstudios/desktop package   # electron-vite build && electron-builder
 ```
 
 Configuration is in `apps/desktop/electron-builder.yml` (Windows nsis, macOS dmg, Linux AppImage/deb).

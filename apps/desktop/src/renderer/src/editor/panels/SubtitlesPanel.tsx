@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, FileUp, Mic, Plus, Trash2 } from 'lucide-react';
-import { defaultSubtitleStyle, formatMs, newId, type Command, type ProjectDocument, type SubtitleStyle, type SubtitleTrack } from '@sevenvid/core';
-import type { TranscribeResult } from '@sevenvid/ipc';
+import { defaultSubtitleStyle, formatMs, newId, type Command, type ProjectDocument, type SubtitleStyle, type SubtitleTrack } from '@sevenstudios/core';
+import type { TranscribeResult } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { CapabilityGate } from '@/components/CapabilityGate';
 import { FileBrowserDialog } from '@/components/dialogs/FileBrowserDialog';

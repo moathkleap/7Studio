@@ -1,5 +1,5 @@
 {
-  "name": "sevenvid-monorepo",
+  "name": "sevenstudios-monorepo",
   "version": "0.1.0",
   "private": true,
   "description": "7Studio \u2014 local-first AI video editor and AI video creator desktop application",
@@ -9,10 +9,10 @@
     "node": ">=22.13"
   },
   "scripts": {
-    "dev": "pnpm --filter @sevenvid/desktop dev",
+    "dev": "pnpm --filter @sevenstudios/desktop dev",
     "dev:browser": "tsx scripts/dev-browser.ts",
     "devbridge": "tsx packages/engine/src/devbridge/main.ts",
-    "build": "pnpm --filter @sevenvid/desktop build",
+    "build": "pnpm --filter @sevenstudios/desktop build",
     "typecheck": "pnpm -r --parallel typecheck",
     "lint": "eslint \"apps/**/*.{ts,tsx}\" \"packages/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
     "format": "prettier --write .",

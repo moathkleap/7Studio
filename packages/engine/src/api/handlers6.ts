@@ -1,4 +1,4 @@
-import type { ApiHandlers } from '@sevenvid/ipc';
+import type { ApiHandlers } from '@sevenstudios/ipc';
 import type { EngineServices } from './createEngine';
 
 export type ProviderChannel = 'providers.list' | 'providers.get' | 'providers.setConfig' | 'providers.test';

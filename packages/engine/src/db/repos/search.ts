@@ -1,4 +1,4 @@
-import type { SearchResult } from '@sevenvid/ipc';
+import type { SearchResult } from '@sevenstudios/ipc';
 import type { SqlDriver } from '../driver';
 
 export type SearchEntityType = SearchResult['type'];

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, FlaskConical, HardDrive, Play, RefreshCw, Terminal, Trash2 } from 'lucide-react';
-import type { ModelStatusInfo, RuntimeStatus, TaskInfo } from '@sevenvid/ipc';
+import type { ModelStatusInfo, RuntimeStatus, TaskInfo } from '@sevenstudios/ipc';
 import { getApi } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { useAppStore } from '@/store/appStore';

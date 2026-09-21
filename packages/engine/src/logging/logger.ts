@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import pino, { type Logger as PinoLogger } from 'pino';
-import type { LogEntry } from '@sevenvid/ipc';
+import type { LogEntry } from '@sevenstudios/ipc';
 
 export type Logger = PinoLogger;
 

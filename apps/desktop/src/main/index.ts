@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell } from 'electron';
 import { pathToFileURL } from 'node:url';
-import { AppError, createEngine, type Engine } from '@sevenvid/engine';
+import { AppError, createEngine, type Engine } from '@sevenstudios/engine';
 import { createElectronHost } from './host';
 import { buildMenu, type MenuLang } from './menu';
 
@@ -117,7 +117,7 @@ function wireIpc(e: Engine): void {
 }
 
 app.whenReady().then(async () => {
-  app.setAppUserModelId('com.sevenvid.app');
+  app.setAppUserModelId('com.sevenstudios.app');
   engine = createEngine({
     host: createElectronHost(() => mainWindow, isDev),
     paths: { userData: process.env.SEVENVID_USER_DATA ?? app.getPath('userData'), resources: resourcesDir() },

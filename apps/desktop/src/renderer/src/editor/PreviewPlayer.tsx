@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { maskBoxAt, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenvid/core';
+import { maskBoxAt, type MaskTrack, type NormBox, type ProjectDocument } from '@sevenstudios/core';
 import { useEditorStore } from '@/store/editorStore';
 import { useMediaStore } from '@/store/mediaStore';
 import { Badge } from '@/components/ui/Badge';
