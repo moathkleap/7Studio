@@ -1,6 +1,6 @@
 {
   "name": "@sevenstudios/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Pure TypeScript domain core: project document, timeline commands, undo/redo, validation, intent parser",

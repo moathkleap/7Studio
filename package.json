@@ -1,6 +1,6 @@
 {
   "name": "sevenstudios-monorepo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "7Studio \u2014 local-first AI video editor and AI video creator desktop application",
   "license": "MIT",
