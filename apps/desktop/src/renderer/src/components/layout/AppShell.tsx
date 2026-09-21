@@ -10,6 +10,7 @@ import { ErrorDialog } from '../dialogs/ErrorDialog';
 import { RecoveryDialog } from '../dialogs/RecoveryDialog';
 import { TasksPanel } from '../dialogs/TasksPanel';
 import { GlobalSearch } from '../dialogs/GlobalSearch';
+import { AboutDialog } from '../dialogs/AboutDialog';
 import { AssistantPanel } from '@/assistant/AssistantPanel';
 import { useShortcuts } from '@/hooks/useShortcuts';
 import { useAppStore } from '@/store/appStore';
@@ -39,6 +40,7 @@ export function AppShell() {
       <RecoveryDialog />
       <TasksPanel />
       <GlobalSearch />
+      <AboutDialog />
     </div>
   );
 }

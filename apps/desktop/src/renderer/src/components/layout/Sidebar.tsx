@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Activity, Clapperboard, Download, FolderOpen, Home, Image, LayoutTemplate, Monitor, Settings, Share2, Sparkles, Brain } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useSessionStore } from '@/store/sessionStore';
+import { useAppStore } from '@/store/appStore';
 import markUrl from '@/assets/brand/mark.png';
 
 const items = [
@@ -23,15 +24,22 @@ const items = [
 export function Sidebar() {
   const { t } = useTranslation();
   const projectId = useSessionStore((s) => s.projectId);
+  const setAboutOpen = useAppStore((s) => s.setAboutOpen);
   return (
     <nav className="flex h-full w-[212px] shrink-0 flex-col border-e border-border bg-surface" aria-label="main">
-      <div className="flex h-14 items-center gap-2.5 px-5">
+      <button
+        type="button"
+        data-action="about.open"
+        onClick={() => setAboutOpen(true)}
+        title={t('about.title')}
+        className="focus-ring flex h-14 items-center gap-2.5 px-5 text-start transition-colors hover:bg-surface-2"
+      >
         <img src={markUrl} alt="" className="size-8 shrink-0 rounded-lg shadow-sm" />
         <div className="flex min-w-0 flex-col leading-none">
           <span className="text-[15px] font-semibold tracking-tight">7vid</span>
           <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-faint">Seven Studios</span>
         </div>
-      </div>
+      </button>
       <div className="flex flex-1 flex-col gap-0.5 px-3 py-2">
         {items.map(({ to, key, icon: Icon, ...rest }) => {
           const target = (key === 'editor' || key === 'creator') && projectId ? `${to}/${projectId}` : to;

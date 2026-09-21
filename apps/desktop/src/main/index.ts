@@ -157,6 +157,14 @@ function wireIpc(e: Engine): void {
 
 app.whenReady().then(async () => {
   app.setAppUserModelId('com.sevenvid.app');
+  // Native "About" panel content (macOS/Linux); the in-app About dialog covers all platforms.
+  app.setAboutPanelOptions({
+    applicationName: '7vid',
+    applicationVersion: app.getVersion(),
+    version: process.versions.electron ? `Electron ${process.versions.electron}` : '',
+    copyright: `© ${new Date().getFullYear()} Seven Studios`,
+    credits: 'SEVEN STUDIOS — AI Video Editor & Creator',
+  });
   createSplash();
   engine = createEngine({
     host: createElectronHost(() => mainWindow, isDev),

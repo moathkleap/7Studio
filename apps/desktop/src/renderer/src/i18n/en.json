@@ -904,6 +904,19 @@
     "select": "Select {{count}} file(s)",
     "selected": "{{count}} selected"
   },
+  "about": {
+    "title": "About 7vid",
+    "product": "AI Video Editor & Creator",
+    "tagline": "Local-first video editing and creation, powered by AI. Your media never leaves your machine.",
+    "studio": "Seven Studios",
+    "version": "Version",
+    "electron": "Electron",
+    "node": "Node",
+    "platform": "Platform",
+    "github": "Project on GitHub",
+    "docs": "Documentation",
+    "rights": "All rights reserved."
+  },
   "common": {
     "yes": "Yes",
     "no": "No",
