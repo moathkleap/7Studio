@@ -237,6 +237,15 @@ export class AssistantService {
     return { cleared: true };
   }
 
+  /**
+   * Transcribes a spoken request (microphone recording) to text using the local speech-recognition model,
+   * so the user can describe what they want out loud instead of typing. The returned text is fed straight
+   * back into `plan()` by the caller; the request still goes through the same schema and per-step verification.
+   */
+  transcribeVoice(projectId: string, audio: { base64: string; mimeType?: string }, opts: { language?: 'auto' | 'ar' | 'en' } = {}): Promise<{ text: string; language: string; modelId: string; durationMs: number }> {
+    return this.s.subtitles.transcribeRecording(projectId, audio, { language: opts.language });
+  }
+
   private async run(params: ApplyParams, ctx: Ctx): Promise<PlanRunResult> {
     const { projectId, planId } = params;
     const plan = this.s.db.ai.getPlan(planId);
