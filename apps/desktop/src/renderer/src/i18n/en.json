@@ -858,6 +858,14 @@
     "someUnknown": "I did not understand: {{text}}",
     "someFeasible": "{{done}} of {{total}} can run now",
     "noneFeasible": "None of these can run right now — see the reasons above.",
+    "record": "Record a voice request",
+    "recording": "Recording… tap to stop",
+    "stopRecording": "Stop recording",
+    "transcribing": "Transcribing your voice…",
+    "voiceHint": "Speak your request and I will type it out and plan it.",
+    "voiceUnavailable": "Voice input needs a speech-recognition model. Install a Whisper model from AI Models.",
+    "micDenied": "Microphone access was denied. Allow the microphone to use voice requests.",
+    "noSpeech": "I did not hear any speech in the recording. Try again.",
     "help": {
       "title": "What I can do",
       "body": "Trim and cut, remove silence, blur faces or on-screen text, clean up audio, adjust colour, change speed, stabilize, add subtitles, set the aspect ratio for a platform, upscale and export. Just describe it."

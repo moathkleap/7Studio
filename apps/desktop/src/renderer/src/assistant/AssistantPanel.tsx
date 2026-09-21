@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bot, Check, ChevronRight, Loader2, Send, Sparkles, Trash2, TriangleAlert, Undo2, X } from 'lucide-react';
+import { Bot, Check, ChevronRight, Loader2, Mic, Send, Sparkles, Square, Trash2, TriangleAlert, Undo2, X } from 'lucide-react';
 import type { AssistantMessage, AssistantPlan, PlanRunResult, PlanStep, TaskInfo } from '@sevenvid/ipc';
-import { getApi } from '@/api/client';
+import { getApi, RemoteError } from '@/api/client';
 import { useEvent } from '@/api/hooks';
 import { Badge } from '@/components/ui/Badge';
 import { Button, IconButton } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Misc';
+import { MicPermissionError, useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useAppStore } from '@/store/appStore';
 import { useEditorStore } from '@/store/editorStore';
 import { useSessionStore } from '@/store/sessionStore';
@@ -20,6 +21,7 @@ export function AssistantPanel() {
   const lang = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const setOpen = useAppStore((s) => s.setAssistantOpen);
   const reportError = useAppStore((s) => s.reportError);
+  const pushToast = useAppStore((s) => s.pushToast);
   const projectId = useSessionStore((s) => s.projectId);
   const selection = useEditorStore((s) => s.selection);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
@@ -27,6 +29,8 @@ export function AssistantPanel() {
   const [busy, setBusy] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ value: number; message: string | null } | null>(null);
+  const [transcribing, setTranscribing] = useState(false);
+  const recorder = useVoiceRecorder();
   const applyTaskRef = useRef<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -91,6 +95,54 @@ export function AssistantPanel() {
       reportError(err);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const notify = useCallback(
+    (key: string, level: 'info' | 'warning' | 'error' = 'warning') => pushToast({ level, titleKey: key, messageKey: null, params: {}, errorId: null, taskId: null }),
+    [pushToast],
+  );
+
+  // Voice request: record → transcribe locally → drop the text into the box and plan it automatically.
+  const toggleVoice = async () => {
+    if (!projectId || busy || transcribing) return;
+    if (recorder.state === 'recording') {
+      let clip;
+      try {
+        clip = await recorder.stop();
+      } catch (err) {
+        reportError(err);
+        return;
+      }
+      if (!clip || clip.durationMs < 400) {
+        notify('assistant.noSpeech');
+        return;
+      }
+      setTranscribing(true);
+      try {
+        const lang = i18n.language.startsWith('ar') ? 'ar' : 'en';
+        const { text } = await getApi().invoke('assistant.transcribe', { projectId, audioBase64: clip.base64, mimeType: clip.mimeType, language: lang });
+        if (!text.trim()) {
+          notify('assistant.noSpeech');
+          return;
+        }
+        setInput(text);
+        await send(text);
+      } catch (err) {
+        const code = err instanceof RemoteError ? err.info.code : null;
+        if (code === 'NO_SPEECH_FOUND') notify('assistant.noSpeech');
+        else if (code === 'MODEL_NOT_INSTALLED' || code === 'WORKER_UNAVAILABLE') notify('assistant.voiceUnavailable');
+        else reportError(err);
+      } finally {
+        setTranscribing(false);
+      }
+      return;
+    }
+    try {
+      await recorder.start();
+    } catch (err) {
+      if (err instanceof MicPermissionError) notify('assistant.micDenied', 'error');
+      else reportError(err);
     }
   };
 
@@ -191,7 +243,34 @@ export function AssistantPanel() {
           void send(input);
         }}
       >
+        {recorder.state === 'recording' ? (
+          <div className="mb-2 flex items-center gap-2 text-[12px] text-danger" data-testid="assistant-recording">
+            <span className="inline-block size-2 animate-pulse rounded-full bg-danger" />
+            {t('assistant.recording')}
+          </div>
+        ) : transcribing ? (
+          <div className="mb-2 flex items-center gap-2 text-[12px] text-muted" data-testid="assistant-transcribing">
+            <Spinner />
+            {t('assistant.transcribing')}
+          </div>
+        ) : recorder.supported ? (
+          <p className="mb-2 text-[11.5px] text-muted">{t('assistant.voiceHint')}</p>
+        ) : null}
         <div className="flex items-end gap-2">
+          {recorder.supported ? (
+            <IconButton
+              action="assistant.record"
+              label={recorder.state === 'recording' ? t('assistant.stopRecording') : t('assistant.record')}
+              size="md"
+              disabled={!projectId || busy || transcribing}
+              onClick={() => void toggleVoice()}
+              className={recorder.state === 'recording' ? 'bg-danger/15 text-danger hover:bg-danger/20 hover:text-danger' : undefined}
+              data-testid="assistant-record"
+              data-recording={recorder.state === 'recording'}
+            >
+              {recorder.state === 'recording' ? <Square /> : <Mic />}
+            </IconButton>
+          ) : null}
           <textarea
             data-testid="assistant-input"
             value={input}
@@ -203,11 +282,11 @@ export function AssistantPanel() {
               }
             }}
             rows={2}
-            disabled={!projectId || busy}
+            disabled={!projectId || busy || transcribing}
             placeholder={t('assistant.placeholder')}
             className="focus-ring min-h-[40px] flex-1 resize-none rounded-lg border border-border bg-surface-2 px-3 py-2 text-[13px] outline-none disabled:opacity-50"
           />
-          <Button action="assistant.send" variant="primary" icon={busy ? <Loader2 className="animate-spin" /> : <Send />} disabled={!projectId || busy || !input.trim()} onClick={() => void send(input)} data-testid="assistant-send">
+          <Button action="assistant.send" variant="primary" icon={busy ? <Loader2 className="animate-spin" /> : <Send />} disabled={!projectId || busy || transcribing || !input.trim()} onClick={() => void send(input)} data-testid="assistant-send">
             {t('assistant.send')}
           </Button>
         </div>
