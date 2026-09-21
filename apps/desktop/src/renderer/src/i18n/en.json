@@ -544,7 +544,8 @@
       "url": "Trends feed URL",
       "note": "Fetches trend templates (formats, captions, suggested sounds) from an opt-in feed through the privacy-aware network gateway. No copyrighted audio is downloaded or embedded.",
       "enable": "Enable trend sync in Privacy settings",
-      "synced": "Trends synced: {{added}} added, {{updated}} updated"
+      "synced": "Trends synced: {{added}} added, {{updated}} updated",
+      "soundOnPlatform": "add on platform"
     },
     "category": {
       "youtube": "YouTube",

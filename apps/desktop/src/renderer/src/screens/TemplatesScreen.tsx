@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LayoutTemplate, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { LayoutTemplate, Music, RefreshCw, Save, Trash2 } from 'lucide-react';
 import type { TemplateInfo } from '@sevenvid/ipc';
 import { getApi } from '@/api/client';
 import { useAppStore } from '@/store/appStore';
@@ -90,6 +90,16 @@ export function TemplatesScreen() {
                 {tpl.settings ? `${tpl.settings.width}×${tpl.settings.height} · ${tpl.settings.fps} fps` : '—'}
                 {tpl.targetDurationMs ? ` · ${t('templates.targetDuration')} ${formatDuration(tpl.targetDurationMs)}` : ''}
               </div>
+              {tpl.suggestedSound || tpl.hashtags?.length ? (
+                <div className="mt-2 flex flex-wrap items-center gap-1" data-testid="template-trend">
+                  {tpl.suggestedSound ? (
+                    <Badge tone={tpl.suggestedSound.licensed ? 'success' : 'warning'}>
+                      <Music className="size-3" /> {tpl.suggestedSound.name}{tpl.suggestedSound.licensed ? '' : ` · ${t('templates.trends.soundOnPlatform')}`}
+                    </Badge>
+                  ) : null}
+                  {(tpl.hashtags ?? []).slice(0, 3).map((h) => <span key={h} className="text-[11px] text-faint" dir="ltr">#{h}</span>)}
+                </div>
+              ) : null}
               <Button action="templates.use" data-template={tpl.id} variant="primary" size="sm" className="mt-4" onClick={() => setUseTemplate(tpl)}>{t('templates.use')}</Button>
             </div>
           ))}

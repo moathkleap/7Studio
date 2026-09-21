@@ -192,8 +192,13 @@ export class PublishService {
     if (fit.willTrim) warnings.push(`trimmed to the ${Math.round(target.maxDurationMs! / 1000)}s limit for ${target.id}`);
     if (fit.upscales) warnings.push('the source is smaller than the target canvas and was upscaled');
     if (req.strategy === 'blur-fill') warnings.push('blur-fill is not available yet; used crop instead');
-    // A suggested sound is never embedded here; a copyrighted platform sound must be added at upload time.
+    // A copyrighted platform sound is never embedded; it is added from within the platform at upload time.
     if (req.sound && !req.sound.licensed) warnings.push(`suggested sound "${req.sound.name}" is copyrighted and not embedded; add it from within the platform when you upload`);
+    // A cleared (licensed) sound backed by a local file is mixed in as a background bed; a URL-only one cannot be.
+    const soundUrl = req.sound?.licensed ? req.sound.url : null;
+    const embedMusicPath = soundUrl && !/^https?:/i.test(soundUrl) && fs.existsSync(soundUrl) ? soundUrl : null;
+    if (req.sound?.licensed && !embedMusicPath) warnings.push(`cleared sound "${req.sound.name}" has no local file and was not embedded; it is kept as a note`);
+    if (embedMusicPath) warnings.push(`embedded cleared sound "${req.sound!.name}" as a background music bed`);
 
     const seqFps = fpsToNumber(doc.settings.fps);
     const cappedFps = target.maxFps != null && seqFps > target.maxFps ? { num: Math.round(target.maxFps * 1000), den: 1000 } : null;
@@ -218,6 +223,7 @@ export class PublishService {
         signal: ctx.signal,
         scratchDir: path.join(project.dataDir, 'cache', 'publish'),
         finalVideoFilters: reframeFilters(record.strategy, target.width, target.height),
+        backgroundMusic: embedMusicPath ? { path: embedMusicPath, gainDb: -6 } : null,
         onProgress: (ratio, message) => ctx.progress(Math.min(0.9, ratio * 0.9), message),
         onProcess: (_proc, controls) => ctx.setPauseHandlers({ pause: () => void controls.pause(), resume: () => void controls.resume() }),
       });
@@ -249,7 +255,7 @@ export class PublishService {
       }
       fs.writeFileSync(
         path.join(record.dir, 'metadata.json'),
-        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, suggestedSound: req.sound ?? null, project: project.name, createdAt: record.createdAt }, null, 2),
+        JSON.stringify({ platform: target.platform, target: target.id, width: target.width, height: target.height, container: target.container, durationMs: rendered.durationMs, strategy: record.strategy, trimmed: record.trimmed, caption, hashtags, suggestedSound: req.sound ?? null, embeddedSound: Boolean(embedMusicPath), project: project.name, createdAt: record.createdAt }, null, 2),
         'utf8',
       );
 

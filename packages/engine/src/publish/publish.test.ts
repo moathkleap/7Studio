@@ -64,6 +64,7 @@ describe.skipIf(!hasFixtures)('publish packaging', () => {
       // a suggested (copyrighted) sound is carried as advisory metadata, never embedded
       expect(pkg.suggestedSound?.name).toBe('Trending sound');
       expect(meta.suggestedSound.licensed).toBe(false);
+      expect(meta.embeddedSound).toBe(false); // copyrighted sound is never embedded
       expect(pkg.warnings.some((w) => w.includes('not embedded'))).toBe(true);
       const soundNote = fs.readFileSync(path.join(pkg.dir, 'sound.txt'), 'utf8');
       expect(soundNote).toContain('add it from within the app');
