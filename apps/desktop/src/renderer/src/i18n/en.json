@@ -19,7 +19,8 @@
     "export": "Export",
     "settings": "Settings",
     "system": "System",
-    "diagnostics": "Diagnostics"
+    "diagnostics": "Diagnostics",
+    "publish": "Publish"
   },
   "topbar": {
     "noProject": "No project open",
@@ -470,6 +471,53 @@
     "warnings": "Warnings",
     "encoder": "Encoder used"
   },
+  "publish": {
+    "title": "Publish",
+    "subtitle": "Format your video for each platform and export a ready-to-upload package.",
+    "noProject": "Open a project first to publish it.",
+    "empty": "The timeline is empty — add clips before publishing.",
+    "platforms": "Platforms",
+    "selected": "Selected",
+    "caption": "Caption",
+    "captionPlaceholder": "Write a caption for your post…",
+    "hashtags": "Hashtags",
+    "hashtagsPlaceholder": "#travel #sunset #reels",
+    "strategy": "Reframe",
+    "crop": "Crop (fill)",
+    "fit": "Fit (letterbox)",
+    "build": "Build package",
+    "buildAll": "Build selected",
+    "building": "Building…",
+    "needsReframe": "Reframes to {{aspect}}",
+    "sameAspect": "Matches your aspect ratio",
+    "willTrim": "Trims to {{seconds}}s",
+    "upscales": "Upscaled from your resolution",
+    "maxDuration": "Max {{seconds}}s",
+    "noLimit": "No duration limit",
+    "captionLimit": "up to {{n}} chars",
+    "hashtagLimit": "up to {{n}} tags",
+    "openFolder": "Open folder",
+    "openVideo": "Play",
+    "warnings": "Notes",
+    "done": "Ready to upload",
+    "failed": "Failed",
+    "queued": "Queued",
+    "running": "Building",
+    "results": "Packages",
+    "noResults": "No packages built yet.",
+    "size": "{{w}}×{{h}}",
+    "target": {
+      "youtubeVideo": "YouTube video",
+      "youtubeShorts": "YouTube Shorts",
+      "tiktok": "TikTok",
+      "instagramReels": "Instagram Reels",
+      "instagramPost": "Instagram post",
+      "instagramStory": "Instagram story",
+      "facebookFeed": "Facebook feed",
+      "xPost": "X post",
+      "linkedin": "LinkedIn"
+    }
+  },
   "templates": {
     "title": "Templates",
     "subtitle": "Start from platform-ready sequence settings and caption styles.",
@@ -864,7 +912,8 @@
       "light": "Light",
       "system": "System"
     },
-    "phase": "Phase {{phase}}"
+    "phase": "Phase {{phase}}",
+    "auto": "Auto"
   },
   "shortcuts": {
     "playbackToggle": "Play / pause",

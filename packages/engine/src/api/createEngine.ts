@@ -17,6 +17,7 @@ import { SessionManager } from '../project/SessionManager';
 import { TemplateService } from '../project/TemplateService';
 import { MediaService } from '../media/MediaService';
 import { ExportService } from '../export/ExportService';
+import { PublishService } from '../publish/PublishService';
 import { PreviewRenderService } from '../render/PreviewRenderService';
 import { PythonRuntime } from '../worker/PythonRuntime';
 import { WorkerService } from '../worker/WorkerService';
@@ -69,6 +70,7 @@ export interface EngineServices {
   templates: TemplateService;
   media: MediaService;
   exports: ExportService;
+  publish: PublishService;
   previews: PreviewRenderService;
   runtime: PythonRuntime;
   worker: WorkerService;
@@ -124,6 +126,7 @@ export function createEngine(opts: EngineOptions): Engine {
   const media = new MediaService(db, paths, ffmpeg, tasks, sessions, settings, search, bus, logs.child({ module: 'media' }));
   const exportsService = new ExportService(db, paths, ffmpeg, tasks, projects, sessions, settings, bus, logs.child({ module: 'export' }));
   const previews = new PreviewRenderService(paths, ffmpeg, tasks, projects, sessions, exportsService, logs.child({ module: 'render' }));
+  const publish = new PublishService(paths, ffmpeg, tasks, projects, sessions, settings, exportsService, bus, logs.child({ module: 'publish' }));
   const runtime = new PythonRuntime(paths, tasks, logs.child({ module: 'worker' }));
   const models = new ModelManager(db, paths, tasks, bus, logs.child({ module: 'models' }));
   const gateway = new NetworkGateway(db, settings, logs.child({ module: 'network' }));
@@ -138,7 +141,7 @@ export function createEngine(opts: EngineOptions): Engine {
   const providers = new ProvidersService(db, settings, gateway, opts.host, capabilities, bus, logs.child({ module: 'providers' }));
   const assistant = new AssistantService({ db, sessions, tasks, capabilities, settings, bus, logger: logs.child({ module: 'ai' }), audio, vision, subtitles, ocr, enhance, exports: exportsService, providers });
 
-  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator, providers };
+  const services: EngineServices = { host: opts.host, paths, logs, logger, bus, db, settings, tasks, projects, sessions, hardware, capabilities, search, fs: fsService, errors, notifications, ffmpeg, templates, media, exports: exportsService, publish, previews, runtime, worker, models, gateway, audio, vision, subtitles, ocr, enhance, assistant, creator, providers };
   registerCoreCapabilities(services);
   models.setTester((spec, dir) => testModel(services, spec, dir));
   bus.on('models.changed', () => void capabilities.refresh());

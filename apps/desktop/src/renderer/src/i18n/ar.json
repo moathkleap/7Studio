@@ -19,7 +19,8 @@
     "export": "التصدير",
     "settings": "الإعدادات",
     "system": "النظام",
-    "diagnostics": "التشخيص"
+    "diagnostics": "التشخيص",
+    "publish": "نشر"
   },
   "topbar": {
     "noProject": "لا يوجد مشروع مفتوح",
@@ -470,6 +471,53 @@
     "warnings": "تحذيرات",
     "encoder": "المرمّز المستخدم"
   },
+  "publish": {
+    "title": "النشر",
+    "subtitle": "نسّق الفيديو لكل منصة وصدّر حزمة جاهزة للرفع.",
+    "noProject": "افتح مشروعاً أولاً لنشره.",
+    "empty": "الخط الزمني فارغ — أضف مقاطع قبل النشر.",
+    "platforms": "المنصات",
+    "selected": "المحدَّدة",
+    "caption": "التعليق",
+    "captionPlaceholder": "اكتب تعليقاً لمنشورك…",
+    "hashtags": "الوسوم",
+    "hashtagsPlaceholder": "#سفر #غروب #ريلز",
+    "strategy": "إعادة التأطير",
+    "crop": "قص (ملء)",
+    "fit": "احتواء (هوامش)",
+    "build": "بناء الحزمة",
+    "buildAll": "بناء المحدَّد",
+    "building": "جارٍ البناء…",
+    "needsReframe": "سيُعاد التأطير إلى {{aspect}}",
+    "sameAspect": "يطابق نسبة العرض لديك",
+    "willTrim": "سيُقتطع إلى {{seconds}} ث",
+    "upscales": "تكبير من دقتك الحالية",
+    "maxDuration": "حد أقصى {{seconds}} ث",
+    "noLimit": "بلا حد للمدة",
+    "captionLimit": "حتى {{n}} حرف",
+    "hashtagLimit": "حتى {{n}} وسماً",
+    "openFolder": "فتح المجلد",
+    "openVideo": "تشغيل",
+    "warnings": "ملاحظات",
+    "done": "جاهز للرفع",
+    "failed": "فشل",
+    "queued": "في الانتظار",
+    "running": "جارٍ البناء",
+    "results": "الحزم",
+    "noResults": "لا توجد حزم بعد.",
+    "size": "{{w}}×{{h}}",
+    "target": {
+      "youtubeVideo": "فيديو يوتيوب",
+      "youtubeShorts": "يوتيوب شورتس",
+      "tiktok": "تيك توك",
+      "instagramReels": "إنستغرام ريلز",
+      "instagramPost": "منشور إنستغرام",
+      "instagramStory": "قصة إنستغرام",
+      "facebookFeed": "فيسبوك",
+      "xPost": "منشور X",
+      "linkedin": "لينكدإن"
+    }
+  },
   "templates": {
     "title": "القوالب",
     "subtitle": "ابدأ من إعدادات تسلسل جاهزة للمنصات وأنماط ترجمة.",
@@ -864,7 +912,8 @@
       "light": "فاتح",
       "system": "النظام"
     },
-    "phase": "المرحلة {{phase}}"
+    "phase": "المرحلة {{phase}}",
+    "auto": "تلقائي"
   },
   "shortcuts": {
     "playbackToggle": "تشغيل / إيقاف",

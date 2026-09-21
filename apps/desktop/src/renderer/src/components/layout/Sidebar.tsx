@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Activity, Clapperboard, Download, FolderOpen, Home, Image, LayoutTemplate, Monitor, Settings, Sparkles, Brain } from 'lucide-react';
+import { Activity, Clapperboard, Download, FolderOpen, Home, Image, LayoutTemplate, Monitor, Settings, Share2, Sparkles, Brain } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useSessionStore } from '@/store/sessionStore';
 
@@ -13,6 +13,7 @@ const items = [
   { to: '/models', key: 'models', icon: Brain },
   { to: '/templates', key: 'templates', icon: LayoutTemplate },
   { to: '/export', key: 'export', icon: Download },
+  { to: '/publish', key: 'publish', icon: Share2 },
   { to: '/settings', key: 'settings', icon: Settings },
   { to: '/system', key: 'system', icon: Monitor },
   { to: '/diagnostics', key: 'diagnostics', icon: Activity },

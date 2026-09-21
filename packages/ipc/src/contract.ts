@@ -41,6 +41,9 @@ import {
   ScriptIoSchema,
   CharacterIoSchema,
   ProviderStatusSchema,
+  PublishTargetInfoSchema,
+  PublishPackageSchema,
+  ReframeStrategySchema,
 } from './schemas';
 
 const Void = z.void().or(z.undefined()).or(z.null());
@@ -135,6 +138,10 @@ export const channels = {
   'export.start': { input: z.object({ projectId: z.string(), settings: ExportSettingsInputSchema, outputPath: z.string().nullable().optional(), fileName: z.string().nullable().optional() }), output: ExportInfoSchema },
   'export.get': { input: z.object({ exportId: z.string() }), output: ExportInfoSchema.nullable() },
   'export.estimate': { input: z.object({ projectId: z.string(), settings: ExportSettingsInputSchema, outputPath: z.string().nullable().optional() }), output: z.object({ estimatedBytes: z.number(), requiredBytes: z.number(), freeBytes: z.number().nullable(), enoughSpace: z.boolean(), durationMs: z.number(), videoBitrateKbps: z.number(), targetDir: z.string() }) },
+  'publish.targets': { input: z.object({ projectId: z.string().nullable().optional() }).optional(), output: z.array(PublishTargetInfoSchema) },
+  'publish.build': { input: z.object({ projectId: z.string(), targetId: z.string(), strategy: ReframeStrategySchema.optional(), caption: z.string().optional(), hashtags: z.string().optional(), outputDir: z.string().nullable().optional() }), output: PublishPackageSchema },
+  'publish.get': { input: z.object({ id: z.string() }), output: PublishPackageSchema.nullable() },
+  'publish.recent': { input: z.object({ limit: z.number().optional() }).optional(), output: z.array(PublishPackageSchema) },
   'export.encoders': { input: z.object({ verify: z.boolean().optional() }).optional(), output: z.object({ available: z.array(z.string()), hardware: z.array(z.string()), verified: z.record(z.string(), z.object({ ok: z.boolean(), error: z.string().nullable(), ms: z.number() })) }) },
   'render.previewRange': { input: z.object({ projectId: z.string(), startMs: z.number(), endMs: z.number() }), output: TaskInfoSchema },
   'render.extractFrame': { input: z.object({ projectId: z.string(), tMs: z.number() }), output: TaskInfoSchema },
@@ -212,6 +219,7 @@ export const events = {
   'models.changed': z.object({ modelId: z.string() }),
   'assets.changed': z.object({ projectId: z.string().nullable(), assetId: z.string(), reason: z.enum(['imported', 'analyzed', 'proxy', 'updated', 'removed', 'relinked']) }),
   'exports.changed': z.object({ exportId: z.string(), status: z.string() }),
+  'publish.changed': z.object({ packageId: z.string(), status: z.string() }),
   'assistant.updated': z.object({ projectId: z.string(), planId: z.string(), result: PlanRunResultSchema.nullable() }),
   'creator.updated': z.object({ projectId: z.string() }),
   'providers.changed': z.object({ providerId: z.string() }),

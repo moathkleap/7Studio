@@ -64,6 +64,13 @@ An honest account of what has been verified, and how. Status legend:
   `WorkerService.segmentPerson` / `faceLandmarksImage`. A background-blur render and a landmark-based
   precise face mask are the natural UI features to build on them next.
 
+### Publish
+- ✅ Reframes a project to each platform's canvas (crop/fit), trims to the platform duration limit, extracts
+  a thumbnail, writes caption + normalized hashtags + metadata, and validates the output by measurement
+  (engine + E2E tests build real TikTok 1080×1920 and YouTube 1920×1080 packages).
+- ⏭️ Direct posting to social accounts (OAuth per platform) is not built — the current feature formats and
+  packages for manual upload; nothing leaves the machine.
+
 ### Cross-cutting
 - ✅ i18n (ar/en) at key parity with full RTL/LTR; dark/light theming.
 - ✅ Security: contextIsolation, sandbox, `nodeIntegration:false`, `webSecurity`, strict production CSP,

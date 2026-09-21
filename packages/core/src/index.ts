@@ -7,6 +7,7 @@ export * from './document/commands';
 export * from './document/history';
 export * from './document/validate';
 export * from './presets';
+export * from './publish';
 export * from './settings';
 export * from './shortcuts';
 export * from './capabilities';

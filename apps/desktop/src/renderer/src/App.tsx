@@ -18,6 +18,7 @@ const CreatorScreen = lazy(() => import('./screens/CreatorScreen').then((m) => (
 const ModelsScreen = lazy(() => import('./screens/ModelsScreen').then((m) => ({ default: m.ModelsScreen })));
 const MediaScreen = lazy(() => import('./screens/MediaScreen').then((m) => ({ default: m.MediaScreen })));
 const ExportScreen = lazy(() => import('./screens/ExportScreen').then((m) => ({ default: m.ExportScreen })));
+const PublishScreen = lazy(() => import('./screens/PublishScreen').then((m) => ({ default: m.PublishScreen })));
 
 const router = createHashRouter([
   {
@@ -32,6 +33,7 @@ const router = createHashRouter([
       { path: 'models', element: <ModelsScreen /> },
       { path: 'templates', element: <TemplatesScreen /> },
       { path: 'export', element: <ExportScreen /> },
+      { path: 'publish', element: <PublishScreen /> },
       { path: 'settings/:section?', element: <SettingsScreen /> },
       { path: 'system', element: <SystemScreen /> },
       { path: 'diagnostics', element: <DiagnosticsScreen /> },

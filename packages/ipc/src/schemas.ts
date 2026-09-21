@@ -231,6 +231,57 @@ export const ExportInfoSchema = z.object({
 });
 export type ExportInfo = z.infer<typeof ExportInfoSchema>;
 
+export const ReframeStrategySchema = z.enum(['crop', 'fit', 'blur-fill']);
+
+export const PublishFitSchema = z.object({
+  targetId: z.string(),
+  sourceAspect: z.number(),
+  targetAspect: z.number(),
+  needsReframe: z.boolean(),
+  upscales: z.boolean(),
+  overByMs: z.number(),
+  willTrim: z.boolean(),
+});
+
+export const PublishTargetInfoSchema = z.object({
+  id: z.string(),
+  platform: z.string(),
+  nameKey: z.string(),
+  width: z.number(),
+  height: z.number(),
+  maxFps: z.number().nullable(),
+  maxDurationMs: z.number().nullable(),
+  container: z.string(),
+  aspectLabel: z.string(),
+  captionMax: z.number(),
+  hashtagMax: z.number(),
+  defaultStrategy: ReframeStrategySchema,
+  fit: PublishFitSchema.nullable(),
+});
+export type PublishTargetInfo = z.infer<typeof PublishTargetInfoSchema>;
+
+export const PublishPackageSchema = z.object({
+  id: z.string(),
+  projectId: z.string(),
+  targetId: z.string(),
+  taskId: z.string().nullable(),
+  status: z.enum(['queued', 'running', 'done', 'failed']),
+  dir: z.string(),
+  videoPath: z.string(),
+  thumbnailPath: z.string().nullable(),
+  captionPath: z.string().nullable(),
+  width: z.number(),
+  height: z.number(),
+  durationMs: z.number(),
+  strategy: ReframeStrategySchema,
+  trimmed: z.boolean(),
+  warnings: z.array(z.string()),
+  validation: z.record(z.string(), z.unknown()).nullable(),
+  error: z.string().nullable(),
+  createdAt: z.string(),
+});
+export type PublishPackage = z.infer<typeof PublishPackageSchema>;
+
 export const NetworkLogEntrySchema = z.object({
   id: z.number(),
   ts: z.string(),
