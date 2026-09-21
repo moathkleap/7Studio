@@ -7,7 +7,12 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin({ exclude: ['@sevenvid/core', '@sevenvid/ipc', '@sevenvid/engine'] })],
     build: {
-      rollupOptions: { input: { index: resolve(__dirname, 'src/main/index.ts') } },
+      rollupOptions: {
+        input: { index: resolve(__dirname, 'src/main/index.ts') },
+        // `ws` (used by the dev bridge) optionally requires these native addons; they are not installed and
+        // ws falls back to pure JS. Mark them external so the bundler does not try to resolve them.
+        external: ['bufferutil', 'utf-8-validate'],
+      },
     },
   },
   preload: {
