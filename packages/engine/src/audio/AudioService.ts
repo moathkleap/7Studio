@@ -90,6 +90,25 @@ export class AudioService {
     return this.tasks.enqueue({ kind: 'audio.previewEnhance', params: opts, projectId: opts.projectId, priority: 3 });
   }
 
+  /**
+   * Decodes an arbitrary audio (or video) file — e.g. a voice recording from the assistant microphone —
+   * into a mono 16 kHz PCM WAV suitable for speech recognition. Handles any container FFmpeg can read
+   * (WebM/Opus, Ogg, MP4, WAV, …) and strips video, so the caller never depends on the recorder format.
+   */
+  async transcodeToWav(input: string, out: string, opts: { sampleRate?: number; channels?: number; signal?: AbortSignal } = {}): Promise<string> {
+    const ffmpeg = this.requireFfmpeg();
+    if (!fs.existsSync(input)) throw new AppError({ code: 'FILE_NOT_FOUND', operation: 'audio.transcode', message: 'Recording not found' });
+    await runFfmpeg({
+      ffmpeg,
+      args: ['-nostdin', '-y', '-i', input, '-vn', '-ac', String(opts.channels ?? 1), '-ar', String(opts.sampleRate ?? 16000), '-c:a', 'pcm_s16le', out],
+      logger: this.logger,
+      signal: opts.signal,
+      operation: 'audio.transcode',
+    });
+    if (!fs.existsSync(out) || fs.statSync(out).size < 100) throw new AppError({ code: 'RENDER_FAILED', operation: 'audio.transcode', message: 'Could not decode the recording' });
+    return out;
+  }
+
   /** Renders the mixed timeline audio for a range to a WAV file (what the user would hear). */
   async renderAudio(doc: ProjectDocument, projectId: string, range: Range, out: string, opts: { sampleRate: number; channels: number; bypass?: CompileOptions['bypass']; signal?: AbortSignal; onProgress?: (r: number) => void }): Promise<string> {
     const ffmpeg = this.requireFfmpeg();

@@ -183,6 +183,7 @@ export const channels = {
   'assistant.history': { input: z.object({ projectId: z.string() }), output: z.array(AssistantMessageSchema) },
   'assistant.clear': { input: z.object({ projectId: z.string() }), output: z.object({ cleared: z.boolean() }) },
   'assistant.meta': { input: z.object({ projectId: z.string(), action: z.enum(['undo', 'redo']) }), output: SessionStateSchema },
+  'assistant.transcribe': { input: z.object({ projectId: z.string(), audioBase64: z.string().min(1), mimeType: z.string().optional(), language: z.enum(['auto', 'ar', 'en']).optional() }), output: z.object({ text: z.string(), language: z.string(), modelId: z.string(), durationMs: z.number() }) },
   // ---- creator (phase 5) ----
   'creator.state': { input: z.object({ projectId: z.string() }), output: CreatorStateSchema },
   'creator.setBrief': { input: z.object({ projectId: z.string(), brief: BriefInputSchema }), output: CreatorStateSchema },

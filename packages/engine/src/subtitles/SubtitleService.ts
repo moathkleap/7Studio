@@ -56,6 +56,50 @@ export class SubtitleService {
     return STT_MODEL_IDS.find((id) => this.models.isInstalled(id)) ?? null;
   }
 
+  /**
+   * Transcribes a one-off voice recording (base64-encoded audio bytes from the microphone) to plain text,
+   * without touching the timeline or creating a subtitle track. Used by the AI assistant so a user can
+   * speak a request instead of typing it. Runs through the same local Whisper model and worker as subtitles;
+   * nothing leaves the machine. The temporary audio files are always removed.
+   */
+  async transcribeRecording(
+    projectId: string,
+    audio: { base64: string; mimeType?: string },
+    opts: { language?: 'auto' | 'ar' | 'en'; signal?: AbortSignal } = {},
+  ): Promise<{ text: string; language: string; modelId: string; durationMs: number }> {
+    this.projects.get(projectId);
+    const modelId = this.installedSttModel();
+    if (!modelId) throw new AppError({ code: 'MODEL_NOT_INSTALLED', operation: 'assistant.transcribe', message: 'No speech-recognition model is installed (install a Whisper model from AI Models)', details: { candidates: STT_MODEL_IDS } });
+    if (!this.capabilities.isAvailable('stt')) {
+      const cap = this.capabilities.status('stt');
+      throw new AppError({ code: cap.status === 'needs-runtime' ? 'WORKER_UNAVAILABLE' : 'MODEL_NOT_INSTALLED', operation: 'assistant.transcribe', message: `Speech recognition is not available (${cap.status})`, details: { capability: cap } });
+    }
+    const bytes = Buffer.from(audio.base64, 'base64');
+    if (bytes.length < 64) throw new AppError({ code: 'VALIDATION_FAILED', operation: 'assistant.transcribe', message: 'The recording is empty' });
+
+    const dir = path.join(this.projects.get(projectId).dataDir, 'cache', 'audio');
+    fs.mkdirSync(dir, { recursive: true });
+    const raw = path.join(dir, `voice-${newId()}.${extForMime(audio.mimeType)}`);
+    const wav = path.join(dir, `voice-${newId()}.wav`);
+    fs.writeFileSync(raw, bytes);
+    try {
+      await this.audio.transcodeToWav(raw, wav, { sampleRate: 16000, channels: 1, signal: opts.signal });
+      const res = await this.worker.transcribe(wav, { modelId, language: opts.language ?? 'auto', signal: opts.signal });
+      const text = res.segments
+        .map((s) => s.text.trim())
+        .filter(Boolean)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!text) throw new AppError({ code: 'NO_SPEECH_FOUND', operation: 'assistant.transcribe', message: 'No speech was recognized in the recording', details: { modelId } });
+      this.logger.info({ module: 'subtitles', operation: 'assistant.transcribe', projectId, chars: text.length, language: res.language, modelId, device: res.device }, 'voice request transcribed');
+      return { text, language: res.language, modelId, durationMs: Math.round(res.duration_ms) };
+    } finally {
+      fs.rmSync(raw, { force: true });
+      fs.rmSync(wav, { force: true });
+    }
+  }
+
   startTranscribe(opts: TranscribeOptions): TaskInfo {
     this.sessions.get(opts.projectId);
     const modelId = this.installedSttModel(opts.modelId);
@@ -160,4 +204,15 @@ export class SubtitleService {
     this.logger.info({ module: 'subtitles', operation: 'export', file, format, cues: track.cues.length }, 'subtitles exported');
     return { path: file, cues: track.cues.length };
   }
+}
+
+/** Maps a recorder MIME type to a sensible file extension so FFmpeg can sniff the container reliably. */
+function extForMime(mimeType?: string): string {
+  const m = (mimeType ?? '').toLowerCase();
+  if (m.includes('webm')) return 'webm';
+  if (m.includes('ogg') || m.includes('opus')) return 'ogg';
+  if (m.includes('mp4') || m.includes('m4a') || m.includes('aac')) return 'm4a';
+  if (m.includes('mpeg') || m.includes('mp3')) return 'mp3';
+  if (m.includes('wav') || m.includes('x-wav') || m.includes('pcm')) return 'wav';
+  return 'webm';
 }

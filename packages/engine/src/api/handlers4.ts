@@ -1,9 +1,9 @@
 import type { ApiHandlers } from '@sevenstudios/ipc';
 import type { EngineServices } from './createEngine';
 
-export type AssistantChannel = 'assistant.plan' | 'assistant.apply' | 'assistant.history' | 'assistant.clear' | 'assistant.meta';
+export type AssistantChannel = 'assistant.plan' | 'assistant.apply' | 'assistant.history' | 'assistant.clear' | 'assistant.meta' | 'assistant.transcribe';
 
-/** Phase 4 handlers: the AI assistant (plan, apply, history, undo/redo). */
+/** Phase 4 handlers: the AI assistant (plan, apply, history, undo/redo, voice transcription). */
 export function createAssistantHandlers(s: EngineServices): Pick<ApiHandlers, AssistantChannel> {
   return {
     'assistant.plan': ({ projectId, text, selectedClipIds, choices }) => s.assistant.plan(projectId, text, { selectedClipIds, choices }),
@@ -11,5 +11,6 @@ export function createAssistantHandlers(s: EngineServices): Pick<ApiHandlers, As
     'assistant.history': ({ projectId }) => s.assistant.history(projectId),
     'assistant.clear': ({ projectId }) => s.assistant.clear(projectId),
     'assistant.meta': ({ projectId, action }) => s.assistant.meta(projectId, action),
+    'assistant.transcribe': ({ projectId, audioBase64, mimeType, language }) => s.assistant.transcribeVoice(projectId, { base64: audioBase64, mimeType }, { language }),
   };
 }

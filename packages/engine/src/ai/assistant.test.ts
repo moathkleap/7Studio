@@ -108,4 +108,15 @@ describe.skipIf(!hasFixtures)('assistant service', () => {
     await engine.invoke('assistant.clear', { projectId: project.id });
     expect(await engine.invoke('assistant.history', { projectId: project.id })).toHaveLength(0);
   });
+
+  it('refuses a voice request honestly when no speech model is installed, and rejects an empty recording', async () => {
+    const { project } = await setup();
+    const sample = Buffer.from('a'.repeat(256)).toString('base64');
+    if (!engine.subtitles.installedSttModel()) {
+      // no Whisper model here: voice input must report a model error, never pretend to have heard something
+      await expect(engine.invoke('assistant.transcribe', { projectId: project.id, audioBase64: sample, mimeType: 'audio/webm', language: 'ar' })).rejects.toMatchObject({ info: { code: 'MODEL_NOT_INSTALLED' } });
+    }
+    // an empty recording is rejected up front regardless of model state
+    await expect(engine.invoke('assistant.transcribe', { projectId: project.id, audioBase64: '', mimeType: 'audio/webm' })).rejects.toBeTruthy();
+  });
 });

@@ -78,6 +78,20 @@ function installCsp(): void {
   });
 }
 
+/**
+ * Grants the microphone to the app's own content only — needed for the AI assistant's voice input — and
+ * denies every other permission (camera, geolocation, notifications, …). Recording is processed locally by
+ * the speech-recognition worker; nothing is sent anywhere.
+ */
+function installPermissions(): void {
+  const isLocal = (url: string) => url.startsWith('file:') || url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1');
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback, details) => {
+    const mediaTypes = (details as { mediaTypes?: string[] }).mediaTypes;
+    callback(permission === 'media' && !!mediaTypes?.includes('audio') && !mediaTypes.includes('video') && isLocal(details.requestingUrl ?? ''));
+  });
+  session.defaultSession.setPermissionCheckHandler((_wc, permission, requestingOrigin) => permission === 'media' && (requestingOrigin.startsWith('file:') || requestingOrigin.startsWith('http://localhost') || requestingOrigin.startsWith('http://127.0.0.1')));
+}
+
 /** Serves local media the engine allows (assets and derived cache files) with Range support via net.fetch. */
 function installMediaProtocol(e: Engine): void {
   protocol.handle('sevenstudios-media', (request) => {
@@ -126,6 +140,7 @@ app.whenReady().then(async () => {
   wireIpc(engine);
   installMediaProtocol(engine);
   installCsp();
+  installPermissions();
   installMenu(engine);
   // Rebuild the native menu in the selected language whenever the UI language setting changes.
   let menuLang = resolveMenuLang(engine.settings.get().general.language);
