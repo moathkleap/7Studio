@@ -10,7 +10,7 @@ import { isExternalUrlAllowed } from './host';
 export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreChannel> {
   return {
     'app.info': () => ({
-      name: '7vid',
+      name: '7Studio',
       version: s.host.appVersion,
       platform: process.platform,
       arch: process.arch,
@@ -85,7 +85,7 @@ export function createCoreHandlers(s: EngineServices): Pick<ApiHandlers, CoreCha
       }
       const dir = input?.targetDir ?? s.paths.exports;
       fs.mkdirSync(dir, { recursive: true });
-      const file = path.join(dir, `7vid-diagnostics-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`);
+      const file = path.join(dir, `7studio-diagnostics-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`);
       const buf = zip.toBuffer();
       fs.writeFileSync(file, buf);
       return { path: file, sizeBytes: buf.length };

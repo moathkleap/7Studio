@@ -1,9 +1,9 @@
-# 7vid
+# 7Studio
 
-**7vid** is a local-first desktop application for AI-assisted video editing and AI video creation.
+**7Studio** is a local-first desktop application for AI-assisted video editing and AI video creation.
 Every operation runs on your machine by default; cloud providers are optional, opt-in and clearly labeled.
 
-> **الوصف بالعربية:** 7vid تطبيق سطح مكتب يعمل محلياً أولاً لتحرير الفيديو وتوليده بالذكاء الاصطناعي.
+> **الوصف بالعربية:** 7Studio تطبيق سطح مكتب يعمل محلياً أولاً لتحرير الفيديو وتوليده بالذكاء الاصطناعي.
 > كل العمليات تعمل على جهازك افتراضياً؛ المزوّدون السحابيون اختياريون ويُفعَّلون صراحةً مع تنبيه واضح.
 > خطة البناء الكاملة (المعمارية، خريطة الوحدات، قاعدة البيانات، المزوّدون، خارطة الطريق) في [`docs/PLAN.ar.md`](docs/PLAN.ar.md).
 

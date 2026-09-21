@@ -2,10 +2,10 @@
   "name": "@sevenvid/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "7vid desktop application (Electron shell + React renderer)",
-  "productName": "7vid",
+  "description": "7Studio desktop application (Electron shell + React renderer)",
+  "productName": "7Studio",
   "main": "./out/main/index.js",
-  "author": "7vid",
+  "author": "7Studio",
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
