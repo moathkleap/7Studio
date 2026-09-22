@@ -76,6 +76,21 @@ Run the `.exe`, choose the install folder and Seven Studios appears in the Start
 The installers are **not code-signed** yet, so Windows SmartScreen shows "Windows protected your PC" on
 first run: click *More info* → *Run anyway*. macOS asks to right-click → *Open* the first time.
 
+### If the app opens to a blue "Electron" welcome screen
+
+That screen is Electron's built-in placeholder. It appears only when the executable is launched **without the
+`resources` folder that must sit next to it** — for example when the bare `Seven Studios.exe` is copied out of
+its folder onto the desktop, or when an install was interrupted or blocked by antivirus.
+
+Fix it by launching the app the intended way:
+
+1. Run the **installer** (`Seven Studios-Setup-<version>-<arch>.exe`) and let the wizard finish.
+2. Open the app from the **Seven Studios** shortcut it creates on the desktop and in the Start menu — not by
+   copying the `.exe` somewhere else.
+
+If you want a portable copy, move or zip the **whole** install folder (the `.exe` plus its `resources` and
+`locales` folders together), never the `.exe` on its own.
+
 The packaged app still needs **FFmpeg on the PATH** (Windows: `winget install Gyan.FFmpeg`) unless static
 binaries were bundled under `resources/bin/<platform>-<arch>/` before packaging. AI features are set up from
 inside the app (**AI Models → Set up runtime**), which creates its own Python environment.

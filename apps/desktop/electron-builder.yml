@@ -59,6 +59,7 @@ npmRebuild: false
 electronLanguages: ['en', 'ar']
 
 win:
+  icon: build-resources/icon.ico
   target:
     - target: nsis
       arch: [x64, arm64]
@@ -69,6 +70,17 @@ nsis:
   perMachine: false
   allowToChangeInstallationDirectory: true
   deleteAppDataOnUninstall: false
+  # A branded, named shortcut on the desktop and in the Start menu, plus the offer to launch on finish,
+  # so the app is opened from its shortcut (beside its resources) and never as a bare, resource-less exe.
+  shortcutName: Seven Studios
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  menuCategory: false
+  runAfterFinish: true
+  installerIcon: build-resources/icon.ico
+  uninstallerIcon: build-resources/icon.ico
+  installerHeaderIcon: build-resources/icon.ico
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
 
 mac:
   category: public.app-category.video
