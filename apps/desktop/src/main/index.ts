@@ -157,6 +157,12 @@ function wireIpc(e: Engine): void {
 
 app.whenReady().then(async () => {
   app.setAppUserModelId('com.sevenstudios.app');
+  // Chromium's spellchecker downloads a Hunspell dictionary for the OS locale from redirector.gvt1.com as soon
+  // as a session exists, even for windows created with `spellcheck: false`. The app must not contact the
+  // network outside the gateway, so the spellchecker is disabled and its language list emptied before any
+  // window opens (verified with a Chromium net log: no request leaves the app at startup afterwards).
+  session.defaultSession.setSpellCheckerEnabled(false);
+  session.defaultSession.setSpellCheckerLanguages([]);
   // Native "About" panel content (macOS/Linux); the in-app About dialog covers all platforms.
   app.setAboutPanelOptions({
     applicationName: 'Seven Studios',
