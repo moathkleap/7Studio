@@ -222,7 +222,9 @@ function registerCoreCapabilities(s: EngineServices): void {
   const ffmpegGate = (): Partial<CapabilityReport> =>
     ffmpegOk()
       ? { status: 'available', providerId: 'ffmpeg', external: false, action: { type: 'none', target: null } }
-      : { status: 'needs-runtime', reasonKey: 'capabilities.ffmpegMissing', action: { type: 'open-settings', target: 'system' }, external: false };
+      : // FFmpeg is a runtime dependency surfaced on the System screen — route there (like the tts gate), not to a
+        // non-existent "system" settings section, so the capability's next-step button lands where FFmpeg is shown.
+        { status: 'needs-runtime', reasonKey: 'capabilities.ffmpegMissing', action: { type: 'setup-runtime', target: null }, external: false };
   for (const id of ['media.import', 'media.proxy', 'edit.basic', 'render.export', 'audio.enhance', 'enhance.video', 'stabilize', 'interpolate', 'upscale.lanczos'] as const) {
     s.capabilities.register(id, ffmpegGate);
   }
