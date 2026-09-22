@@ -58,6 +58,12 @@ tests               Playwright end-to-end tests (browser mode + Electron)
 
 Capabilities that need a model, a runtime or hardware this machine lacks are shown as such in the interface, with the reason and the next step.
 
+## Install
+
+Installers for Windows (`.exe`), macOS (`.dmg`) and Linux (`.AppImage`/`.deb`) are published on the
+[Releases](https://github.com/moathkleap/7Studio/releases) page by the *Desktop release* workflow; see
+[`docs/INSTALL.md`](docs/INSTALL.md) for details and for building one locally.
+
 ## Development
 
 ```bash

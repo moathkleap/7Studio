@@ -4,6 +4,9 @@
 # apps/desktop/build-resources/ before a release build; electron-builder picks them up from buildResources.
 appId: com.sevenstudios.app
 productName: Seven Studios
+# The npm package is @sevenstudios/desktop; without this the executable would be called "@sevenstudiosdesktop",
+# which AppImage rejects as an unsafe file name.
+executableName: seven-studios
 copyright: Copyright © 2026 Seven Studios
 
 directories:
@@ -24,10 +27,6 @@ files:
 extraResources:
   - from: ../../resources/fonts
     to: resources/fonts
-  - from: ../../resources/models
-    to: resources/models
-  - from: ../../resources/presets
-    to: resources/presets
   - from: ../../resources/templates
     to: resources/templates
   - from: ../../resources/test
