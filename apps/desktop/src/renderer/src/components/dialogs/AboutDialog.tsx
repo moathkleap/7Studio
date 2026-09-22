@@ -6,8 +6,8 @@ import { Dialog } from '../ui/Dialog';
 import { Button } from '../ui/Button';
 import markUrl from '@/assets/brand/mark.png';
 
-const REPO_URL = 'https://github.com/moathkleap/7vid';
-const DOCS_URL = 'https://github.com/moathkleap/7vid/tree/HEAD/docs';
+const REPO_URL = 'https://github.com/moathkleap/7Studio';
+const DOCS_URL = 'https://github.com/moathkleap/7Studio/tree/HEAD/docs';
 
 function openExternal(url: string): void {
   void getApi().invoke('shell.openExternal', { url }).catch(() => undefined);

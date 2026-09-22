@@ -26,8 +26,8 @@ sudo apt-get install ffmpeg espeak-ng fonts-noto-core libegl1 libgles2
 ## From source
 
 ```bash
-git clone https://github.com/moathkleap/7vid.git
-cd Seven Studios
+git clone https://github.com/moathkleap/7Studio.git
+cd 7Studio
 corepack enable
 pnpm install
 pnpm build            # or: pnpm dev  (Electron)  /  pnpm dev:browser  (no Electron)
