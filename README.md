@@ -90,6 +90,7 @@ directory, or the system `PATH`.
 
 - No telemetry. The setting exists only to show that it cannot be enabled.
 - No hidden network calls: every outbound request goes through the network gateway and is logged.
+- Third-party runtime telemetry is switched off: ONNX Runtime's built-in Microsoft telemetry uploader is disabled (`ORT_DISABLE_TELEMETRY=1`) for the Python worker.
 - Original media files are never modified.
 
 ## Documentation

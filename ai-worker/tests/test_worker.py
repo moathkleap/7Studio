@@ -167,3 +167,10 @@ def test_music_generate_requires_local_model(ctx, tmp_path):
     with pytest.raises(WorkerError) as exc:
         music.generate({"prompt": "calm lofi", "out_path": str(tmp_path / "m.wav"), "model_path": None}, ctx)
     assert exc.value.code == "MODEL_NOT_INSTALLED"
+
+
+def test_worker_disables_onnxruntime_telemetry():
+    """Importing the worker package must opt out of ONNX Runtime's built-in telemetry uploader."""
+    import sevenstudios_worker  # noqa: F401
+
+    assert os.environ.get("ORT_DISABLE_TELEMETRY") == "1"

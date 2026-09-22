@@ -71,6 +71,7 @@ type Progress = (ratio: number, message: string | null) => void;
 /** High-level, typed access to the Python worker plus capability reporting derived from real probes. */
 export class WorkerService {
   private client: WorkerClient | null = null;
+  private starting: Promise<WorkerClient> | null = null;
   private lastHello: WorkerHello | null = null;
   private lastError: string | null = null;
 
@@ -114,11 +115,26 @@ export class WorkerService {
   /** Starts (or reuses) the worker. Throws WORKER_UNAVAILABLE with setup guidance when Python is missing. */
   async ensure(): Promise<WorkerClient> {
     if (this.client?.running) return this.client;
+    // Concurrent callers (the capability probes at startup) must share one start, or each of them spawns its
+    // own Python process and only the last one is kept while the others keep running as orphans.
+    if (this.starting) return this.starting;
+    this.starting = this.startClient().finally(() => {
+      this.starting = null;
+    });
+    return this.starting;
+  }
+
+  private async startClient(): Promise<WorkerClient> {
     const py = await this.runtime.detect();
     if (!py || !py.workerInstalled) {
       throw new AppError({ code: 'WORKER_UNAVAILABLE', operation: 'worker.ensure', message: py ? `Python ${py.version} found at ${py.path} but the Seven Studios worker is not installed` : 'No Python ≥ 3.10 interpreter found', details: { python: py?.path ?? null } });
     }
-    const env: Record<string, string> = { SEVENSTUDIOS_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '' };
+    const env: Record<string, string> = {
+      SEVENSTUDIOS_FFMPEG_PATH: this.ffmpeg.ffmpeg ?? '',
+      // ONNX Runtime's official builds ship Microsoft's 1DS telemetry client and upload trace events on import.
+      // Nothing may leave the machine outside the network gateway, so switch it off before the runtime initializes.
+      ORT_DISABLE_TELEMETRY: '1',
+    };
     if (!py.venvReady) env.PYTHONPATH = this.runtime.workerSourceDir;
     const client = new WorkerClient(py.path, this.runtime.workerSourceDir, env, this.logger);
     try {
