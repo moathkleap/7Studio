@@ -1,0 +1,87 @@
+# Builds installable desktop packages and attaches them to a GitHub Release.
+#
+# - Push a tag like `v0.1.0` to build and publish a release.
+# - Or run it manually (Actions → Desktop release → Run workflow) to get the installers as workflow
+#   artifacts without publishing a release.
+#
+# The Windows job produces `Seven Studios-<version>-x64.exe` / `-arm64.exe` (NSIS installer).
+# Installers are unsigned: Windows SmartScreen shows a warning on first run until a code-signing
+# certificate is configured (see docs/INSTALL.md).
+name: Desktop release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows (x64, arm64)
+            os: windows-latest
+            args: --win nsis --x64 --arm64
+            artifact: windows
+            files: |
+              apps/desktop/release/*.exe
+              apps/desktop/release/*.exe.blockmap
+          - name: Linux (x64)
+            os: ubuntu-latest
+            args: --linux AppImage deb --x64
+            artifact: linux
+            files: |
+              apps/desktop/release/*.AppImage
+              apps/desktop/release/*.deb
+          - name: macOS (x64, arm64)
+            os: macos-latest
+            args: --mac dmg --x64 --arm64
+            artifact: macos
+            files: |
+              apps/desktop/release/*.dmg
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm (pinned by packageManager)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build renderer, preload and main
+        run: pnpm --filter @sevenstudios/desktop build
+
+      - name: Package
+        run: pnpm --filter @sevenstudios/desktop exec electron-builder ${{ matrix.args }} --publish never
+        env:
+          # No signing identity is configured; do not try to discover one on macOS.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: seven-studios-${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.files }}
+          generate_release_notes: true

@@ -5,8 +5,12 @@
   "description": "Seven Studios desktop application (Electron shell + React renderer)",
   "productName": "Seven Studios",
   "main": "./out/main/index.js",
-  "author": "Seven Studios",
+  "author": {
+    "name": "Seven Studios",
+    "email": "moathkleap@users.noreply.github.com"
+  },
   "license": "MIT",
+  "homepage": "https://github.com/moathkleap/7Studio",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",

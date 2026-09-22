@@ -61,12 +61,39 @@ Verify installed models from the command line:
 pnpm verify:models
 ```
 
-## Packaging a desktop build
+## Installing the desktop app (Windows, macOS, Linux)
+
+Ready-made installers are built by the **Desktop release** GitHub Actions workflow
+(`.github/workflows/release.yml`):
+
+- Push a tag such as `v0.1.0` and the workflow publishes a GitHub Release with
+  `Seven Studios-<version>-x64.exe` / `-arm64.exe` (Windows NSIS installer), `.dmg` (macOS) and
+  `.AppImage` / `.deb` (Linux) attached.
+- Or start it manually (Actions → *Desktop release* → *Run workflow*) and download the installers from
+  the run's artifacts.
+
+Run the `.exe`, choose the install folder and Seven Studios appears in the Start menu and on the desktop.
+The installers are **not code-signed** yet, so Windows SmartScreen shows "Windows protected your PC" on
+first run: click *More info* → *Run anyway*. macOS asks to right-click → *Open* the first time.
+
+The packaged app still needs **FFmpeg on the PATH** (Windows: `winget install Gyan.FFmpeg`) unless static
+binaries were bundled under `resources/bin/<platform>-<arch>/` before packaging. AI features are set up from
+inside the app (**AI Models → Set up runtime**), which creates its own Python environment.
+
+## Packaging a desktop build locally
 
 ```bash
-pnpm --filter @sevenstudios/desktop package   # electron-vite build && electron-builder
+pnpm --filter @sevenstudios/desktop package   # electron-vite build && electron-builder for the current OS
 ```
 
-Configuration is in `apps/desktop/electron-builder.yml` (Windows nsis, macOS dmg, Linux AppImage/deb).
+The installer lands in `apps/desktop/release/`. Configuration is in `apps/desktop/electron-builder.yml`
+(Windows nsis, macOS dmg, Linux AppImage/deb); icons are in `apps/desktop/build-resources/`.
 Before a release build, optionally place static FFmpeg binaries in `resources/bin/<platform>-<arch>/`
-(see `resources/bin/README.md`) and app icons in `apps/desktop/build-resources/`.
+(see `resources/bin/README.md`).
+
+Notes:
+
+- On Windows, electron-builder extracts a tools archive that contains symbolic links; if packaging fails
+  with *"Cannot create symbolic link"*, enable **Developer Mode** (Settings → For developers) or run the
+  terminal as administrator once, then retry.
+- Building the Windows installer on Linux additionally needs `wine` (the CI workflow uses a Windows runner).
