@@ -31,7 +31,7 @@ export function buildMenu(opts: { isDev: boolean; lang: MenuLang; openExternal: 
       ],
     },
     { label: s.window, submenu: [{ role: 'minimize' }, { role: 'zoom' }, ...(isMac ? [{ type: 'separator' as const }, { role: 'front' as const }] : [{ role: 'close' as const }])] },
-    { role: 'help', submenu: [{ label: s.githubProject, click: () => opts.openExternal('https://github.com/moathkleap/7vid') }] },
+    { role: 'help', submenu: [{ label: s.githubProject, click: () => opts.openExternal('https://github.com/moathkleap/7Studio') }] },
   ];
   return Menu.buildFromTemplate(template);
 }
